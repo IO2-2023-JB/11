@@ -15,12 +15,15 @@ namespace YouTubeV2.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IBlobImageService _blobImageService;
         private readonly RegisterDtoValidator _registerDtoValidator;
+        private readonly UserIDValidator _userIDValidator;
 
-        public UserService(UserManager<User> userManager, IBlobImageService blobImageService, RegisterDtoValidator registerDtoValidator)
+        public UserService(UserManager<User> userManager, IBlobImageService blobImageService, RegisterDtoValidator registerDtoValidator,
+            UserIDValidator userIDValidator)
         {
             _userManager = userManager;
             _blobImageService = blobImageService;
             _registerDtoValidator = registerDtoValidator;
+            _userIDValidator = userIDValidator;
         }
 
         public async Task RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken)
@@ -52,6 +55,26 @@ namespace YouTubeV2.Application.Services
             var newUser = await _userManager.FindByEmailAsync(registerDto.email);
             byte[] image = Convert.FromBase64String(registerDto.avatarImage);
             await _blobImageService.UploadProfilePictureAsync(image, user.Id, cancellationToken);
+        }
+
+        public async Task DeleteAsync(string userID, CancellationToken cancellationToken)
+        {
+            await _userIDValidator.ValidateAndThrowAsync(userID);
+
+            var user = await _userManager.FindByIdAsync(userID);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            foreach (var role in userRoles)
+            {
+                var roleResult = await _userManager.RemoveFromRoleAsync(user, role);
+                if (!roleResult.Succeeded)
+                    throw new BadRequestException(roleResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
+            }
+
+            var deleteResult = await _userManager.DeleteAsync(user);
+            if (!deleteResult.Succeeded)
+                throw new BadRequestException(deleteResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
+
         }
     }
 }
