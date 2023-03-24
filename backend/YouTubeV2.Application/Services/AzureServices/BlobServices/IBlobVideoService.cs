@@ -2,5 +2,6 @@
 {
     public interface IBlobVideoService
     {
+        Task<byte[]> GetVideoAsync(string fileName, Range bytesRange, CancellationToken cancellationToken = default);
     }
 }

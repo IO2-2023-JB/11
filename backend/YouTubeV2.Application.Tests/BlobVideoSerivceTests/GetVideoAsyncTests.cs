@@ -57,5 +57,49 @@ namespace YouTubeV2.Application.Tests.BlobVideoSerivceTests
             for (int i = range.Start.Value; i <= range.End.Value; i++)
                 buffer[i - range.Start.Value].Should().Be(_entireStreamBuffer[i]);
         }
+
+        [TestMethod]
+        public async Task GetVideoTryingToGetBytesStartingInRangeAndEndingOutOfRangeOfStreamShouldReturnBufferBeingShorter()
+        {
+            // ARRANGE
+            System.Range range = new System.Range(15, 20);
+
+            // ACT
+            byte[] buffer = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
+
+            // ASSERT
+            buffer.Length.Should().Be(_entireStreamBuffer.Length - range.Start.Value);
+            for (int i = range.Start.Value; i < _entireStreamBuffer.Length; i++)
+                buffer[i - range.Start.Value].Should().Be(_entireStreamBuffer[i]);
+        }
+
+        [TestMethod]
+        public async Task GetVideoTryingToGetBytesStartingOutOfRangeOfStreamShouldReturnBufferBeingShorter()
+        {
+            // ARRANGE
+            System.Range range = new System.Range(20, 25);
+
+            // ACT
+            byte[] buffer = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
+
+            // ASSERT
+            buffer.Length.Should().Be(0);
+        }
+
+        [TestMethod]
+        public void GetVideoThatDoesntExistShouldThrowAnException()
+        {
+            // ARRANGE
+            System.Range range = new System.Range(1, 4);
+            _blobClientMock
+                .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Response.FromValue(false, new Mock<Response>().Object));
+
+            // ACT
+            Func<Task> action = async () => await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
+
+            // ASSERT
+            action.Should().ThrowAsync<FileNotFoundException>().WithMessage($"There is no video with fileName {It.IsAny<string>()}");
+        }
     }
 }

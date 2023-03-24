@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Microsoft.Extensions.Options;
-using System.IO;
 using YouTubeV2.Application.Configurations.BlobStorage;
 
 namespace YouTubeV2.Application.Services.AzureServices.BlobServices
