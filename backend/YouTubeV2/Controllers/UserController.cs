@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Text;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Services;
+using Newtonsoft.Json;
 
 namespace YouTubeV2.Api.Controllers
 {
@@ -29,5 +31,14 @@ namespace YouTubeV2.Api.Controllers
 
             return Ok();
         }
+
+        [HttpGet("/user")]
+        public async Task<ActionResult<UserDTO>> GetAsync([FromQuery] string userID, CancellationToken cancellationToken)
+        {
+            var userDTO = await _userService.GetAsync(userID, cancellationToken);
+
+            return userDTO;
+        }
+        
     }
 }

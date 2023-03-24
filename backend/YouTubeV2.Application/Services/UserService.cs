@@ -74,7 +74,23 @@ namespace YouTubeV2.Application.Services
             var deleteResult = await _userManager.DeleteAsync(user);
             if (!deleteResult.Succeeded)
                 throw new BadRequestException(deleteResult.Errors.Select(error => new ErrorResponseDTO(error.Description)));
+        }
 
+        private UserDTO GetUserDTO(User user, string userRole)
+        {
+            return new UserDTO(user.Id, user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
+                userRole, String.Empty, user.SubscriptionsCount);
+        }
+
+        public async Task<UserDTO> GetAsync(string userID, CancellationToken cancellationToken)
+        {
+            await _userIDValidator.ValidateAndThrowAsync(userID);
+
+            var user = await _userManager.FindByIdAsync(userID);
+            var userRoles = await _userManager.GetRolesAsync(user);
+            UserDTO userDTO = GetUserDTO(user, userRoles.First());
+
+            return userDTO;
         }
     }
 }

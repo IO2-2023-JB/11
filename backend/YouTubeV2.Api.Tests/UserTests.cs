@@ -96,5 +96,51 @@ namespace YouTubeV2.Api.Tests
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+        [TestMethod]
+        public async Task GetShouldReturnData()
+        {
+            // Arrange
+            var httpClient = _webApplicationFactory.CreateClient();
+            var registerDto = new RegisterDto("adress@adress.com", "Seniorek", "Generatorik", "Frajdusi", "asdf1243@#$GJH", Role.Simple, "");
+            var stringContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8, "application/json");
+            await httpClient.PostAsync("register", stringContent);
+
+            string userID = String.Empty;
+            await _webApplicationFactory.DoWithinScope<UserManager<User>>(
+                async userManager =>
+                {
+                    User user = await userManager.FindByEmailAsync(registerDto.email);
+                    userID = user.Id;
+                });
+
+            // Act
+            var path = QueryHelpers.AddQueryString("user", "userID", userID);
+            HttpResponseMessage response = await httpClient.GetAsync(path);
+
+            // Assert
+            response.Content.Should().NotBeNull();
+            string responseString = await response.Content.ReadAsStringAsync();
+            responseString.Should().NotBeNull().Should().NotBe(string.Empty);
+            var userDTO = JsonConvert.DeserializeObject<UserDTO>(responseString);
+            await _webApplicationFactory.DoWithinScope<UserManager<User>>(
+                async userManager =>
+                {
+                    User userResult = await userManager.FindByEmailAsync(registerDto.email);
+
+                    userResult.Name.Should().Be(userDTO.name);
+                    userResult.Surname.Should().Be(userDTO.surname);
+                    userResult.UserName.Should().Be(userDTO.nickname);
+                    userResult.Email.Should().Be(userDTO.email);
+                    userResult.AccountBalance.Should().Be(userDTO.accountBalance);
+                    userResult.SubscriptionsCount.Should().Be(userDTO.subscriptionsCount);
+                    userResult.Id.Should().Be(userDTO.id);
+
+                    var roles = await userManager.GetRolesAsync(userResult);
+                    roles.First().Should().Be(userDTO.userType);
+                });
+
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        }
     }
 }
