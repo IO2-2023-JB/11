@@ -21,6 +21,11 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
         public async Task UploadProfilePictureAsync(byte[] bytes, string fileName, CancellationToken cancellationToken = default) =>
             await UploadImageAsync(bytes, fileName, _blobStorageConfig.UserAvatarsContainerName, cancellationToken);
 
+        public Uri GetVideoThumbnail(string fileName) => GetImageUrl(fileName, _blobStorageConfig.VideoThumbnailsContainerName);
+
+        public async Task UploadVideoThumbnailAsync(byte[] bytes, string fileName, CancellationToken cancellationToken = default) =>
+            await UploadImageAsync(bytes, fileName, _blobStorageConfig.VideoThumbnailsContainerName, cancellationToken);
+
         private Uri GetImageUrl(string fileName, string blobContainerName)
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
