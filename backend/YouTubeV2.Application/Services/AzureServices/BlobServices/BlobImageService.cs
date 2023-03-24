@@ -1,16 +1,16 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
-using YouTubeV2.Application.Configurations;
+using YouTubeV2.Application.Configurations.BlobStorage;
 
 namespace YouTubeV2.Application.Services.AzureServices.BlobServices
 {
     public class BlobImageService : IBlobImageService
     {
         private readonly BlobServiceClient _blobServiceClient;
-        private readonly BlobStorageConfig _blobStorageConfig;
+        private readonly BlobStorageImagesConfig _blobStorageConfig;
 
-        public BlobImageService(BlobServiceClient blobServiceClient, IOptions<BlobStorageConfig> blobStorageConfig)
+        public BlobImageService(BlobServiceClient blobServiceClient, IOptions<BlobStorageImagesConfig> blobStorageConfig)
         {
             _blobServiceClient = blobServiceClient;
             _blobStorageConfig = blobStorageConfig.Value;

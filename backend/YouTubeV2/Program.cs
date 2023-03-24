@@ -3,7 +3,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
-using YouTubeV2.Application.Configurations;
+using YouTubeV2.Application.Configurations.BlobStorage;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
@@ -18,15 +18,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddOptions<BlobStorageConfig>().Bind(builder.Configuration.GetSection("BlobStorage"));
+builder.Services.AddOptions<BlobStorageImagesConfig>().Bind(builder.Configuration.GetSection("BlobStorageImagesConfig"));
+builder.Services.AddOptions<BlobStorageVideosConfig>().Bind(builder.Configuration.GetSection("BlobStorageVideosConfig"));
 
 string connectionString = builder.Configuration.GetConnectionString("Db")!;
 builder.Services.AddDbContext<YTContext>(
     options => options.UseSqlServer(connectionString));
 
 builder.Services.AddTransient<UserService>();
-builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_IMAGES_BLOB_STORAGE_CONNECTION_STRING")));
+builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
 builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
+builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
