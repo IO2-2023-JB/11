@@ -25,10 +25,10 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
 
             using var memoryStream = new MemoryStream();
             await blobClient.DownloadToAsync(memoryStream);
-            int bufferSize = bytesRange.End.Value - bytesRange.Start.Value + 1;
-            var buffer = new byte[bufferSize];
-            int bytesRead = await memoryStream.ReadAsync(buffer, bytesRange.Start.Value, bufferSize, cancellationToken);
-            return buffer[..(bytesRead - 1)];
+            memoryStream.Seek(bytesRange.Start.Value, SeekOrigin.Begin);
+            var buffer = new byte[bytesRange.End.Value - bytesRange.Start.Value + 1];
+            int bytesRead = await memoryStream.ReadAsync(buffer, cancellationToken);
+            return buffer[..bytesRead];
         }
     }
 }
