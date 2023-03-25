@@ -21,6 +21,9 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
         public async Task UploadProfilePictureAsync(byte[] bytes, string fileName, CancellationToken cancellationToken = default) =>
             await UploadImageAsync(bytes, fileName, _blobStorageConfig.UserAvatarsContainerName, cancellationToken);
 
+        public async Task DeleteProfilePictureAsync(string fileName, CancellationToken cancellationToken = default) =>
+            await DeleteImageAsync(fileName, _blobStorageConfig.UserAvatarsContainerName, cancellationToken);
+
         private Uri GetImageUrl(string fileName, string blobContainerName)
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
@@ -36,6 +39,13 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
                 new BinaryData(bytes),
                 new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = "image/png" } },
                 cancellationToken);
+        }
+
+        private async Task DeleteImageAsync(string fileName, string blobContainerName, CancellationToken cancellationToken = default)
+        {
+            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
+            await blobClient.DeleteAsync();
         }
     }
 }
