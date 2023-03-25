@@ -42,7 +42,7 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.VideosContainerName);
             BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
             await blobClient.UploadAsync(
-                videoStrem,
+                videoStream,
                 new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = "video/mp4" } },
                 cancellationToken);
         }
