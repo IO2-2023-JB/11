@@ -5,10 +5,10 @@ namespace YouTubeV2.Application.Model
 {
     public class User : IdentityUser
     {
-        public string Name { get; init; }
-        public string Surname { get; init; }
-        public decimal AccountBalance { get; init; }
-        public int SubscriptionsCount { get; init; }
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public decimal AccountBalance { get; set; }
+        public int SubscriptionsCount { get; set; }
         public User() { }
 
         public User(RegisterDto registerDto)

@@ -25,5 +25,9 @@ namespace YouTubeV2.Application.Exceptions
         {
             Errors = errors;
         }
+        public BadRequestException(ErrorResponseDTO errors)
+        {
+            Errors = new[] { errors };
+        }
     }
 }

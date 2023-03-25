@@ -45,7 +45,10 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
             BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
-            await blobClient.DeleteAsync();
+            bool exists = await blobClient.ExistsAsync();
+
+            if (exists)
+                await blobClient.DeleteAsync();
         }
     }
 }
