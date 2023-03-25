@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
 using Microsoft.Extensions.Options;
 using YouTubeV2.Application.Configurations.BlobStorage;
 
@@ -34,6 +35,16 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
             var buffer = new byte[bytesRange.End.Value - bytesRange.Start.Value + 1];
             int bytesRead = await memoryStream.ReadAsync(buffer, cancellationToken);
             return buffer[..bytesRead];
+        }
+
+        public async Task UploadVideoAsync(string fileName, Stream videoStream, CancellationToken cancellationToken = default)
+        {
+            BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.VideosContainerName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
+            await blobClient.UploadAsync(
+                videoStrem,
+                new BlobUploadOptions { HttpHeaders = new BlobHttpHeaders { ContentType = "video/mp4" } },
+                cancellationToken);
         }
     }
 }
