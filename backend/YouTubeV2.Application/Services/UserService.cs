@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Threading;
@@ -62,7 +63,7 @@ namespace YouTubeV2.Application.Services
 
         public async Task DeleteAsync(string userID, CancellationToken cancellationToken)
         {
-            await _userIDValidator.ValidateAndThrowAsync(userID);
+            await _userIDValidator.ValidateAndThrowAsync(userID, cancellationToken);
 
             var user = await _userManager.FindByIdAsync(userID);
             var userRoles = await _userManager.GetRolesAsync(user);
@@ -83,18 +84,27 @@ namespace YouTubeV2.Application.Services
 
         public async Task<UserDTO> GetAsync(string userID, CancellationToken cancellationToken)
         {
-            await _userIDValidator.ValidateAndThrowAsync(userID);
+            await _userIDValidator.ValidateAndThrowAsync(userID, cancellationToken);
 
             var user = await _userManager.FindByIdAsync(userID);
+
+            return await GetDTOForUser(user);
+        }
+        private async Task<UserDTO> GetDTOForUser(User user)
+        {
             var imageUri = _blobImageService.GetProfilePicture(user.Id);
+            var topRoleName = await GetTopRoleForUserAsync(user);
 
+            return new UserDTO(user.Id, user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
+                topRoleName, imageUri.ToString(), user.SubscriptionsCount);
+        }
+        private async Task<string> GetTopRoleForUserAsync(User user)
+        {
             var userRoles = await _userManager.GetRolesAsync(user);
-            string topRole = userRoles.Contains(Role.Creator, StringComparer.InvariantCultureIgnoreCase) ? Role.Creator : Role.Simple;
+            string topRoleName = userRoles.Contains(Role.Creator, StringComparer.InvariantCultureIgnoreCase) 
+                ? Role.Creator : Role.Simple;
 
-            UserDTO userDTO = new UserDTO(user.Id, user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
-                topRole, imageUri.ToString(), user.SubscriptionsCount);
-
-            return userDTO;
+            return topRoleName;
         }
 
         public async Task EditAsync(UserDTO userDTO, CancellationToken cancellationToken)
@@ -111,8 +121,8 @@ namespace YouTubeV2.Application.Services
                 await _blobImageService.UploadProfilePictureAsync(image, user.Id, cancellationToken);
             }
 
-            await VerifyEmailUnique(user);
-            await VerifyNameUnique(user);
+            await VerifyEmailUniqueAsync(user);
+            await VerifyNameUniqueAsync(user);
 
             user.Email = userDTO.email;
             user.UserName = userDTO.nickname;
@@ -121,31 +131,29 @@ namespace YouTubeV2.Application.Services
             user.AccountBalance = userDTO.accountBalance;
             user.SubscriptionsCount = userDTO.subscriptionsCount;
 
+            var topRoleName = await GetTopRoleForUserAsync(user);
 
-            var userRoles = await _userManager.GetRolesAsync(user);
-            string topRole = userRoles.Contains(Role.Creator, StringComparer.InvariantCultureIgnoreCase) ? Role.Creator : Role.Simple;
-
-            if (topRole != userDTO.userType)
-                await EditUserRole(user, topRole);
+            if (topRoleName != userDTO.userType)
+                await EditUserRoleAsync(user, topRoleName);
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
                 throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
         }
 
-        private async Task VerifyEmailUnique(User user)
+        private async Task VerifyEmailUniqueAsync(User user)
         {
             var userFound = await _userManager.FindByEmailAsync(user.Email);
             if (userFound != null && userFound != user)
                 throw new BadRequestException(new ErrorResponseDTO("User with this email already exists"));
         }
-        private async Task VerifyNameUnique(User user)
+        private async Task VerifyNameUniqueAsync(User user)
         {
             var userFound = await _userManager.FindByNameAsync(user.UserName);
             if (userFound != null && userFound != user)
                 throw new BadRequestException(new ErrorResponseDTO("User with this nickname already exists"));
         }
-        private async Task EditUserRole(User user, string topRole)
+        private async Task EditUserRoleAsync(User user, string topRole)
         {
             if (topRole == Role.Simple)
             {
@@ -159,6 +167,71 @@ namespace YouTubeV2.Application.Services
                 if (!result.Succeeded)
                     throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
             }
+        }
+        public async Task<IEnumerable<UserDTO>> SearchAsync(string query, SortingDirections sortingDirection, 
+            SortingTypes sortingType, DateTime dateBegin, DateTime dateEnd, CancellationToken cancellationToken)
+        {
+            var searchableUsers = await _userManager.GetUsersInRoleAsync(Role.Creator);
+            var matchingUsers = searchableUsers.Select(user => user).Where(user => user.UserName.
+                Contains(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
+
+            ClipUsersBasedOnDate(ref matchingUsers, dateBegin, dateEnd);
+            SortUsers(ref matchingUsers, sortingDirection, sortingType);
+            
+            List<UserDTO> result = new List<UserDTO>();
+            foreach (var user in matchingUsers)
+            {
+                var userDTO = await GetDTOForUser(user);
+                result.Add(userDTO);
+            }
+
+            return result;
+        }
+        private void ClipUsersBasedOnDate(ref List<User> users, DateTime dateBegin, DateTime dateEnd)
+        {
+            if (dateBegin > dateEnd)
+                throw new BadRequestException(new ErrorResponseDTO("Begin date cannot be bigger than end date"));
+
+            if (dateBegin != DateTime.MinValue)
+                users = users.Select(user => user).Where(user => user.AccountCreationDate > dateBegin).ToList();
+            if (dateBegin != DateTime.MinValue)
+                users = users.Select(user => user).Where(user => user.AccountCreationDate < dateEnd).ToList();
+        }
+        private void SortUsers(ref List<User> usres, SortingDirections sortingDirection, SortingTypes sortingType)
+        {
+            switch (sortingType)
+            {
+                case SortingTypes.Alphabetical:
+                    SortUsersAlphabetical(ref usres, sortingDirection);
+                    break;
+                case SortingTypes.PublishDate:
+                    SortUsersPublish(ref usres, sortingDirection);
+                    break;
+                case SortingTypes.Popularity:
+                    SortUsersPopularity(ref usres, sortingDirection);
+                    break;
+            }
+        }
+        private void SortUsersAlphabetical(ref List<User> users, SortingDirections sortingDirection)
+        {
+            if (sortingDirection == SortingDirections.Ascending)
+                users = users.OrderBy(x => x.UserName).ToList();
+            else
+                users = users.OrderByDescending(x => x.UserName).ToList();
+        }
+        private void SortUsersPublish(ref List<User> users, SortingDirections sortingDirection)
+        {
+            if (sortingDirection == SortingDirections.Ascending)
+                users = users.OrderBy(x => x.AccountCreationDate).ToList();
+            else
+                users = users.OrderByDescending(x => x.AccountCreationDate).ToList();
+        }
+        private void SortUsersPopularity(ref List<User> users, SortingDirections sortingDirection)
+        {
+            if (sortingDirection == SortingDirections.Ascending)
+                users = users.OrderBy(x => x.SubscriptionsCount).ToList();
+            else
+                users = users.OrderByDescending(x => x.SubscriptionsCount).ToList();
         }
     }
 }

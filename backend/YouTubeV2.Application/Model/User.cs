@@ -9,6 +9,7 @@ namespace YouTubeV2.Application.Model
         public string Surname { get; set; }
         public decimal AccountBalance { get; set; }
         public int SubscriptionsCount { get; set; }
+        public DateTime AccountCreationDate { get; init; }
         public User() { }
 
         public User(RegisterDto registerDto)
@@ -20,6 +21,7 @@ namespace YouTubeV2.Application.Model
 
             AccountBalance = 0;
             SubscriptionsCount = 0;
+            AccountCreationDate = DateTime.Now;
         }
     }
 }

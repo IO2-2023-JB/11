@@ -3,6 +3,7 @@ using System.Text;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Services;
 using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace YouTubeV2.Api.Controllers
 {
@@ -40,7 +41,7 @@ namespace YouTubeV2.Api.Controllers
             return userDTO;
         }
         [HttpPut("/user")]
-        public async Task<IActionResult> PutAsync([FromBody] UserDTO userDTO, CancellationToken cancellationToken)
+        public async Task<IActionResult> PutAsync([FromBody][Required] UserDTO userDTO, CancellationToken cancellationToken)
         {
             await _userService.EditAsync(userDTO, cancellationToken);
 
