@@ -21,10 +21,8 @@ namespace YouTubeV2.Api.Controllers
             [FromQuery] DateTime beginDate, [FromQuery] DateTime endDate, 
             CancellationToken cancellationToken)
         {
-            SearchResultsDTO result = await _searchService.SearchAsync(query, sortingType, 
+            return await _searchService.SearchAsync(query, sortingType, 
                 sortingCriterion, beginDate, endDate, cancellationToken);
-
-            return result;
         }
     }
 }

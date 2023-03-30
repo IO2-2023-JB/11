@@ -1,8 +1,0 @@
-﻿################################################################################
-# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
-################################################################################
-
-/.vs
-/backend/YouTubeV2/.config
-/backend/YouTubeV2/Properties
-/frontend/angular.json

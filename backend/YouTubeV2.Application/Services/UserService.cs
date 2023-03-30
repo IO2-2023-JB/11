@@ -39,18 +39,7 @@ namespace YouTubeV2.Application.Services
             if (!result.Succeeded)
                 throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
 
-            if (registerDto.userType.Equals(Role.Simple, StringComparison.InvariantCultureIgnoreCase)) result = await _userManager.AddToRoleAsync(user, Role.Simple);
-            else if (registerDto.userType.Equals(Role.Creator, StringComparison.InvariantCultureIgnoreCase))
-            {
-                result = await _userManager.AddToRoleAsync(user, Role.Simple);
-
-                if (!result.Succeeded)
-                    throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
-
-                result = await _userManager.AddToRoleAsync(user, Role.Creator);
-            }
-
-
+            result = await _userManager.AddToRoleAsync(user, registerDto.userType);
             if (!result.Succeeded)
                 throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
 
@@ -93,30 +82,27 @@ namespace YouTubeV2.Application.Services
         private async Task<UserDTO> GetDTOForUser(User user)
         {
             var imageUri = _blobImageService.GetProfilePicture(user.Id);
-            var topRoleName = await GetTopRoleForUserAsync(user);
+            var roleName = await GetRoleForUserAsync(user);
 
-            return new UserDTO(user.Id, user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
-                topRoleName, imageUri.ToString(), user.SubscriptionsCount);
+            return new UserDTO(new Guid(user.Id), user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
+                roleName, imageUri.ToString(), user.SubscriptionsCount);
         }
-        private async Task<string> GetTopRoleForUserAsync(User user)
+        private async Task<string> GetRoleForUserAsync(User user)
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
-            string topRoleName = userRoles.Contains(Role.Creator, StringComparer.InvariantCultureIgnoreCase) 
-                ? Role.Creator : Role.Simple;
-
-            return topRoleName;
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles.First();
         }
 
         public async Task EditAsync(UserDTO userDTO, CancellationToken cancellationToken)
         {
-            await _userIDValidator.ValidateAndThrowAsync(userDTO.id);
+            await _userIDValidator.ValidateAndThrowAsync(userDTO.id.ToString());
             await _userDTOValidator.ValidateAndThrowAsync(userDTO);
 
-            var user = await _userManager.FindByIdAsync(userDTO.id);
+            var user = await _userManager.FindByIdAsync(userDTO.id.ToString());
 
+            await _blobImageService.DeleteProfilePictureAsync(user.Id, cancellationToken);
             if (!userDTO.avatarImage.IsNullOrEmpty())
             {
-                await _blobImageService.DeleteProfilePictureAsync(user.Id, cancellationToken);
                 byte[] image = Convert.FromBase64String(userDTO.avatarImage);
                 await _blobImageService.UploadProfilePictureAsync(image, user.Id, cancellationToken);
             }
@@ -131,10 +117,10 @@ namespace YouTubeV2.Application.Services
             user.AccountBalance = userDTO.accountBalance;
             user.SubscriptionsCount = userDTO.subscriptionsCount;
 
-            var topRoleName = await GetTopRoleForUserAsync(user);
+            var currentRoleName = await GetRoleForUserAsync(user);
 
-            if (topRoleName != userDTO.userType)
-                await EditUserRoleAsync(user, topRoleName);
+            if (currentRoleName != userDTO.userType)
+                await SwitchUserRoleAsync(user, currentRoleName, userDTO.userType);
 
             var result = await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
@@ -145,28 +131,23 @@ namespace YouTubeV2.Application.Services
         {
             var userFound = await _userManager.FindByEmailAsync(user.Email);
             if (userFound != null && userFound != user)
-                throw new BadRequestException(new ErrorResponseDTO("User with this email already exists"));
+                throw new BadRequestException("User with this email already exists");
         }
         private async Task VerifyNameUniqueAsync(User user)
         {
             var userFound = await _userManager.FindByNameAsync(user.UserName);
             if (userFound != null && userFound != user)
-                throw new BadRequestException(new ErrorResponseDTO("User with this nickname already exists"));
+                throw new BadRequestException("User with this nickname already exists");
         }
-        private async Task EditUserRoleAsync(User user, string topRole)
+        private async Task SwitchUserRoleAsync(User user, string currentRole, string newRole)
         {
-            if (topRole == Role.Simple)
-            {
-                var result = await _userManager.AddToRoleAsync(user, Role.Creator);
-                if (!result.Succeeded)
-                    throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
-            }
-            else if (topRole == Role.Creator)
-            {
-                var result = await _userManager.RemoveFromRoleAsync(user, Role.Creator);
-                if (!result.Succeeded)
-                    throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
-            }
+            var result = await _userManager.RemoveFromRoleAsync(user, currentRole);
+            if (!result.Succeeded)
+                throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
+
+            result = await _userManager.AddToRoleAsync(user, newRole);
+            if (!result.Succeeded)
+                throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
         }
         public async Task<IEnumerable<UserDTO>> SearchAsync(string query, SortingDirections sortingDirection, 
             SortingTypes sortingType, DateTime dateBegin, DateTime dateEnd, CancellationToken cancellationToken)
@@ -190,7 +171,7 @@ namespace YouTubeV2.Application.Services
         private void ClipUsersBasedOnDate(ref List<User> users, DateTime dateBegin, DateTime dateEnd)
         {
             if (dateBegin > dateEnd)
-                throw new BadRequestException(new ErrorResponseDTO("Begin date cannot be bigger than end date"));
+                throw new BadRequestException("Begin date cannot be bigger than end date");
 
             if (dateBegin != DateTime.MinValue)
                 users = users.Select(user => user).Where(user => user.AccountCreationDate > dateBegin).ToList();

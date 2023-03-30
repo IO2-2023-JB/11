@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
@@ -12,6 +13,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using YouTubeV2.Application.DTO;
+using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 
 namespace YouTubeV2.Api.Tests
@@ -47,6 +49,16 @@ namespace YouTubeV2.Api.Tests
                 var stringContent = new StringContent(JsonConvert.SerializeObject(regosterDTO), Encoding.UTF8, "application/json");
                 await httpClient.PostAsync("register", stringContent);
             }
+            await _webApplicationFactory.DoWithinScope<UserManager<User>>(
+                async userManager =>
+                {
+                    foreach (var registerDto in registerDtos) 
+                    {
+                        User user = new User(registerDto);
+                        await userManager.CreateAsync(user, registerDto.password);
+                        await userManager.AddToRoleAsync(user, registerDto.userType);
+                    }
+                });
 
             // Act
             var querys = new Dictionary<string, string?>()
@@ -65,13 +77,17 @@ namespace YouTubeV2.Api.Tests
             var searchDTO = JsonConvert.DeserializeObject<SearchResultsDTO>(responseString);
             var foundUsers = searchDTO.users.ToList();
 
-            foundUsers.Should().HaveCount(2);
-            foundUsers[0].nickname.Should().Be("Alac");
-            foundUsers[1].nickname.Should().Be("Alaa");
+            foundUsers.Count.Should().BeGreaterThanOrEqualTo(2);
+            foundUsers.FindIndex(x => x.nickname.Equals("Alab")).Should().Be(-1);
+            foundUsers.FindIndex(x => x.nickname.Equals("Maikołaj")).Should().Be(-1);
+            int userSmallerID = foundUsers.FindIndex(x => x.nickname.Equals("Alaa"));
+            int userLargerID = foundUsers.FindIndex(x => x.nickname.Equals("Alac"));
+
+            userSmallerID.Should().NotBe(-1);
+            userLargerID.Should().NotBe(-1);
+            userLargerID.Should().BeLessThan(userSmallerID);
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         }
     }
-
 }

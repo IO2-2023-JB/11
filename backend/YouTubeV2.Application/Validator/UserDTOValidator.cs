@@ -4,12 +4,13 @@ using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Constants;
 using System;
+using FluentValidation.Results;
 
 namespace YouTubeV2.Application.Validator
 {
     public class UserDTOValidator : AbstractValidator<UserDTO>
     {
-        public UserDTOValidator(UserManager<User> userManager)
+        public UserDTOValidator()
         {
             RuleFor(x => x.name).NotNull().Length(1, UserConstants.MaxUserNameLength);
             RuleFor(x => x.surname).NotNull().Length(1, UserConstants.MaxUserSurnameLength);

@@ -12,14 +12,7 @@ namespace YouTubeV2.Application.Validator
         {
             RuleFor(id => id).NotNull().NotEmpty()
                 .MustAsync(async (id, cancellationToken) => await userManager.FindByIdAsync(id) != null)
-                .WithMessage("User with provided ID does not exist")
-                .Must(IsGuid)
-                .WithMessage("Provided ID is not a Guid");
-        }
-
-        private bool IsGuid(string id)
-        {
-            return Guid.TryParse(id, out var _);
+                .WithMessage("User with provided ID does not exist");
         }
     }
 }

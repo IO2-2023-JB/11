@@ -21,9 +21,6 @@ namespace YouTubeV2.Application.Services
         public async Task<SearchResultsDTO> SearchAsync(string query, SortingDirections sortingDirection,
             SortingTypes sortingType, DateTime dateBegin, DateTime dateEnd, CancellationToken cancellationToken)
         {
-            if (query.IsNullOrEmpty())
-                throw new BadRequestException(new ErrorResponseDTO("Query cannot be empty"));
-
             var users = await SearchForUsersAsync(query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
 
             return new SearchResultsDTO(users);

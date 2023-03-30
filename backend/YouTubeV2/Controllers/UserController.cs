@@ -26,17 +26,17 @@ namespace YouTubeV2.Api.Controllers
         }
         // TODO after login - auth 
         [HttpDelete("/user")]
-        public async Task<IActionResult> DeleteAsync([FromQuery] string userID, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteAsync([FromQuery] Guid userID, CancellationToken cancellationToken)
         {
-            await _userService.DeleteAsync(userID, cancellationToken);
+            await _userService.DeleteAsync(userID.ToString(), cancellationToken);
 
             return Ok();
         }
 
         [HttpGet("/user")]
-        public async Task<ActionResult<UserDTO>> GetAsync([FromQuery] string userID, CancellationToken cancellationToken)
+        public async Task<ActionResult<UserDTO>> GetAsync([FromQuery] Guid userID, CancellationToken cancellationToken)
         {
-            var userDTO = await _userService.GetAsync(userID, cancellationToken);
+            var userDTO = await _userService.GetAsync(userID.ToString(), cancellationToken);
 
             return userDTO;
         }

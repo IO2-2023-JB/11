@@ -133,14 +133,13 @@ namespace YouTubeV2.Api.Tests
                     userResult.Email.Should().Be(userDTO.email);
                     userResult.AccountBalance.Should().Be(userDTO.accountBalance);
                     userResult.SubscriptionsCount.Should().Be(userDTO.subscriptionsCount);
-                    userResult.Id.Should().Be(userDTO.id);
+                    userResult.Id.Should().Be(userDTO.id.ToString());
 
                     var roles = await userManager.GetRolesAsync(userResult);
                     roles.First().Should().Be(userDTO.userType);
                 });
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         }
         [TestMethod]
         public async Task PutShouldEditDB()
@@ -159,7 +158,7 @@ namespace YouTubeV2.Api.Tests
                     userID = user.Id;
                 });
 
-            UserDTO userDTO = new UserDTO(userID, "koka@cola.com", "Robert", "Robert", "Kubica", 13, Role.Creator, "", 73);
+            UserDTO userDTO = new UserDTO(new Guid(userID), "koka@cola.com", "Robert", "Robert", "Kubica", 13, Role.Creator, "", 73);
             stringContent = new StringContent(JsonConvert.SerializeObject(userDTO), Encoding.UTF8, "application/json");
 
             // Act
@@ -179,12 +178,11 @@ namespace YouTubeV2.Api.Tests
                     userResult.SubscriptionsCount.Should().Be(userDTO.subscriptionsCount);
 
                     var roles = await userManager.GetRolesAsync(userResult);
-                    roles.Should().Contain(Role.Simple);
-                    roles.Should().Contain(Role.Creator);
+                    roles.Should().HaveCount(1);
+                    roles.First().Should().Be(Role.Creator);
                 });
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
-
         }
     }
 }
