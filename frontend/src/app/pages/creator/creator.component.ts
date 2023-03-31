@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { PlaylistDto } from 'src/app/core/models/playlist-dto';
 import { UserDTO } from 'src/app/core/models/user-dto';
 import { VideoListDto } from 'src/app/core/models/video-list-dto';
@@ -14,38 +14,47 @@ import { VideoService } from 'src/app/core/services/video.service';
   styleUrls: ['./creator.component.scss']
 })
 export class CreatorComponent {
+  videosPerRow: number = 6;
   id!: string;
   user!: UserDTO;
-  videos: VideoMetadataDto[];
-  playlists: PlaylistDto[];
+  videos!: VideoMetadataDto[];
 
   constructor(
     private route: ActivatedRoute, 
     private userService: UserService,
-    private playlistService: PlaylistService,
+    private router: Router,
     private videoService: VideoService
     ) {
     this.id = this.route.snapshot.paramMap.get('id')!;
     userService.getUser(this.id).subscribe(user => this.user = user);
 
-    this.playlists = [];
     this.videos = [];
 
     this.getVideos();
-    this.getPlaylists();
   }
 
   public getVideos() {
-    console.log('Tab 1 selected!');
     this.videoService.getUserVideos(this.id).subscribe(videos => {
       this.videos = videos.videos;
     });
   }
 
-  public getPlaylists() {
-    console.log('Tab 2 selected!');
-    this.playlistService.getUserPlaylists(this.id).subscribe(playlists => {
-      this.playlists = playlists;
-    });
+  getRows(): number[] {
+    const rows = [];
+    for (let i = 0; i < this.videos.length; i += this.videosPerRow) {
+      rows.push(i / this.videosPerRow);
+    }
+    return rows;
+  }
+  
+  getListForRow(row: number): VideoMetadataDto[] {
+    const startIndex = row * this.videosPerRow;
+
+    return this.videos.slice(startIndex, startIndex + this.videosPerRow);
+  }
+
+  public goToUserProfile(id: string): void {
+    console.log(id);
+    this.router.navigate(['creator/' + id]);
   }
 }

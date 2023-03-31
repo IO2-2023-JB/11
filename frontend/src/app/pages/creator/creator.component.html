@@ -1,57 +1,44 @@
-<p-panel header="User Details">  
+<p-panel>  
+  <div class="userProfile">
+    <div class="avatar">
+      <img [src] = "user.avatarImage" class="avatarImage">
+    </div>
+    <div class="userInfo">
+      <div class="p-col">
+        <h2>{{ user.nickname }}</h2>
+      </div>
+      <div class="p-col">
+        <label>{{ user.name }} {{ user.surname }}</label> 
+      </div>
+      <div class="p-col">
+        <label>{{ user.email }}</label> 
+      </div>
+      <div class="p-col">
+        <label>{{ user.subscriptionsCount }} subscribers, {{ videos.length }} videos</label> 
+      </div>
+    </div>
+    <div class="flex align-items-center justify-content-center font-bold text-white border-round m-2">
+      <div class="p-col">
+        <p-button label="Subscribe"></p-button>
+      </div>
+    </div>   
+  </div>
   <p-tabView>
-    <p-tabPanel header="About">
-      <div class="p-grid p-dir-col">
-        <img [src] = "user.avatarImage" class="avatar">
-        <div class="p-col">
-          <label>String:</label> {{ user.string }}
-        </div>
-        <div class="p-col">
-          <label>Email:</label> {{ user.email }}
-        </div>
-        <div class="p-col">
-          <label>Nickname:</label> {{ user.nickname }}
-        </div>
-        <div class="p-col">
-          <label>Name:</label> {{ user.name }}
-        </div>
-        <div class="p-col">
-          <label>Surname:</label> {{ user.surname }}
-        </div>
-        <div class="p-col">
-          <label>Account Balance:</label> {{ user.accountBalance }}
-        </div>
-        <div class="p-col">
-          <label>User Type:</label> {{ user.userType }}
-        </div>
-        <div class="p-col">
-          <label>Subscriptions Count:</label> {{ user.subscriptionsCount }}
+    <ul *ngIf="videos">
+      <div class="container">
+        <div class="row" *ngFor="let row of getRows()">
+          <div class="column" *ngFor="let video of getListForRow(row)">              
+            <div class="image-container">
+              <img [src] = "video.thumbnail" class="video">
+              <span class="image-label">{{ video.duration }}</span>
+            </div>
+            <h3 class="noPadding">{{ video.title }}</h3>
+            <p class="noPadding" (click)="goToUserProfile(video.authorId)">{{ video.authorNickname }}</p>
+            <p class="noPadding">{{ video.viewCount }} views</p>
+          </div>
         </div>
       </div>
-    </p-tabPanel>
-    <p-tabPanel header="Videos" (onActivate)="getVideos()">
-      <ul *ngIf="videos">
-        <li *ngFor="let video of videos">
-          <h3>{{ video.title }}</h3>
-          <p>{{ video.description }}</p>
-          <img [src] = "video.thumbnail" class="video">
-          <p>Author: {{ video.authorNickname }}</p>
-          <p>Views: {{ video.viewCount }}</p>
-          <p>Tags: {{ video.tags.join(', ') }}</p>
-          <p>Visibility: {{ video.visibility }}</p>
-          <p>Duration: {{ video.duration }}</p>
-        </li>
-      </ul>
-    </p-tabPanel>
-    <p-tabPanel header="Playlists" (onTabShow)="getPlaylists()">
-      <ul *ngIf="playlists">
-        <li *ngFor="let playlist of playlists">
-          <h3>{{ playlist.name }}</h3>
-          <p>{{ playlist.count }} count</p>
-        </li>
-      </ul>
-    </p-tabPanel>
+    </ul>
   </p-tabView>
-  
 </p-panel>
 
