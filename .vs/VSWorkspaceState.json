@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\backend",
+    "\\backend\\YouTubeV2",
+    "\\backend\\YouTubeV2.Application",
+    "\\backend\\YouTubeV2.Application\\Configurations",
+    "\\backend\\YouTubeV2.Application\\DTO",
+    "\\backend\\YouTubeV2.Application\\Model",
+    "\\backend\\YouTubeV2.Application\\Services",
+    "\\backend\\YouTubeV2\\Middleware",
+    "\\backend\\YouTubeV2\\Properties"
+  ],
+  "SelectedNode": "\\backend\\YouTubeV2.Application\\YTContext.cs",
+  "PreviewInSolutionExplorer": false
+}
