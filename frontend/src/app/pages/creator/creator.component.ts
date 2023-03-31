@@ -1,10 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { PlaylistDto } from 'src/app/core/models/playlist-dto';
 import { UserDTO } from 'src/app/core/models/user-dto';
-import { VideoListDto } from 'src/app/core/models/video-list-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
-import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { UserService } from 'src/app/core/services/user.service';
 import { VideoService } from 'src/app/core/services/video.service';
 
