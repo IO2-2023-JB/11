@@ -9,6 +9,7 @@ import { MessageService } from 'primeng/api';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpErrorInterceptor } from './core/interceptors/http-error-interceptor';
+import { CreatorModule } from './pages/creator/creator.module';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { HttpErrorInterceptor } from './core/interceptors/http-error-interceptor
         ToastModule,
         MenuModule,
         BrowserAnimationsModule,
+        CreatorModule
     ]
 })
 export class AppModule { }
