@@ -16,12 +16,14 @@ namespace YouTubeV2.Application
         IdentityRoleClaim<string>,
         IdentityUserToken<string>>
     {
+        public DbSet<Subscription> Subscriptions { get; set; }
         public YTContext(DbContextOptions<YTContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityConfiguration).Assembly);
+            modelBuilder.Entity<Subscription>().HasNoKey();
         }
     }
 }

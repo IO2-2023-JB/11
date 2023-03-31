@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using YouTubeV2.Application.DTO;
@@ -12,14 +13,26 @@ namespace YouTubeV2.Application.Services
 {
     public class SubscriptionsService
     {
-        public SubscriptionsService()
+        private readonly IBlobImageService _blobImageService;
+        private readonly YTContext _context;
+        public SubscriptionsService(IBlobImageService blobImageService, YTContext context)
         {
-
+            _blobImageService = blobImageService;
+            _context = context;
         }
 
-        public async Task GetSubscriptionsAsync(CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<SubscriptionDTO>> GetSubscriptionsAsync(string Id)
         {
-            
+            return await _context.Subscriptions.
+                Where(s => s.SubcriberId == Id).
+                Select(s => GetDTOForSubscription(s)).
+                ToListAsync();
+        }
+
+        public SubscriptionDTO GetDTOForSubscription(Subscription subscription)
+        {
+            var imageUri = _blobImageService.GetProfilePicture(subscription.Subscribee.Id);
+            return new SubscriptionDTO(subscription.SubscribeeId, imageUri.ToString(), subscription.Subscribee.UserName);
         }
     }
 }
