@@ -25,6 +25,8 @@ namespace YouTubeV2.Api.Controllers
         [HttpGet("user")]
         public async Task<UserDto> GetUserAsync([FromQuery] string id, CancellationToken cancellationToken)
         {
+            // This endpoint exists only to check if frontend works. It will need to be raplaced
+
             return new UserDto(id,
               "john.doe@mail.com",
               "johnny123",
@@ -39,6 +41,8 @@ namespace YouTubeV2.Api.Controllers
         [HttpGet("user/videos")]
         public async Task<VideoListDto> GetVideosAsync([FromQuery] string id, CancellationToken cancellationToken)
         {
+            // This endpoint exists only to check if frontend works. It will need to be raplaced
+
             List<string> tags = new List<string>() { "tag1", "tag2", "tag3" };
             List<VideoMetadataDto> videos = new List<VideoMetadataDto>()
             {
@@ -69,19 +73,6 @@ namespace YouTubeV2.Api.Controllers
             };
 
             return new VideoListDto(videos);
-        }
-
-        [HttpGet("playlist/user")]
-        public async Task<ICollection<PlaylistDto>> GetPlaylistsByUserAsync([FromQuery] string id, CancellationToken cancellationToken)
-        {
-            List<PlaylistDto> videos = new List<PlaylistDto>()
-            {
-                new PlaylistDto("name1", 32, "kfdlha32"),
-                new PlaylistDto("name2", 2332, "kfdlha32"),
-                new PlaylistDto("name3", 2, "kfdlha32"),
-            };
-
-            return videos;
         }
     }
 }
