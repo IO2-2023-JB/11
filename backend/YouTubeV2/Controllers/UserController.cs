@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Text;
-using YouTubeV2.Application.DTO;
-using YouTubeV2.Application.Services;
 using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
+using YouTubeV2.Application.DTO;
+using YouTubeV2.Application.Services;
 
 namespace YouTubeV2.Api.Controllers
 {

@@ -1,9 +1,6 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Threading;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;

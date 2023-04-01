@@ -6,14 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using YouTubeV2.Application.DTO;
-using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 
 namespace YouTubeV2.Api.Tests
