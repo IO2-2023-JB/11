@@ -8,7 +8,7 @@ namespace YouTubeV2.Application.Model
 {
     public class Subscription
     {
-        public string SubcriberId { get ; set; }
+        public string SubscriberId { get ; set; }
 
         public virtual User Subscriber { get; set; }
 

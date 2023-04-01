@@ -24,7 +24,7 @@ namespace YouTubeV2.Application.Services
         public async Task<IReadOnlyList<SubscriptionDTO>> GetSubscriptionsAsync(string Id)
         {
             return await _context.Subscriptions.
-                Where(s => s.SubcriberId == Id).
+                Where(s => s.SubscriberId == Id).
                 Select(s => GetDTOForSubscription(s)).
                 ToListAsync();
         }

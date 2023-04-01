@@ -3,10 +3,10 @@
     "",
     "\\backend",
     "\\backend\\YouTubeV2",
+    "\\backend\\YouTubeV2.Api.Tests",
     "\\backend\\YouTubeV2.Application",
-    "\\backend\\YouTubeV2.Application\\Model",
-    "\\backend\\YouTubeV2\\Controllers"
+    "\\backend\\YouTubeV2.Application\\Services"
   ],
-  "SelectedNode": "\\backend\\YouTubeV2.Application\\YTContext.cs",
+  "SelectedNode": "\\backend\\YouTubeV2.Application\\Services\\SubscriptionsService.cs",
   "PreviewInSolutionExplorer": false
 }

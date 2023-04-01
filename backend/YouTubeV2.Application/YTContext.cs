@@ -23,7 +23,8 @@ namespace YouTubeV2.Application
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(UserEntityConfiguration).Assembly);
-            modelBuilder.Entity<Subscription>().HasNoKey();
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof (RoleEntityConfiguration).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(SubscriptionEntityConfiguration).Assembly);
         }
     }
 }
