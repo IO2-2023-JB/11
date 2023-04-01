@@ -31,6 +31,7 @@ namespace YouTubeV2.Api.Tests
             var connection = config.GetConnectionString("Db");
             await Setup.ResetDatabaseAsync(connection);
         }
+
         [TestMethod]
         public async Task SearchShouldReturnUsersFromDB()
         {
@@ -44,17 +45,12 @@ namespace YouTubeV2.Api.Tests
                 new RegisterDto("polska@polska.com", "Maikołaj", "Maikołaj", "Tomaszewski", "asdf1243@#$GJH", Role.Creator, "")
             };
 
-            foreach (var regosterDTO in registerDtos)
-            {
-                var stringContent = new StringContent(JsonConvert.SerializeObject(regosterDTO), Encoding.UTF8, "application/json");
-                await httpClient.PostAsync("register", stringContent);
-            }
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
                 async userManager =>
                 {
                     foreach (var registerDto in registerDtos) 
                     {
-                        User user = new User(registerDto);
+                        var user = new User(registerDto);
                         await userManager.CreateAsync(user, registerDto.password);
                         await userManager.AddToRoleAsync(user, registerDto.userType);
                     }
@@ -64,8 +60,8 @@ namespace YouTubeV2.Api.Tests
             var querys = new Dictionary<string, string?>()
             {
                 { "query", "ala" },
-                { "sortingCriterion", "Alphabetical" },
-                { "sortingType", "Descending" }
+                { "sortingCriterion", SortingTypes.Alphabetical.ToString() },
+                { "sortingType", SortingDirections.Descending.ToString() }
             };
             var path = QueryHelpers.AddQueryString("search", querys);
             HttpResponseMessage response = await httpClient.GetAsync(path);

@@ -47,7 +47,7 @@ namespace YouTubeV2.Application.Services
 
             var newUser = await _userManager.FindByEmailAsync(registerDto.email);
             byte[] image = Convert.FromBase64String(registerDto.avatarImage);
-            await _blobImageService.UploadProfilePictureAsync(image, user.Id, cancellationToken);
+            await _blobImageService.UploadProfilePictureAsync(image, newUser.Id, cancellationToken);
         }
 
         public async Task DeleteAsync(string userID, CancellationToken cancellationToken)
@@ -79,7 +79,8 @@ namespace YouTubeV2.Application.Services
 
             return await GetDTOForUser(user);
         }
-        private async Task<UserDTO> GetDTOForUser(User user)
+
+        public async Task<UserDTO> GetDTOForUser(User user)
         {
             var imageUri = _blobImageService.GetProfilePicture(user.Id);
             var roleName = await GetRoleForUserAsync(user);
@@ -87,6 +88,7 @@ namespace YouTubeV2.Application.Services
             return new UserDTO(new Guid(user.Id), user.Email, user.UserName, user.Name, user.Surname, user.AccountBalance,
                 roleName, imageUri.ToString(), user.SubscriptionsCount);
         }
+
         private async Task<string> GetRoleForUserAsync(User user)
         {
             var roles = await _userManager.GetRolesAsync(user);
@@ -133,12 +135,14 @@ namespace YouTubeV2.Application.Services
             if (userFound != null && userFound != user)
                 throw new BadRequestException("User with this email already exists");
         }
+
         private async Task VerifyNameUniqueAsync(User user)
         {
             var userFound = await _userManager.FindByNameAsync(user.UserName);
             if (userFound != null && userFound != user)
                 throw new BadRequestException("User with this nickname already exists");
         }
+
         private async Task SwitchUserRoleAsync(User user, string currentRole, string newRole)
         {
             var result = await _userManager.RemoveFromRoleAsync(user, currentRole);
@@ -148,71 +152,6 @@ namespace YouTubeV2.Application.Services
             result = await _userManager.AddToRoleAsync(user, newRole);
             if (!result.Succeeded)
                 throw new BadRequestException(result.Errors.Select(error => new ErrorResponseDTO(error.Description)));
-        }
-        public async Task<IEnumerable<UserDTO>> SearchAsync(string query, SortingDirections sortingDirection, 
-            SortingTypes sortingType, DateTime dateBegin, DateTime dateEnd, CancellationToken cancellationToken)
-        {
-            var searchableUsers = await _userManager.GetUsersInRoleAsync(Role.Creator);
-            var matchingUsers = searchableUsers.Select(user => user).Where(user => user.UserName.
-                Contains(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
-
-            ClipUsersBasedOnDate(ref matchingUsers, dateBegin, dateEnd);
-            SortUsers(ref matchingUsers, sortingDirection, sortingType);
-            
-            List<UserDTO> result = new List<UserDTO>();
-            foreach (var user in matchingUsers)
-            {
-                var userDTO = await GetDTOForUser(user);
-                result.Add(userDTO);
-            }
-
-            return result;
-        }
-        private void ClipUsersBasedOnDate(ref List<User> users, DateTime dateBegin, DateTime dateEnd)
-        {
-            if (dateBegin > dateEnd)
-                throw new BadRequestException("Begin date cannot be bigger than end date");
-
-            if (dateBegin != DateTime.MinValue)
-                users = users.Select(user => user).Where(user => user.AccountCreationDate > dateBegin).ToList();
-            if (dateBegin != DateTime.MinValue)
-                users = users.Select(user => user).Where(user => user.AccountCreationDate < dateEnd).ToList();
-        }
-        private void SortUsers(ref List<User> usres, SortingDirections sortingDirection, SortingTypes sortingType)
-        {
-            switch (sortingType)
-            {
-                case SortingTypes.Alphabetical:
-                    SortUsersAlphabetical(ref usres, sortingDirection);
-                    break;
-                case SortingTypes.PublishDate:
-                    SortUsersPublish(ref usres, sortingDirection);
-                    break;
-                case SortingTypes.Popularity:
-                    SortUsersPopularity(ref usres, sortingDirection);
-                    break;
-            }
-        }
-        private void SortUsersAlphabetical(ref List<User> users, SortingDirections sortingDirection)
-        {
-            if (sortingDirection == SortingDirections.Ascending)
-                users = users.OrderBy(x => x.UserName).ToList();
-            else
-                users = users.OrderByDescending(x => x.UserName).ToList();
-        }
-        private void SortUsersPublish(ref List<User> users, SortingDirections sortingDirection)
-        {
-            if (sortingDirection == SortingDirections.Ascending)
-                users = users.OrderBy(x => x.AccountCreationDate).ToList();
-            else
-                users = users.OrderByDescending(x => x.AccountCreationDate).ToList();
-        }
-        private void SortUsersPopularity(ref List<User> users, SortingDirections sortingDirection)
-        {
-            if (sortingDirection == SortingDirections.Ascending)
-                users = users.OrderBy(x => x.SubscriptionsCount).ToList();
-            else
-                users = users.OrderByDescending(x => x.SubscriptionsCount).ToList();
         }
     }
 }

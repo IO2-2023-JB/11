@@ -65,21 +65,24 @@ namespace YouTubeV2.Api.Tests
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
         [TestMethod]
         public async Task DeleteShouldRemoveFromDB()
         {
             // Arrange
             var httpClient = _webApplicationFactory.CreateClient();
             var registerDto = new RegisterDto("adres@adres.com", "Senior", "Generator", "Frajdy", "asdf1243@#$GJH", Role.Simple, "");
-            var stringContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8, "application/json");
-            await httpClient.PostAsync("register", stringContent);
 
             string userID = String.Empty;
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
                 async userManager =>
                 {
-                    User user = await userManager.FindByEmailAsync(registerDto.email);
-                    userID = user.Id;
+                    var user = new User(registerDto);
+                    await userManager.CreateAsync(user, registerDto.password);
+                    await userManager.AddToRoleAsync(user, registerDto.userType);
+
+                    var addedUser = await userManager.FindByEmailAsync(registerDto.email);
+                    userID = addedUser.Id;
                 });
 
             // Act
@@ -96,21 +99,24 @@ namespace YouTubeV2.Api.Tests
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
         [TestMethod]
         public async Task GetShouldReturnDataFromDB()
         {
             // Arrange
             var httpClient = _webApplicationFactory.CreateClient();
             var registerDto = new RegisterDto("adress@adress.com", "Seniorek", "Generatorik", "Frajdusi", "asdf1243@#$GJH", Role.Simple, "");
-            var stringContent = new StringContent(JsonConvert.SerializeObject(registerDto), Encoding.UTF8, "application/json");
-            await httpClient.PostAsync("register", stringContent);
 
             string userID = String.Empty;
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
                 async userManager =>
                 {
-                    User user = await userManager.FindByEmailAsync(registerDto.email);
-                    userID = user.Id;
+                    var user = new User(registerDto);
+                    await userManager.CreateAsync(user, registerDto.password);
+                    await userManager.AddToRoleAsync(user, registerDto.userType);
+                    
+                    var addedUser = await userManager.FindByEmailAsync(registerDto.email);
+                    userID = addedUser.Id;
                 });
 
             // Act
@@ -141,6 +147,7 @@ namespace YouTubeV2.Api.Tests
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
+
         [TestMethod]
         public async Task PutShouldEditDB()
         {
@@ -154,8 +161,12 @@ namespace YouTubeV2.Api.Tests
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
                 async userManager =>
                 {
-                    User user = await userManager.FindByEmailAsync(registerDto.email);
-                    userID = user.Id;
+                    var user = new User(registerDto);
+                    await userManager.CreateAsync(user, registerDto.password);
+                    await userManager.AddToRoleAsync(user, registerDto.userType);
+
+                    var addedUser = await userManager.FindByEmailAsync(registerDto.email);
+                    userID = addedUser.Id;
                 });
 
             UserDTO userDTO = new UserDTO(new Guid(userID), "koka@cola.com", "Robert", "Robert", "Kubica", 13, Role.Creator, "", 73);
