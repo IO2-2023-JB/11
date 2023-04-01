@@ -12,7 +12,7 @@ using YouTubeV2.Application;
 namespace YouTubeV2.Application.Migrations
 {
     [DbContext(typeof(YTContext))]
-    [Migration("20230401132021_FK")]
+    [Migration("20230401140218_FK")]
     partial class FK
     {
         /// <inheritdoc />
@@ -160,37 +160,19 @@ namespace YouTubeV2.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "240719ec-43fc-43da-994d-fdd433cf4da1",
+                            Id = "3b2b45fb-8321-40d6-9487-c5b593698fa9",
                             Name = "Simple",
                             NormalizedName = "SIMPLE"
                         },
                         new
                         {
-                            Id = "bc8a03fa-0357-46b7-88de-d0ffb4d13712",
+                            Id = "fa381995-8e47-4b1f-83f1-b534e6f41aa4",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "dfb13081-6eed-4ad2-b5e0-56efbd3ef2a3",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
-                        },
-                        new
-                        {
-                            Id = "20b1882c-b478-4b55-85b3-c440e04b1170",
-                            Name = "Simple",
-                            NormalizedName = "SIMPLE"
-                        },
-                        new
-                        {
-                            Id = "6de3edd3-3e2f-44b5-83e5-57a9ace25264",
-                            Name = "Creator",
-                            NormalizedName = "CREATOR"
-                        },
-                        new
-                        {
-                            Id = "0578c2f5-f4ec-485d-81f8-4c83a72b60e7",
+                            Id = "7aa01131-19ba-4154-b9a2-439c7031ba3b",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });

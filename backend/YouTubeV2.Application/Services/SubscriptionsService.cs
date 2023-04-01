@@ -25,14 +25,15 @@ namespace YouTubeV2.Application.Services
         {
             return await _context.Subscriptions.
                 Where(s => s.SubscriberId == Id).
-                Select(s => GetDTOForSubscription(s)).
+                //Select(s => GetDTOForSubscription(s)).
+                Select(s => new SubscriptionDTO(s.SubscribeeId, _blobImageService.GetProfilePicture(s.Subscribee.Id).ToString(), s.Subscribee.UserName)).
                 ToListAsync();
         }
 
-        public SubscriptionDTO GetDTOForSubscription(Subscription subscription)
-        {
-            var imageUri = _blobImageService.GetProfilePicture(subscription.Subscribee.Id);
-            return new SubscriptionDTO(subscription.SubscribeeId, imageUri.ToString(), subscription.Subscribee.UserName);
-        }
+        //private SubscriptionDTO GetDTOForSubscription(Subscription subscription)
+        //{
+        //    var imageUri = _blobImageService.GetProfilePicture(subscription.Subscribee.Id);
+        //    return new SubscriptionDTO(subscription.SubscribeeId, imageUri.ToString(), subscription.Subscribee.UserName);
+        //}
     }
 }

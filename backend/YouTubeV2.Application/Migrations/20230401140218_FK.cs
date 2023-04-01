@@ -189,12 +189,9 @@ namespace YouTubeV2.Application.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "0578c2f5-f4ec-485d-81f8-4c83a72b60e7", null, "Administrator", "ADMINISTRATOR" },
-                    { "20b1882c-b478-4b55-85b3-c440e04b1170", null, "Simple", "SIMPLE" },
-                    { "240719ec-43fc-43da-994d-fdd433cf4da1", null, "Simple", "SIMPLE" },
-                    { "6de3edd3-3e2f-44b5-83e5-57a9ace25264", null, "Creator", "CREATOR" },
-                    { "bc8a03fa-0357-46b7-88de-d0ffb4d13712", null, "Creator", "CREATOR" },
-                    { "dfb13081-6eed-4ad2-b5e0-56efbd3ef2a3", null, "Administrator", "ADMINISTRATOR" }
+                    { "3b2b45fb-8321-40d6-9487-c5b593698fa9", null, "Simple", "SIMPLE" },
+                    { "7aa01131-19ba-4154-b9a2-439c7031ba3b", null, "Administrator", "ADMINISTRATOR" },
+                    { "fa381995-8e47-4b1f-83f1-b534e6f41aa4", null, "Creator", "CREATOR" }
                 });
 
             migrationBuilder.CreateIndex(
