@@ -1,7 +1,5 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
-using YouTubeV2.Application.Utils;
 
 namespace YouTubeV2.Api.Controllers
 {
@@ -15,12 +13,14 @@ namespace YouTubeV2.Api.Controllers
             _blobVideoService = blobVideoService;
         }
 
-        [HttpPost("video/{id:guid}")]
-        public async Task<ActionResult<string>> GetVideoAsync(Guid id, [FromHeader] string range, CancellationToken cancellationToken)
+        [HttpGet("video/{id:guid}")]
+        //[Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<IActionResult> GetVideoAsync(Guid id, CancellationToken cancellationToken)
         {
-            Range processedRange = RangeExtensions.FromString(range);
-            byte[] bytes = await _blobVideoService.GetVideoAsync(id.ToString(), processedRange, cancellationToken);
-            return Ok(System.Text.Encoding.UTF8.GetString(bytes));
+            // + ".mp4" is temporary as adding files from local file system seems to be adding extensions as prefix to the name (will change with uploading video from our portal)
+            Stream videoStream = await _blobVideoService.GetVideoAsync(id.ToString() + ".mp4", cancellationToken);
+            Response.Headers.Add("Accept-Ranges", "true");
+            return File(videoStream, "video/mp4", true);
         }
     }
 }

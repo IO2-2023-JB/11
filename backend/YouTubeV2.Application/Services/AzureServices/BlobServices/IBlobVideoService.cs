@@ -2,7 +2,7 @@
 {
     public interface IBlobVideoService
     {
-        Task<byte[]> GetVideoAsync(string fileName, Range bytesRange, CancellationToken cancellationToken = default);
+        Task<Stream> GetVideoAsync(string fileName, CancellationToken cancellationToken = default);
 
         Task UploadVideoAsync(string fileName, Stream videoStream, CancellationToken cancellationToken = default);
     }

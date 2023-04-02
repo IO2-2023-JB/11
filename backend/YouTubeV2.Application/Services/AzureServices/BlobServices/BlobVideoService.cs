@@ -16,7 +16,7 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
             _blobStorageConfig = blobStorageConfig.Value;
         }
 
-        public async Task<byte[]> GetVideoAsync(string fileName, Range bytesRange, CancellationToken cancellationToken = default)
+        public async Task<Stream> GetVideoAsync(string fileName, CancellationToken cancellationToken = default)
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(_blobStorageConfig.VideosContainerName);
             BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
@@ -24,17 +24,10 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
             if (!(await blobClient.ExistsAsync(cancellationToken)).Value)
                 throw new FileNotFoundException($"There is no video with fileName {fileName}");
 
-            using var memoryStream = new MemoryStream();
-            await blobClient.DownloadToAsync(memoryStream, cancellationToken);
-            return await GetBytesFromStream(memoryStream, bytesRange, cancellationToken);
-        }
-
-        private async Task<byte[]> GetBytesFromStream(MemoryStream memoryStream, Range bytesRange, CancellationToken cancellationToken = default)
-        {
-            memoryStream.Seek(bytesRange.Start.Value, SeekOrigin.Begin);
-            var buffer = new byte[bytesRange.End.Value - bytesRange.Start.Value + 1];
-            int bytesRead = await memoryStream.ReadAsync(buffer, cancellationToken);
-            return buffer[..bytesRead];
+            Stream videoStream = new MemoryStream();
+            await blobClient.DownloadToAsync(videoStream, cancellationToken);
+            videoStream.Seek(0, SeekOrigin.Begin);
+            return videoStream;
         }
 
         public async Task UploadVideoAsync(string fileName, Stream videoStream, CancellationToken cancellationToken = default)
