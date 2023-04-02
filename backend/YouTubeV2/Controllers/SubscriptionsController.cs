@@ -16,9 +16,9 @@ namespace YouTubeV2.Api.Controllers
 		}
 
 		[HttpGet("subscriptions")]
-		public async Task<ActionResult<IReadOnlyList<SubscriptionDTO>>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
+		public async Task<ActionResult<UserSubscriptionListDTO>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
 		{
-			return Ok((await _subscriptionsService.GetSubscriptionsAsync(id.ToString(), cancellationToken)));
+			return Ok((await _subscriptionsService.GetSubscriptionsAsync(id, cancellationToken)));
 		}
 	}
 }

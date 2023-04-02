@@ -21,10 +21,10 @@ namespace YouTubeV2.Application.Services
             _context = context;
         }
 
-        public async Task<UserSubscriptionListDTO> GetSubscriptionsAsync(string Id, CancellationToken cancellationToken)
+        public async Task<UserSubscriptionListDTO> GetSubscriptionsAsync(Guid Id, CancellationToken cancellationToken)
         {
             return new UserSubscriptionListDTO( await _context.Subscriptions.
-                Where(s => s.SubscriberId == Id).
+                Where(s => new Guid(s.SubscriberId) == Id).
                 Select(s => new SubscriptionDTO(new Guid(s.SubscribeeId), _blobImageService.GetProfilePicture(s.Subscribee.Id), s.Subscribee.UserName)).
                 ToListAsync(cancellationToken));
         }
