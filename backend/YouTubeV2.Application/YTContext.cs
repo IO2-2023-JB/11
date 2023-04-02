@@ -17,6 +17,7 @@ namespace YouTubeV2.Application
         IdentityUserToken<string>>
     {
         public DbSet<Subscription> Subscriptions { get; set; }
+
         public YTContext(DbContextOptions<YTContext> options) : base(options) { }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
