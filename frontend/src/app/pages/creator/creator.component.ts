@@ -11,7 +11,6 @@ import { VideoService } from 'src/app/core/services/video.service';
   styleUrls: ['./creator.component.scss']
 })
 export class CreatorComponent {
-  videosPerRow: number = 6;
   id!: string;
   user!: UserDTO;
   videos!: VideoMetadataDto[];
@@ -36,22 +35,7 @@ export class CreatorComponent {
     });
   }
 
-  getRows(): number[] {
-    const rows = [];
-    for (let i = 0; i < this.videos.length; i += this.videosPerRow) {
-      rows.push(i / this.videosPerRow);
-    }
-    return rows;
-  }
-  
-  getListForRow(row: number): VideoMetadataDto[] {
-    const startIndex = row * this.videosPerRow;
-
-    return this.videos.slice(startIndex, startIndex + this.videosPerRow);
-  }
-
   public goToUserProfile(id: string): void {
-    console.log(id);
     this.router.navigate(['creator/' + id]);
   }
 }

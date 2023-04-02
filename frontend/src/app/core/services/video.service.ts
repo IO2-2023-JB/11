@@ -8,9 +8,6 @@ import { VideoListDto } from "../models/video-list-dto";
   providedIn: 'root'
 })
 export class VideoService {
-  private authenticationStateChangeSubject = new Subject<boolean>();
-  public authenticationStateChanged = this.authenticationStateChangeSubject.asObservable();
-
   private readonly videoPageWebAPIUrl: string = `${environment.webApiUrl}`;
 
   constructor(private httpClient: HttpClient) {}

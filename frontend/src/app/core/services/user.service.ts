@@ -9,9 +9,6 @@ import { UserDTO } from "../models/user-dto";
   providedIn: 'root'
 })
 export class UserService {
-  private authenticationStateChangeSubject = new Subject<boolean>();
-  public authenticationStateChanged = this.authenticationStateChangeSubject.asObservable();
-
   private readonly registrationPageWebAPIUrl: string = `${environment.webApiUrl}`;
 
   constructor(private httpClient: HttpClient) {}
