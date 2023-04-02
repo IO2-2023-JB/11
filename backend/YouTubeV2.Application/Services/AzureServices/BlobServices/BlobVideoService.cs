@@ -24,10 +24,7 @@ namespace YouTubeV2.Application.Services.AzureServices.BlobServices
             if (!(await blobClient.ExistsAsync(cancellationToken)).Value)
                 throw new FileNotFoundException($"There is no video with fileName {fileName}");
 
-            Stream videoStream = new MemoryStream();
-            await blobClient.DownloadToAsync(videoStream, cancellationToken);
-            videoStream.Seek(0, SeekOrigin.Begin);
-            return videoStream;
+            return await blobClient.OpenReadAsync(false, cancellationToken: cancellationToken);
         }
 
         public async Task UploadVideoAsync(string fileName, Stream videoStream, CancellationToken cancellationToken = default)
