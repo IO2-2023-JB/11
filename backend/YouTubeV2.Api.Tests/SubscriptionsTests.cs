@@ -27,10 +27,5 @@ namespace YouTubeV2.Api.Tests
             await Setup.ResetDatabaseAsync(connection);
         }
 
-        //public async Task ShouldReturnSubscriptions()
-        //{
-        //    // Arrange
-        //    var httpClient = _webApplicationFactory.CreateClient();
-        //}
     }
 }
