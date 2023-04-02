@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Services;
 
@@ -15,9 +16,9 @@ namespace YouTubeV2.Api.Controllers
 		}
 
 		[HttpGet("subscriptions")]
-		public async Task<ActionResult<IReadOnlyList<SubscriptionDTO>>> GetSubscriptionsAsync([FromQuery] string id, CancellationToken cancellationToken)
+		public async Task<ActionResult<IReadOnlyList<SubscriptionDTO>>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
 		{
-			return (await _subscriptionsService.GetSubscriptionsAsync(id)).ToList();
+			return Ok((await _subscriptionsService.GetSubscriptionsAsync(id.ToString(), cancellationToken)));
 		}
 	}
 }

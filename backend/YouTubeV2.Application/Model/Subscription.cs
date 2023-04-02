@@ -15,8 +15,5 @@ namespace YouTubeV2.Application.Model
         public string SubscribeeId { get; set; }
 
         public virtual User Subscribee { get; set; }
-
     }
 }
-
-
