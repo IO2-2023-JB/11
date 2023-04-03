@@ -17,23 +17,15 @@ namespace YouTubeV2.Application.Tests.BlobVideoSerivceTests
         private Mock<BlobContainerClient> _blobContainerClientMock = new Mock<BlobContainerClient>();
         private Mock<BlobClient> _blobClientMock = new Mock<BlobClient>();
         private BlobVideoService _blobVideoService = null!;
-        private byte[] _entireStreamBuffer = null!;
+        private byte[] _expectedStreamContent = Encoding.UTF8.GetBytes("testStreamContent");
 
 
         [TestInitialize]
         public void Initialize()
         {
-            _entireStreamBuffer = Encoding.UTF8.GetBytes("testStreamContent");
             _blobClientMock
-                .Setup(x => x.DownloadToAsync(It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-                .Callback<Stream, CancellationToken>(async (stream, cancellationToken) =>
-                {
-                    await stream.WriteAsync(_entireStreamBuffer, 0, _entireStreamBuffer.Length, cancellationToken);
-                    await stream.FlushAsync(cancellationToken);
-                });
-            _blobClientMock
-                .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
-                .ReturnsAsync(Response.FromValue(true, new Mock<Response>().Object));
+                .Setup(x => x.OpenReadAsync(It.IsAny<bool>(), It.IsAny<long>(), It.IsAny<int?>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(new MemoryStream(_expectedStreamContent));
             _blobContainerClientMock.Setup(x => x.GetBlobClient(It.IsAny<string>())).Returns(_blobClientMock.Object);
             _blobServiceClientMock
                 .Setup(x => x.GetBlobContainerClient(It.IsAny<string>()))
@@ -44,59 +36,34 @@ namespace YouTubeV2.Application.Tests.BlobVideoSerivceTests
         }
 
         [TestMethod]
-        public async Task GetVideoTryingToGetBytesStartingAndEndingInRangeOfStreamShouldReturnFullBuffer()
+        public async Task GetVideoAsyncShouldReturnFullReadOnlyVideoStream()
         {
             // ARRANGE
-            System.Range range = new System.Range(1, 4);
+            _blobClientMock
+                .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Response.FromValue(true, new Mock<Response>().Object));
 
             // ACT
-            byte[] buffer = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
+            Stream stream = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>());
 
             // ASSERT
-            buffer.Length.Should().Be(range.End.Value - range.Start.Value + 1);
-            for (int i = range.Start.Value; i <= range.End.Value; i++)
-                buffer[i - range.Start.Value].Should().Be(_entireStreamBuffer[i]);
-        }
-
-        [TestMethod]
-        public async Task GetVideoTryingToGetBytesStartingInRangeAndEndingOutOfRangeOfStreamShouldReturnBufferBeingShorter()
-        {
-            // ARRANGE
-            System.Range range = new System.Range(15, 20);
-
-            // ACT
-            byte[] buffer = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
-
-            // ASSERT
-            buffer.Length.Should().Be(_entireStreamBuffer.Length - range.Start.Value);
-            for (int i = range.Start.Value; i < _entireStreamBuffer.Length; i++)
-                buffer[i - range.Start.Value].Should().Be(_entireStreamBuffer[i]);
-        }
-
-        [TestMethod]
-        public async Task GetVideoTryingToGetBytesStartingOutOfRangeOfStreamShouldReturnBufferBeingShorter()
-        {
-            // ARRANGE
-            System.Range range = new System.Range(20, 25);
-
-            // ACT
-            byte[] buffer = await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
-
-            // ASSERT
-            buffer.Length.Should().Be(0);
+            stream.Length.Should().Be(_expectedStreamContent.Length);
+            var streamContent = new byte[_expectedStreamContent.Length];
+            await stream.ReadAsync(streamContent, 0, _expectedStreamContent.Length);
+            for (int i = 0; i < _expectedStreamContent.Length; i++)
+                streamContent[i].Should().Be(_expectedStreamContent[i]);
         }
 
         [TestMethod]
         public void GetVideoThatDoesntExistShouldThrowAnException()
         {
             // ARRANGE
-            System.Range range = new System.Range(1, 4);
             _blobClientMock
                 .Setup(x => x.ExistsAsync(It.IsAny<CancellationToken>()))
                 .ReturnsAsync(Response.FromValue(false, new Mock<Response>().Object));
 
             // ACT
-            Func<Task> action = async () => await _blobVideoService.GetVideoAsync(It.IsAny<string>(), range);
+            Func<Task> action = async () => await _blobVideoService.GetVideoAsync(It.IsAny<string>(), It.IsAny<CancellationToken>());
 
             // ASSERT
             action.Should().ThrowAsync<FileNotFoundException>().WithMessage($"There is no video with fileName {It.IsAny<string>()}");

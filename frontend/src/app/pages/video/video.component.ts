@@ -6,6 +6,6 @@ import { environment } from 'src/environments/environment';
   templateUrl: './video.component.html',
   styleUrls: ['./video.component.scss']
 })
-export class VideoComponent {
+export class VideoComponent  {
   videoUrl: string = `${environment.webApiUrl}/video/54b12988-c373-4746-b687-a1ad1b883ccb`;
 }
