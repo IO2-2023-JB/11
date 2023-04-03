@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
