@@ -1,15 +1,8 @@
-﻿using FluentAssertions;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Newtonsoft.Json;
-using System.Net;
-using System.Text;
-using YouTubeV2.Application.DTO;
-using YouTubeV2.Application.Model;
 
 namespace YouTubeV2.Api.Tests
 {

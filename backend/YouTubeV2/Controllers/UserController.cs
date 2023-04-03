@@ -8,10 +8,12 @@ namespace YouTubeV2.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly SubscriptionsService _subscriptionsService;
 
-        public UserController(UserService userService)
+        public UserController(UserService userService, SubscriptionsService subscriptionsService)
         {
             _userService = userService;
+            _subscriptionsService = subscriptionsService;
         }
 
         [HttpPost("register")]
@@ -26,6 +28,7 @@ namespace YouTubeV2.Api.Controllers
         public async Task<UserDto> GetUserAsync([FromQuery] string id, CancellationToken cancellationToken)
         {
             // This endpoint exists only to check if frontend works. It will need to be raplaced
+            int subs = await _subscriptionsService.GetSubscriptionCount(new Guid(id), cancellationToken);
 
             return new UserDto(id,
               "john.doe@mail.com",
@@ -35,7 +38,7 @@ namespace YouTubeV2.Api.Controllers
               10,
               "Simple",
               "https://imageslocal.blob.core.windows.net/useravatars/c850be63-9986-4d57-b13e-1466560ef189",
-              432230);
+              subs);
         }
 
         [HttpGet("user/videos")]
