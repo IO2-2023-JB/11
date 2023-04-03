@@ -1,12 +1,17 @@
 using Azure.Storage.Blobs;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Configurations.BlobStorage;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
+using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Validator;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -47,6 +52,30 @@ builder.Services.AddCors(options =>
             .WithExposedHeaders("Content-Disposition"));
 });
 
+builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
+       options.TokenLifespan = TimeSpan.FromHours(2));
+
+var jwtSettings = new JwtSettings(builder.Configuration.GetSection("JWTSettings"));
+builder.Services.AddSingleton(jwtSettings);
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.ValidIssuer,
+        ValidAudience = jwtSettings.ValidAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(jwtSettings.SecurityKey)
+    };
+});
+builder.Services.AddScoped<JwtHandler>();
+
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
@@ -71,4 +100,5 @@ else
     app.MapControllers();
 
 app.Run();
+
 public partial class Program { }
