@@ -10,6 +10,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { HttpErrorInterceptor } from './core/interceptors/http-error-interceptor';
 import { CreatorModule } from './pages/creator/creator.module';
+import { LoginModule } from './pages/login/login.module';
 
 @NgModule({
     declarations: [
@@ -28,6 +29,7 @@ import { CreatorModule } from './pages/creator/creator.module';
         BrowserModule,
         AppRoutingModule,
         RegistrationModule,
+        LoginModule,
         ToastModule,
         MenuModule,
         BrowserAnimationsModule,
