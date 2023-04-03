@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
@@ -27,6 +28,7 @@ builder.Services.AddDbContext<YTContext>(
 
 builder.Services.AddTransient<UserService>();
 builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
+builder.Services.AddTransient<SubscriptionsService>();
 builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
 builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
 
