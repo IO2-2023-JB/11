@@ -22,6 +22,7 @@ namespace YouTubeV2.Api.Controllers
             // + ".mp4" is temporary as adding files from local file system seems to be adding extensions as prefix to the name (will change with uploading video from our portal)
             Stream videoStream = await _blobVideoService.GetVideoAsync(id.ToString() + ".mp4", cancellationToken);
             Response.Headers.AcceptRanges = "bytes";
+
             return File(videoStream, "video/mp4", true);
         }
     }
