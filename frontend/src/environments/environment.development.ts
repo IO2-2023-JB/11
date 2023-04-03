@@ -4,8 +4,8 @@
 
 export const environment = {
     production: false,
-    webApiUrl: 'http://localhost:5197',
-    webUrl: 'http://localhost:5197',
+    webApiUrl: 'http://localhost:7133',
+    webUrl: 'http://localhost:7133',
   };
   
   /*
