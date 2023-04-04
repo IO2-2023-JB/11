@@ -32,27 +32,31 @@ namespace YouTubeV2.Application.Services
                 Select(s => new SubscriptionDTO(new Guid(s.SubscribeeId), _blobImageService.GetProfilePicture(s.Subscribee.Id), s.Subscribee.UserName)).
                 ToListAsync(cancellationToken));
         }
-        public async Task PostSubscriptionsAsync(Guid id, string token, CancellationToken cancellationToken)
+        public async Task PostSubscriptionsAsync(Guid subscribeeGuid, string subscriberToken, CancellationToken cancellationToken)
         {
-            Subscription subRequest = new Subscription();
-            var subscribee = await _userManager.FindByIdAsync(id.ToString());
-            if(subscribee == null)
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            string subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (subscriberId.IsNullOrEmpty())
             {
                 throw new BadRequestException();
             }
+            var subscribee = await _userManager.FindByIdAsync(subscribeeGuid.ToString());
+            var subscriber = await _userManager.FindByIdAsync(subscriberId.ToString());
+            if (subscribee == null || subscriber == null)
+            {
+                throw new BadRequestException();
+            }
+
+            Subscription subRequest = new Subscription();
             subRequest.SubscribeeId = subscribee.Id;
             subRequest.Subscribee = subscribee;
+            subRequest.SubscriberId = subscriber.Id;
+            subRequest.Subscriber = subscriber;
 
-            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            JwtSecurityToken jwt = handler.ReadJwtToken(token);
-
-            string userId = jwt.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            subRequest.SubscriberId = subscribee.Id;//???
-            subRequest.Subscriber = subscribee;//???
-
-            if(_context.Subscriptions.
+            var existingCopies = _context.Subscriptions.
                 Where(s => s.SubscriberId == subRequest.SubscriberId && s.SubscribeeId == subRequest.SubscribeeId).
-                ToArray().Length != 0)
+                ToArray();
+            if (existingCopies.Length > 0)
             {
                 throw new BadRequestException();
             }
@@ -61,9 +65,16 @@ namespace YouTubeV2.Application.Services
             _context.SaveChanges();
         }
 
-        public async Task DeleteSubscriptionsAsync(Guid id, string token, CancellationToken cancellationToken)
+        public async Task DeleteSubscriptionsAsync(Guid subscribeeGuid, string subscriberToken, CancellationToken cancellationToken)
         {
-            var subs = await _context.Subscriptions.Where(s => s.SubscribeeId == id.ToString()).ToArrayAsync(cancellationToken);
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            string subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (subscriberId.IsNullOrEmpty())
+            {
+                throw new BadRequestException();
+            }
+            var subs = await _context.Subscriptions.Where(s => s.SubscribeeId == subscribeeGuid.ToString() && s.SubscriberId == subscriberId)
+                .ToArrayAsync(cancellationToken);
             if(subs.Length == 0)
             {
                 throw new BadRequestException();

@@ -14,6 +14,7 @@ using YouTubeV2.Application.Services.AzureServices.BlobServices;
 using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Validator;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
 
 public partial class Program {
     public static void Main(string[] args)
@@ -48,28 +49,41 @@ public partial class Program {
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
         builder.Services.AddSwaggerGen(c =>
         {
-            c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
-
-            // Add JWT authentication to Swagger UI
-            var securityScheme = new OpenApiSecurityScheme
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "Hmmmm", Version = "1.0" });
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
+                Description = @"Insert Token provided on successful login",
                 Name = "Authorization",
-                Description = "JWT Authorization header using the Bearer scheme.",
-                Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT"
-            };
-            c.AddSecurityDefinition("Bearer", securityScheme);
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
 
-            var securityRequirement = new OpenApiSecurityRequirement
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement()
             {
-                { securityScheme, new[] { "Bearer" } }
-            };
-            c.AddSecurityRequirement(securityRequirement);
-        });
+                {
+                new OpenApiSecurityScheme
+                {
+                Reference = new OpenApiReference
+                    {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header,
 
+                },
+                new List<string>()
+                }
+            });
+            //var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            //c.IncludeXmlComments(xmlPath);
+        });
         builder.Services.AddOptions<BlobStorageConfig>().Bind(builder.Configuration.GetSection("BlobStorage"));
 
         string connectionString = builder.Configuration.GetConnectionString("Db")!;

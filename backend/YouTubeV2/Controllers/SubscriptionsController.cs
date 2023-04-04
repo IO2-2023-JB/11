@@ -21,12 +21,10 @@ namespace YouTubeV2.Api.Controllers
 		{
 			return Ok((await _subscriptionsService.GetSubscriptionsAsync(id, cancellationToken)));
 		}
-        [Authorize(Roles = "Simple")]
         [HttpPost("subscriptions")]
         public async Task<IActionResult> PostSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
         {
-            var dupa = HttpContext.Request;
-            string jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
+            string jwtToken = HttpContext.Request.Headers["Authorization"].ToString();
 
             await _subscriptionsService.PostSubscriptionsAsync(id, jwtToken, cancellationToken);
             return Ok();
@@ -34,7 +32,7 @@ namespace YouTubeV2.Api.Controllers
         [HttpDelete("subscriptions")]
         public async Task<IActionResult> DeleteSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
         {
-            string jwtToken = HttpContext.Request.Headers["Authorization"].ToString().Substring("Bearer ".Length);
+            string jwtToken = HttpContext.Request.Headers["Authorization"].ToString();
 
             await _subscriptionsService.DeleteSubscriptionsAsync(id, jwtToken, cancellationToken);
             return Ok();
