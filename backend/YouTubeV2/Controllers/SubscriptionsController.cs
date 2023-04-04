@@ -27,6 +27,7 @@ namespace YouTubeV2.Api.Controllers
             string jwtToken = HttpContext.Request.Headers["Authorization"].ToString();
 
             await _subscriptionsService.PostSubscriptionsAsync(id, jwtToken, cancellationToken);
+            
             return Ok();
         }
         [HttpDelete("subscriptions")]
@@ -35,6 +36,7 @@ namespace YouTubeV2.Api.Controllers
             string jwtToken = HttpContext.Request.Headers["Authorization"].ToString();
 
             await _subscriptionsService.DeleteSubscriptionsAsync(id, jwtToken, cancellationToken);
+            
             return Ok();
         }
     }

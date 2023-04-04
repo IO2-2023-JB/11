@@ -44,7 +44,7 @@ namespace YouTubeV2.Application.Services
                 throw new BadRequestException();
             }
             var subscribee = await _userManager.FindByIdAsync(subscribeeGuid.ToString());
-            var subscriber = await _userManager.FindByIdAsync(subscriberId.ToString());
+            var subscriber = await _userManager.FindByIdAsync(subscriberId);
             if (subscribee == null || subscriber == null)
             {
                 throw new BadRequestException();
@@ -92,7 +92,6 @@ namespace YouTubeV2.Application.Services
             _context.Subscriptions.Remove(subs[0]);
             _context.SaveChanges();
         }
-
 
         public async Task<int> GetSubscriptionCount(Guid id, CancellationToken cancellationToken)
         {

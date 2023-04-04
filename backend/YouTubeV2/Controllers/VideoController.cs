@@ -16,7 +16,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("video/{id:guid}")]
-        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        //[Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<IActionResult> GetVideoAsync(Guid id, CancellationToken cancellationToken)
         {
             // + ".mp4" is temporary as adding files from local file system seems to be adding extensions as prefix to the name (will change with uploading video from our portal)
