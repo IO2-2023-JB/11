@@ -13,7 +13,7 @@ using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
 using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Validator;
-
+using Microsoft.OpenApi.Models;
 
 public partial class Program {
     public static void Main(string[] args)
@@ -48,7 +48,27 @@ public partial class Program {
         builder.Services.AddControllers();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
+
+            // Add JWT authentication to Swagger UI
+            var securityScheme = new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "JWT Authorization header using the Bearer scheme.",
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
+            };
+            c.AddSecurityDefinition("Bearer", securityScheme);
+
+            var securityRequirement = new OpenApiSecurityRequirement
+            {
+                { securityScheme, new[] { "Bearer" } }
+            };
+            c.AddSecurityRequirement(securityRequirement);
+        });
 
         builder.Services.AddOptions<BlobStorageConfig>().Bind(builder.Configuration.GetSection("BlobStorage"));
 

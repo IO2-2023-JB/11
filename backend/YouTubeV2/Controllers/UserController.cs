@@ -14,7 +14,6 @@ namespace YouTubeV2.Api.Controllers
         {
             _userService = userService;
         }
-
         [HttpPost("register")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterDto registerDto, CancellationToken cancellationToken)
         {

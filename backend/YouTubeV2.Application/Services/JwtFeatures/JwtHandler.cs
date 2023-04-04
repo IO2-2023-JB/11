@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.Extensions.Configuration.UserSecrets;
 
 namespace YouTubeV2.Application.Services.JwtFeatures
 {
@@ -36,7 +37,8 @@ namespace YouTubeV2.Application.Services.JwtFeatures
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email)
+                new Claim(ClaimTypes.Name, user.Email),
+                new Claim("userId", user.Id),
             };
 
             IList<string> roles = await _userManager.GetRolesAsync(user);
