@@ -1,6 +1,5 @@
 using Azure.Storage.Blobs;
 using FluentValidation;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -40,7 +39,10 @@ public partial class Program {
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapControllers();
+        if (app.Environment.IsEnvironment("Test"))
+            app.MapControllers().AllowAnonymous();
+        else
+            app.MapControllers();
 
         app.Run();
     }
@@ -84,7 +86,8 @@ public partial class Program {
             //var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
             //c.IncludeXmlComments(xmlPath);
         });
-        builder.Services.AddOptions<BlobStorageConfig>().Bind(builder.Configuration.GetSection("BlobStorage"));
+    builder.Services.AddOptions<BlobStorageImagesConfig>().Bind(builder.Configuration.GetSection("BlobStorageImagesConfig"));
+    builder.Services.AddOptions<BlobStorageVideosConfig>().Bind(builder.Configuration.GetSection("BlobStorageVideosConfig"));
 
         string connectionString = builder.Configuration.GetConnectionString("Db")!;
         builder.Services.AddDbContext<YTContext>(
@@ -92,9 +95,11 @@ public partial class Program {
 
 
         builder.Services.AddTransient<UserService>();
+        builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
         builder.Services.AddTransient<SubscriptionsService>();
-        builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_IMAGES_BLOB_STORAGE_CONNECTION_STRING")));
         builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
+        builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
+        ;
 
 
         builder.Services.AddValidatorsFromAssemblyContaining<LoginDtoValidator>();

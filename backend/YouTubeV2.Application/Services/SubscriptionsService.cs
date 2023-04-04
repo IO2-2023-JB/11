@@ -1,14 +1,10 @@
 ﻿using FluentValidation;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using YouTubeV2.Application.DTO;
-using YouTubeV2.Application.Exceptions;
-using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
-using YouTubeV2.Application.Validator;
 
 namespace YouTubeV2.Application.Services
 {
@@ -94,5 +90,12 @@ namespace YouTubeV2.Application.Services
             _context.SaveChanges();
         }
 
+
+        public async Task<int> GetSubscriptionCount(Guid id, CancellationToken cancellationToken)
+        {
+            var userId = id.ToString();
+
+            return await _context.Subscriptions.CountAsync(s => s.SubscribeeId == userId, cancellationToken);
+        }
     }
 }
