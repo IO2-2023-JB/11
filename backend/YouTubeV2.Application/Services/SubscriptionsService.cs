@@ -32,10 +32,14 @@ namespace YouTubeV2.Application.Services
                 Select(s => new SubscriptionDTO(new Guid(s.SubscribeeId), _blobImageService.GetProfilePicture(s.Subscribee.Id), s.Subscribee.UserName)).
                 ToListAsync(cancellationToken));
         }
-        public async Task PostSubscriptionsAsync(Guid subscribeeGuid, string subscriberToken, CancellationToken cancellationToken)
+        public async Task PostSubscriptionsAsync(Guid subscribeeGuid, string? subscriberToken, CancellationToken cancellationToken)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            string subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (!handler.CanReadToken(subscriberToken))
+            {
+                throw new BadRequestException();
+            }
+            string? subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (subscriberId.IsNullOrEmpty())
             {
                 throw new BadRequestException();
@@ -65,10 +69,14 @@ namespace YouTubeV2.Application.Services
             _context.SaveChanges();
         }
 
-        public async Task DeleteSubscriptionsAsync(Guid subscribeeGuid, string subscriberToken, CancellationToken cancellationToken)
+        public async Task DeleteSubscriptionsAsync(Guid subscribeeGuid, string? subscriberToken, CancellationToken cancellationToken)
         {
             JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
-            string subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (!handler.CanReadToken(subscriberToken))
+            {
+                throw new BadRequestException();
+            }
+            string? subscriberId = handler.ReadJwtToken(subscriberToken).Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (subscriberId.IsNullOrEmpty())
             {
                 throw new BadRequestException();
