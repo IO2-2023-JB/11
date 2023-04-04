@@ -14,6 +14,7 @@ using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Validator;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using YouTubeV2.Application.Configurations.BlobStorage;
 
 public partial class Program {
     public static void Main(string[] args)
