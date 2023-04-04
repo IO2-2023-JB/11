@@ -51,11 +51,13 @@ namespace YouTubeV2.Application.Services
                 throw new BadRequestException();
             }
 
-            Subscription subRequest = new Subscription();
-            subRequest.SubscribeeId = subscribee.Id;
-            subRequest.Subscribee = subscribee;
-            subRequest.SubscriberId = subscriber.Id;
-            subRequest.Subscriber = subscriber;
+            Subscription subRequest = new()
+            {
+                SubscribeeId = subscribee.Id,
+                Subscribee = subscribee,
+                SubscriberId = subscriber.Id,
+                Subscriber = subscriber
+            };
 
             var existingCopies = _context.Subscriptions.
                 Where(s => s.SubscriberId == subRequest.SubscriberId && s.SubscribeeId == subRequest.SubscribeeId).
