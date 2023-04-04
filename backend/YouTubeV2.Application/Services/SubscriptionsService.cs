@@ -27,7 +27,7 @@ namespace YouTubeV2.Application.Services
         {
             var userId = id.ToString();
 
-            return await _context.Subscriptions.Where(s => s.SubscribeeId == userId).CountAsync(cancellationToken);
+            return await _context.Subscriptions.CountAsync(s => s.SubscribeeId == userId, cancellationToken);
         }
     }
 }
