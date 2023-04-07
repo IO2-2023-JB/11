@@ -1,38 +1,43 @@
 <p-card styleClass="p-card-style shadow-7">
-    <div class="flex justify-content-between flex-wrap">
-      <div>
-        <button
-          pButton
-          pRipple
-          type="home"
-          label="Home"
-          class="p-button-secondary p-button-text"
-          (click)="homeButtonOnClick()">
-        </button>
-        <button
-          pButton
-          pRipple
-          type="login"
-          label="Login"
-          class="p-button-secondary p-button-text"
-          (click)="loginButtonOnClick()">
-        </button>
-        <button
-          pButton
-          pRipple
-          type="register"
-          label="Register"
-          class="p-button-secondary p-button-text"
-          (click)="registerButtonOnClick()">
-        </button>
-        <button
-          pButton
-          pRipple
-          type="logout"
-          label="Logout"
-          class="p-button-secondary p-button-text"
-          (click)="logoutButtonOnClick()">
-        </button>
-      </div>
+  <div class="flex justify-content-between flex-wrap">
+    <div>
+      <button
+        pButton
+        pRipple
+        type="home"
+        label="Home"
+        class="p-button-secondary p-button-text"
+        (click)="homeButtonOnClick()">
+      </button>
     </div>
-  </p-card>
+    <div style="margin-left: auto;">
+      <button
+        *ngIf="!isUserAuthenticated"
+        pButton
+        pRipple
+        type="login"
+        label="Login"
+        class="p-button-secondary p-button-text"
+        (click)="loginButtonOnClick()">
+      </button>
+      <button
+        *ngIf="!isUserAuthenticated"
+        pButton
+        pRipple
+        type="register"
+        label="Register"
+        class="p-button-secondary p-button-text"
+        (click)="registerButtonOnClick()">
+      </button>
+      <button
+        *ngIf="isUserAuthenticated"
+        pButton
+        pRipple
+        type="logout"
+        label="Logout"
+        class="p-button-secondary p-button-text"
+        (click)="logoutButtonOnClick()">
+      </button>
+    </div>
+  </div>
+</p-card>

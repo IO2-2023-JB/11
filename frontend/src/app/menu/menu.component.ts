@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { UserService } from '../core/services/user.service';
 
 @Component({
   selector: 'app-menu',
@@ -8,13 +9,19 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit, OnDestroy {
-  isUserAuthenticated!: boolean;
+  isUserAuthenticated: boolean = false;
   isUserBankEmployee!: boolean;
   subscriptions: Subscription[] = [];
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private userService: UserService) {
+    this.isUserAuthenticated = this.userService.isUserAuthenticated();
+  }
 
   ngOnInit(): void {
+    this.subscriptions.push(
+      this.userService.authenticationStateChanged.subscribe(isAuthenticated => {
+        this.isUserAuthenticated = isAuthenticated;
+    }));
   }
 
   homeButtonOnClick(): void {
@@ -30,7 +37,7 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   logoutButtonOnClick(): void {
-    localStorage.removeItem('token');
+    this.userService.logout();
     this.router.navigate(['login']);
   }
 
