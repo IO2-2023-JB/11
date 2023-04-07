@@ -17,8 +17,21 @@ export class MenuComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
   }
 
+  homeButtonOnClick(): void {
+    this.router.navigate(['']);
+  }
+
   registerButtonOnClick(): void {
     this.router.navigate(['register']);
+  }
+
+  loginButtonOnClick(): void {
+    this.router.navigate(['login']);
+  }
+
+  logoutButtonOnClick(): void {
+    localStorage.removeItem('token');
+    this.router.navigate(['login']);
   }
 
   ngOnDestroy(): void {

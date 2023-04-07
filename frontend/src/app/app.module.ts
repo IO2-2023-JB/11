@@ -12,10 +12,12 @@ import { HttpErrorInterceptor } from './core/interceptors/http-error-interceptor
 import { VideoModule } from './pages/video/video.module';
 import { CreatorModule } from './pages/creator/creator.module';
 import { LoginModule } from './pages/login/login.module';
+import { HomeComponent } from './pages/home/home.component';
 
 @NgModule({
     declarations: [
         AppComponent,
+        HomeComponent,
     ],
     providers: [
         MessageService,
