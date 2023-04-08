@@ -32,7 +32,8 @@ namespace YouTubeV2.Application.Services
         {
             await _loginDtoValidator.ValidateAndThrowAsync(loginDto, cancellationToken);
 
-            User user = await _userManager.FindByEmailAsync(loginDto.email);
+            User? user = await _userManager.FindByEmailAsync(loginDto.email)
+                ?? throw new NotFoundException($"User with email {loginDto.email} does not exists");
 
             if (!await _userManager.CheckPasswordAsync(user, loginDto.password))
                 throw new BadRequestException(new ErrorResponseDTO[] { new ErrorResponseDTO("Provided password is invalid") });

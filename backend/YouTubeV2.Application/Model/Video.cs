@@ -13,11 +13,11 @@ namespace YouTubeV2.Application.Model
 
         [MinLength(1)]
         [MaxLength(VideoConstants.titleMaxLength)]
-        public string Title { get; init; }
+        public string Title { get; init; } = null!;
 
         [MinLength(1)]
         [MaxLength(VideoConstants.descriptionMaxLength)]
-        public string Description { get; init; }
+        public string Description { get; init; } = null!;
 
         [Required]
         public Visibility Visibility { get; init; }
@@ -40,7 +40,7 @@ namespace YouTubeV2.Application.Model
 
 
         public virtual User User { get; init; } = null!;
-        public virtual IReadOnlyCollection<Tag> Tags { get; init; }
+        public virtual IReadOnlyCollection<Tag> Tags { get; init; } = null!;
 
         public Video() { }
 

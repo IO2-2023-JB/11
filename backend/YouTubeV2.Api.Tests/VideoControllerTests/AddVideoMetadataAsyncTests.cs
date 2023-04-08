@@ -24,16 +24,16 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
     public class AddVideoMetadataAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
-        private Mock<IUserService> _userServiceMock = new();
-        private Mock<IDateTimeProvider> _dateTimeProviderMock = new();
-        private User _user = new()
+        private readonly Mock<IUserService> _userServiceMock = new();
+        private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
+        private readonly User _user = new()
         {
             Email = "test@mail.com",
             UserName = "testUsername",
             Name = "testName",
             Surname = "testSurname",
         };
-        private DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
+        private readonly DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
 
         [TestInitialize]
         public async Task Initialize()

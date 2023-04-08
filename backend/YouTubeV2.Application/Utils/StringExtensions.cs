@@ -15,14 +15,14 @@ namespace YouTubeV2.Application.Utils
         {
             const char prefix = ':', suffix = ';';
             int startIndex = base64Input.IndexOf(prefix) + 1, endIndex = base64Input.IndexOf(suffix);
-            return base64Input.Substring(startIndex, endIndex - startIndex);
+            return base64Input[startIndex .. endIndex];
         }
 
         public static string GetImageData(this string base64Input)
         {
             const char prefix = ',';
             int startIndex = base64Input.IndexOf(prefix) + 1;
-            return base64Input.Substring(startIndex);
+            return base64Input[startIndex ..];
         }
     }
 }

@@ -24,7 +24,7 @@ namespace YouTubeV2.Application.Services
 
         public async Task<Guid> AddVideoMetadataAsync(VideoMetadataPostDTO videoMetadata, User user, CancellationToken cancellationToken = default)
         {
-            await _videoMetadataDtoValidator.ValidateAndThrowAsync(videoMetadata);
+            await _videoMetadataDtoValidator.ValidateAndThrowAsync(videoMetadata, cancellationToken);
             var video = Video.FromDTO(videoMetadata, user, _dateTimeProvider.UtcNow);
             _context.Users.Attach(user);
             await _context.Videos.AddAsync(video, cancellationToken);

@@ -14,8 +14,8 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
     public class GetVideoAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
-        private Mock<IBlobVideoService> _blobVideoService = new Mock<IBlobVideoService>();
-        private byte[] _wholeFileStreamContent = Encoding.UTF8.GetBytes("testStreamContent");
+        private readonly Mock<IBlobVideoService> _blobVideoService = new();
+        private readonly byte[] _wholeFileStreamContent = Encoding.UTF8.GetBytes("testStreamContent");
 
         [TestInitialize]
         public void Initialize()
