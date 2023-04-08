@@ -1,21 +1,17 @@
-import { test, expect } from '@playwright/test';
+import { test } from '@playwright/test';
+import { LoginObjectModel } from '../test-object-models/login-object-model';
 
-test('Login-Logout', async ({ page }) => {
-  // Login
-  await page.goto('http://localhost:4200/login');
+test('LoginFail-Login-Logout', async ({ page }) => {
 
-  await page.fill('#email-input', 'test@mail.com');
-  await page.fill('#password-input', '123!@#asdASD');
-  await page.click('#login-button');
+  const loginObjectModel = new LoginObjectModel(page);
+  await loginObjectModel.goToHome();
 
-  await expect(page).toHaveURL('http://localhost:4200');
-  let token = await page.evaluate(() => localStorage.getItem('token'));
-  expect(token != null).toBeTruthy();
+  await loginObjectModel.loginFail();
+  await loginObjectModel.expectLoginFail();
 
-  // Logout
-  await page.click('#logout-button');
+  await loginObjectModel.login();
+  await loginObjectModel.expectLoginSuccess();
 
-  await expect(page).toHaveURL('http://localhost:4200/login');
-  token = await page.evaluate(() => localStorage.getItem('token'));
-  expect(token).toBeNull();
+  await loginObjectModel.logout();
+  await loginObjectModel.expectLoginFail();
 });
