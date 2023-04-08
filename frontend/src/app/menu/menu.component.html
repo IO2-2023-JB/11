@@ -2,6 +2,7 @@
   <div class="flex justify-content-between flex-wrap">
     <div>
       <button
+        id="home-button"
         pButton
         pRipple
         type="home"
@@ -13,6 +14,7 @@
     <div style="margin-left: auto;">
       <button
         *ngIf="!isUserAuthenticated"
+        id="login-button"
         pButton
         pRipple
         type="login"
@@ -22,6 +24,7 @@
       </button>
       <button
         *ngIf="!isUserAuthenticated"
+        id="register-button"
         pButton
         pRipple
         type="register"
@@ -31,6 +34,7 @@
       </button>
       <button
         *ngIf="isUserAuthenticated"
+        id="logout-button"
         pButton
         pRipple
         type="logout"
