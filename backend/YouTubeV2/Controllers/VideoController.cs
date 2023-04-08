@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.Constants;
 using YouTubeV2.Application.DTO;
@@ -45,6 +46,6 @@ namespace YouTubeV2.Api.Controllers
             return Ok(id);
         }
 
-        private string GetUserId() => User.Claims.First(claim => claim.Type == CustomClaimTypes.userId).Value;
+        private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
     }
 }

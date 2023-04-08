@@ -8,6 +8,7 @@ using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Configurations.BlobStorage;
 using YouTubeV2.Application.Model;
+using YouTubeV2.Application.Providers;
 using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
 using YouTubeV2.Application.Services.JwtFeatures;
@@ -35,6 +36,7 @@ builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
 builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
 builder.Services.AddTransient<IVideoService, VideoService>();
+builder.Services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
@@ -57,6 +59,7 @@ builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
 
 var jwtSettings = new JwtSettings(builder.Configuration.GetSection("JWTSettings"));
 builder.Services.AddSingleton(jwtSettings);
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -94,10 +97,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-if (app.Environment.IsEnvironment("Test"))
-    app.MapControllers().AllowAnonymous();
-else
-    app.MapControllers();
+app.MapControllers();
 
 app.Run();
 

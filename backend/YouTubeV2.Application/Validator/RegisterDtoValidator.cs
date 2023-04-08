@@ -39,8 +39,8 @@ namespace YouTubeV2.Application.Validator
                 .Matches(@"[!@#$%^&*(),.<>?/]+").WithMessage("Your password must contain at least one special character.");
 
             RuleFor(x => x.avatarImage)
-                .Must(avatarImage => avatarImage.IsValidBase64Image())
-                .WithMessage("Avatar must be a valid base64-encoded PNG or JPEG image.");
+                .Must(avatarImage => avatarImage.IsValidBase64ImageOrEmpty())
+                .WithMessage("Avatar must be a valid base64-encoded PNG or JPEG image or empty.");
         }
     }
 }

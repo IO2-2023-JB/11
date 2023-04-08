@@ -30,10 +30,10 @@ namespace YouTubeV2.Application.Model
         public ProcessingProgress ProcessingProgress { get; init; } = ProcessingProgress.MetadataRecordCreater;
 
         [Required]
-        public DateTimeOffset UploadDate { get; init; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset UploadDate { get; init; }
 
         [Required]
-        public DateTimeOffset EditDate { get; init; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset EditDate { get; init; }
 
         [Required]
         public string Duration { get; init; } = "00:00";
@@ -44,15 +44,17 @@ namespace YouTubeV2.Application.Model
 
         public Video() { }
 
-        public static Video FromDTO(VideoMetadataPostDTO videoMetadata, User user) => new (videoMetadata.title, videoMetadata.description, videoMetadata.visibility, videoMetadata.tags, user);
+        public static Video FromDTO(VideoMetadataPostDTO videoMetadata, User user, DateTimeOffset now) =>
+            new (videoMetadata.title, videoMetadata.description, videoMetadata.visibility, videoMetadata.tags, user, now);
 
-        private Video(string title, string description, Visibility visibility, IReadOnlyCollection<string> tags, User user)
+        private Video(string title, string description, Visibility visibility, IReadOnlyCollection<string> tags, User user, DateTimeOffset now)
         {
             Title = title;
             Description = description;
             Visibility = visibility;
             Tags = tags.Select(tag => new Tag(tag)).ToImmutableList();
             User = user;
+            UploadDate = EditDate = now;
         }
     }
 }
