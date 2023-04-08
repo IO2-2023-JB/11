@@ -72,6 +72,9 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
+            string responseBody = await httpResponseMessage.Content.ReadAsStringAsync();
+            var deserializedResponseBody = JsonConvert.DeserializeObject<VideoMetadataPostResponseDTO>(responseBody);
+
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
@@ -82,6 +85,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
                     .SingleOrDefaultAsync();
 
                     videoResult.Should().NotBeNull();
+                    videoResult!.Id.Should().Be(deserializedResponseBody.id);
                     videoResult!.Title.Should().Be(videoMetadata.title);
                     videoResult!.Description.Should().Be(videoMetadata.description);
                     videoResult!.Visibility.Should().Be(videoMetadata.visibility);

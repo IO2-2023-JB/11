@@ -36,14 +36,14 @@ namespace YouTubeV2.Api.Controllers
 
         [HttpPost("video-metadata")]
         [Roles(Role.Creator)]
-        public async Task<IActionResult> AddVideoMetadataAsync([FromBody] VideoMetadataPostDTO videoMetadata, CancellationToken cancellationToken)
+        public async Task<ActionResult<VideoMetadataPostResponseDTO>> AddVideoMetadataAsync([FromBody] VideoMetadataPostDTO videoMetadata, CancellationToken cancellationToken)
         {
             string userId = GetUserId();
             User? user = await _userService.GetByIdAsync(userId);
             if (user == null) return NotFound("There is no user identifiable by given token");
 
             Guid id = await _videoService.AddVideoMetadataAsync(videoMetadata, user, cancellationToken);
-            return Ok(id);
+            return Ok(new VideoMetadataPostResponseDTO(id.ToString()));
         }
 
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
