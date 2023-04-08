@@ -29,11 +29,12 @@ string connectionString = builder.Configuration.GetConnectionString("Db")!;
 builder.Services.AddDbContext<YTContext>(
     options => options.UseSqlServer(connectionString));
 
-builder.Services.AddTransient<UserService>();
+builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddSingleton(x => new BlobServiceClient(Environment.GetEnvironmentVariable("AZURE_BLOB_STORAGE_CONNECTION_STRING")));
-builder.Services.AddTransient<SubscriptionsService>();
+builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
 builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
+builder.Services.AddTransient<IVideoService, VideoService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 

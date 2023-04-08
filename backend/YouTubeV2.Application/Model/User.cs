@@ -7,8 +7,8 @@ namespace YouTubeV2.Application.Model
     {
         public string Name { get; init; }
         public string Surname { get; init; }
-
         public virtual ICollection<Subscription> Subscriptions { get; init; }
+        public virtual IReadOnlyCollection<Video> Videos { get; init; }
 
         public User() { }
 
