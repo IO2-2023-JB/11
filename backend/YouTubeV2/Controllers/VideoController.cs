@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.Constants;
 using YouTubeV2.Application.DTO;

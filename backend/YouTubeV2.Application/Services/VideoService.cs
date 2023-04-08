@@ -23,6 +23,8 @@ namespace YouTubeV2.Application.Services
         {
             await _videoMetadataDtoValidator.ValidateAndThrowAsync(videoMetadata);
             var video = Video.FromDTO(videoMetadata, user);
+            await _context.Videos.AddAsync(video);
+            await _context.SaveChangesAsync();
             await _blobImageService.UploadVideoThumbnailAsync(videoMetadata.thumbnail, video.Id.ToString(), cancellationToken);
             return video.Id;
         }

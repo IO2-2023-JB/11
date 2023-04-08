@@ -7,10 +7,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using YouTubeV2.Application.Services.AzureServices.BlobServices;
 
-namespace YouTubeV2.Api.Tests
+namespace YouTubeV2.Api.Tests.VideoControllerTests
 {
     [TestClass]
-    public class VideoControllerTests
+    public class GetVideoAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private Mock<IBlobVideoService> _blobVideoService = new Mock<IBlobVideoService>();
