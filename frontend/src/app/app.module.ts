@@ -12,6 +12,7 @@ import { HttpErrorInterceptor } from './core/interceptors/http-error-interceptor
 import { VideoModule } from './pages/video/video.module';
 import { CreatorModule } from './pages/creator/creator.module';
 import { LoginModule } from './pages/login/login.module';
+import { AddVideoModule } from './pages/add-video/add-video.module';
 
 @NgModule({
     declarations: [
@@ -35,7 +36,8 @@ import { LoginModule } from './pages/login/login.module';
         MenuModule,
         BrowserAnimationsModule,
         VideoModule,
-        CreatorModule
+        CreatorModule,
+        AddVideoModule,
     ]
 })
 export class AppModule { }
