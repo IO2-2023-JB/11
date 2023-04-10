@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YouTubeV2.Application;
 
@@ -11,9 +12,11 @@ using YouTubeV2.Application;
 namespace YouTubeV2.Application.Migrations
 {
     [DbContext(typeof(YTContext))]
-    partial class YTContextModelSnapshot : ModelSnapshot
+    [Migration("20230407225051_VideosAdded")]
+    partial class VideosAdded
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,13 +110,6 @@ namespace YouTubeV2.Application.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            UserId = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
-                            RoleId = "39cc2fe2-d00d-4f48-a49d-005d8e983c72"
-                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -164,19 +160,19 @@ namespace YouTubeV2.Application.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "39cc2fe2-d00d-4f48-a49d-005d8e983c72",
+                            Id = "4b366327-19d1-4d54-b595-ba02e10b8afa",
                             Name = "Simple",
                             NormalizedName = "SIMPLE"
                         },
                         new
                         {
-                            Id = "63798117-72aa-4bc5-a1ef-4e771204d561",
+                            Id = "7ca775ff-cffe-42ae-85ad-cf13e9f39975",
                             Name = "Creator",
                             NormalizedName = "CREATOR"
                         },
                         new
                         {
-                            Id = "b3a48a48-1a74-45da-a179-03b298bc53bc",
+                            Id = "ed0a3367-f6ee-437d-856e-eecf86267c02",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -291,26 +287,6 @@ namespace YouTubeV2.Application.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
-                            AccessFailedCount = 0,
-                            ConcurrencyStamp = "deeb3074-4431-4eb8-8fd9-e6284ed1e234",
-                            Email = "test@mail.com",
-                            EmailConfirmed = false,
-                            LockoutEnabled = false,
-                            Name = "Prime",
-                            NormalizedEmail = "TEST@MAIL.COM",
-                            NormalizedUserName = "EXAMPLE",
-                            PasswordHash = "AQAAAAIAAYagAAAAECKy912+seLJXiYrY/JhIiTJCjRmTAcoKgfPi3VLU1p7ih8g8MeDT+fnDSKeHXX9yA==",
-                            PhoneNumberConfirmed = false,
-                            SecurityStamp = "1192c567-fd16-46cd-9270-78a4ce68e8c6",
-                            Surname = "Test",
-                            TwoFactorEnabled = false,
-                            UserName = "Example"
-                        });
                 });
 
             modelBuilder.Entity("YouTubeV2.Application.Model.Video", b =>
@@ -324,30 +300,14 @@ namespace YouTubeV2.Application.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Duration")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("EditDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("ProcessingProgress")
-                        .HasColumnType("int");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTimeOffset>("UploadDate")
-                        .HasColumnType("datetimeoffset");
-
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ViewCount")
-                        .HasColumnType("int");
 
                     b.Property<int>("Visibility")
                         .HasColumnType("int");

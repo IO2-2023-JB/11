@@ -6,12 +6,11 @@ using YouTubeV2.Application.Model;
 
 namespace YouTubeV2.Application
 {
-    public class YTContext : IdentityDbContext<
-        User,
-        Role,
-        string>
+    public class YTContext : IdentityDbContext<User, Role, string>
     {
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Video> Videos { get; set; }
+        public DbSet<Tag> Tags { get; set; }
 
         public YTContext(DbContextOptions<YTContext> options) : base(options) { }
 
