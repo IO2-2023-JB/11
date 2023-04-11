@@ -6,7 +6,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Text;
 using YouTubeV2.Api.Tests.Providers;
-using YouTubeV2.Application.Services.AzureServices.BlobServices;
+using YouTubeV2.Application.Services.BlobServices;
 
 namespace YouTubeV2.Api.Tests.VideoControllerTests
 {

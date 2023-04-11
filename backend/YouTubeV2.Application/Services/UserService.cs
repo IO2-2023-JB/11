@@ -4,7 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
-using YouTubeV2.Application.Services.AzureServices.BlobServices;
+using YouTubeV2.Application.Services.BlobServices;
 using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Validator;
 
