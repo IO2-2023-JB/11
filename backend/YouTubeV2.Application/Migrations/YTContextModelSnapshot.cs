@@ -113,6 +113,16 @@ namespace YouTubeV2.Application.Migrations
                         {
                             UserId = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
                             RoleId = "39cc2fe2-d00d-4f48-a49d-005d8e983c72"
+                        },
+                        new
+                        {
+                            UserId = "6EBD31DD-0321-4FDA-92FA-CD22A1190DC8",
+                            RoleId = "63798117-72aa-4bc5-a1ef-4e771204d561"
+                        },
+                        new
+                        {
+                            UserId = "CB6A6951-E91A-4A13-B6AC-8634883F5B93",
+                            RoleId = "b3a48a48-1a74-45da-a179-03b298bc53bc"
                         });
                 });
 
@@ -297,19 +307,55 @@ namespace YouTubeV2.Application.Migrations
                         {
                             Id = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "deeb3074-4431-4eb8-8fd9-e6284ed1e234",
-                            Email = "test@mail.com",
+                            ConcurrencyStamp = "8b502f63-4717-4180-a782-998d9ccd3c2b",
+                            Email = "simple@test.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            Name = "Prime",
-                            NormalizedEmail = "TEST@MAIL.COM",
-                            NormalizedUserName = "EXAMPLE",
-                            PasswordHash = "AQAAAAIAAYagAAAAECKy912+seLJXiYrY/JhIiTJCjRmTAcoKgfPi3VLU1p7ih8g8MeDT+fnDSKeHXX9yA==",
+                            Name = "Simple",
+                            NormalizedEmail = "SIMPLE@TEST.COM",
+                            NormalizedUserName = "TESTSIMPLE",
+                            PasswordHash = "AQAAAAIAAYagAAAAENfL3ShmDUXWqUSJSbnzkc2RMhtdW+b0Hinx/rObc3A43PIOGx6RLGR8MT5IkPPquw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "1192c567-fd16-46cd-9270-78a4ce68e8c6",
+                            SecurityStamp = "44d91bb0-39cd-4b82-a77b-67afd2942474",
                             Surname = "Test",
                             TwoFactorEnabled = false,
-                            UserName = "Example"
+                            UserName = "TestSimple"
+                        },
+                        new
+                        {
+                            Id = "6EBD31DD-0321-4FDA-92FA-CD22A1190DC8",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "f39285f5-abae-414e-a484-a45cdf66188a",
+                            Email = "creator@test.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            Name = "Creator",
+                            NormalizedEmail = "CREATOR@TEST.COM",
+                            NormalizedUserName = "TESTCREATOR",
+                            PasswordHash = "AQAAAAIAAYagAAAAEA+L9ASrjRPxC4j3nSqjCXv1z7hqVNv+JX5rJJXW5Sm9EVvIrtjsSYPQrD1xBXpbvg==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "9bcb5a4b-38f9-4bf6-9730-fe09bccc11f0",
+                            Surname = "Test",
+                            TwoFactorEnabled = false,
+                            UserName = "TestCreator"
+                        },
+                        new
+                        {
+                            Id = "CB6A6951-E91A-4A13-B6AC-8634883F5B93",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "3eed7e77-5dbc-427d-898f-1f4184cebdde",
+                            Email = "admin@test.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            Name = "Admin",
+                            NormalizedEmail = "ADMIN@TEST.COM",
+                            NormalizedUserName = "TESTADMIN",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJiZvxw0R8PLyPTaYnIksvBzgxR0hW38Bk/2STl466hk9a1m1i/XhLlOPPP42YNDVA==",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "ab902e25-0d69-4c46-9ce1-d8d72312ee52",
+                            Surname = "Test",
+                            TwoFactorEnabled = false,
+                            UserName = "TestAdmin"
                         });
                 });
 

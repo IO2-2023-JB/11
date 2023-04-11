@@ -1,7 +1,7 @@
 import { expect, Locator, Page } from '@playwright/test';
 
 export class LoginObjectModel {
-    readonly email = 'test@mail.com';
+    readonly email = 'simple@test.com';
     readonly password = '123!@#asdASD';
     readonly wrongPassword = 'Admin123';
 
@@ -51,6 +51,11 @@ export class LoginObjectModel {
 
     async expectLoginFail() {
         await expect(this.page).toHaveURL('http://localhost:4200/login');
+        const token = await this.page.evaluate(() => localStorage.getItem('token'));
+        expect(token).toBeNull();
+    }
+
+    async expectLogoutSuccess() {
         const token = await this.page.evaluate(() => localStorage.getItem('token'));
         expect(token).toBeNull();
     }

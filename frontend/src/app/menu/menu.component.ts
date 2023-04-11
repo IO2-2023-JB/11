@@ -9,7 +9,7 @@ import { UserService } from '../core/services/user.service';
   styleUrls: ['./menu.component.scss']
 })
 export class MenuComponent implements OnInit, OnDestroy {
-  isUserAuthenticated: boolean = false;
+  isUserAuthenticated!: boolean;
   isUserBankEmployee!: boolean;
   subscriptions: Subscription[] = [];
 

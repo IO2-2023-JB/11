@@ -13,5 +13,5 @@ test('LoginFail-Login-Logout', async ({ page }) => {
   await loginObjectModel.expectLoginSuccess();
 
   await loginObjectModel.logout();
-  await loginObjectModel.expectLoginFail();
+  await loginObjectModel.expectLogoutSuccess();
 });

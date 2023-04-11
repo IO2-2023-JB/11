@@ -43,27 +43,64 @@ namespace YouTubeV2.Application
 
             modelBuilder.Entity<Role>().HasData(roles);          
 
-            var user = new User
+            var simple = new User
             {
                 Id = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
-                Email = "test@mail.com",
-                NormalizedEmail = "test@mail.com".ToUpper(),
-                Name = "Prime",
+                Email = "simple@test.com",
+                NormalizedEmail = "simple@test.com".ToUpper(),
+                Name = "Simple",
                 Surname = "Test",
-                UserName = "Example",
-                NormalizedUserName = "Example".ToUpper(),
+                UserName = "TestSimple",
+                NormalizedUserName = "TestSimple".ToUpper(),
+            };
+
+            var creator = new User
+            {
+                Id = "6EBD31DD-0321-4FDA-92FA-CD22A1190DC8",
+                Email = "creator@test.com",
+                NormalizedEmail = "creator@test.com".ToUpper(),
+                Name = "Creator",
+                Surname = "Test",
+                UserName = "TestCreator",
+                NormalizedUserName = "TestCreator".ToUpper(),
+            };
+
+            var admin = new User
+            {
+                Id = "CB6A6951-E91A-4A13-B6AC-8634883F5B93",
+                Email = "admin@test.com",
+                NormalizedEmail = "admin@test.com".ToUpper(),
+                Name = "Admin",
+                Surname = "Test",
+                UserName = "TestAdmin",
+                NormalizedUserName = "TestAdmin".ToUpper(),
             };
 
             PasswordHasher<User> ph = new PasswordHasher<User>();
-            user.PasswordHash = ph.HashPassword(user, "123!@#asdASD");
+            simple.PasswordHash = ph.HashPassword(simple, "123!@#asdASD");
+            creator.PasswordHash = ph.HashPassword(creator, "123!@#asdASD");
+            admin.PasswordHash = ph.HashPassword(admin, "123!@#asdASD");
 
-            modelBuilder.Entity<User>().HasData(user);
+            modelBuilder.Entity<User>().HasData(simple);
+            modelBuilder.Entity<User>().HasData(creator);
+            modelBuilder.Entity<User>().HasData(admin);
 
-            modelBuilder.Entity<IdentityUserRole<string>>().HasData(new IdentityUserRole<string>
-            {
-                RoleId = roles[0].Id,
-                UserId = user.Id
-            });
+            modelBuilder.Entity<IdentityUserRole<string>>().HasData(
+                new IdentityUserRole<string>
+                {
+                    RoleId = roles[0].Id,
+                    UserId = simple.Id
+                },
+                new IdentityUserRole<string>
+                {
+                    RoleId = roles[1].Id,
+                    UserId = creator.Id
+                },
+                new IdentityUserRole<string>
+                {
+                    RoleId = roles[2].Id,
+                    UserId = admin.Id
+                });
         }
     }
 }

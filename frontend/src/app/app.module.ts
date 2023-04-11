@@ -13,11 +13,11 @@ import { VideoModule } from './pages/video/video.module';
 import { CreatorModule } from './pages/creator/creator.module';
 import { LoginModule } from './pages/login/login.module';
 import { HomeComponent } from './pages/home/home.component';
+import { HomeModule } from './pages/home/home.module';
 
 @NgModule({
     declarations: [
         AppComponent,
-        HomeComponent,
     ],
     providers: [
         MessageService,
@@ -37,7 +37,8 @@ import { HomeComponent } from './pages/home/home.component';
         MenuModule,
         BrowserAnimationsModule,
         VideoModule,
-        CreatorModule
+        CreatorModule,
+        HomeModule
     ]
 })
 export class AppModule { }
