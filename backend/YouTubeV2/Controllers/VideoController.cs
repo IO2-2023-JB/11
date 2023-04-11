@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections;
 using System.Security.Claims;
-using Xabe.FFmpeg;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Enums;

@@ -3,9 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.JSInterop;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Configurations.BlobStorage;
@@ -40,8 +38,9 @@ builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
 builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
 builder.Services.AddTransient<IVideoService, VideoService>();
 builder.Services.AddTransient<IDateTimeProvider, DateTimeProvider>();
-builder.Services.AddHostedService<VideoProcessingService>();
-builder.Services.AddSingleton<IVideoProcessingService>(sp => sp.GetRequiredService<VideoProcessingService>());
+
+builder.Services.AddSingleton<IVideoProcessingService, VideoProcessingService>();
+builder.Services.AddHostedService(serviceProvider => (VideoProcessingService)serviceProvider.GetRequiredService<IVideoProcessingService>());
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
