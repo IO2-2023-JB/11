@@ -57,7 +57,7 @@ jobs:
             ${{ runner.os }}-nuget-
       
       - name: check path
-        run: pwd
+        run: ls
             
       - name: Change variables
         uses: microsoft/variable-substitution@v1
