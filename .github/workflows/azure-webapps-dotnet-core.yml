@@ -55,9 +55,6 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
-      
-      - name: check path
-        run: echo ${{ github.workspace }}
             
       - name: Change variables
         uses: microsoft/variable-substitution@v1
@@ -67,7 +64,7 @@ jobs:
           ConnectionStrings.Db: ${{ secrets.DATABSE_CONNECTION_STRING }}
           
       - name: check
-        run: echo ${{ github.workspace }}/backend/YouTubeV2/appsettings.json
+        run: cat ${{ github.workspace }}/backend/YouTubeV2/appsettings.json
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
