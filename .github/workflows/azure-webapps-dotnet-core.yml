@@ -67,7 +67,7 @@ jobs:
         run: cat ${{ github.workspace }}/backend/YouTubeV2/appsettings.json 
         
       - name: secret 
-        run: echo ${{ secrets.DATABASE_CONNECTION_STRING }}
+        run: echo '${{ secrets.DATABASE_CONNECTION_STRING }}'
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
