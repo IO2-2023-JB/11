@@ -55,16 +55,19 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+      
+      - name: check path
+        run: pwd
             
       - name: Change variables
         uses: microsoft/variable-substitution@v1
         with:
-          files: '${{ env.WORKING_DIRECTORY }}/appsettings.json'
+          files: ./appsettings.json'
         env:
           ConnectionStrings.Db: ${{ secrets.DATABSE_CONNECTION_STRING }}
           
       - name: check
-        run: ls ${{ env.WORKING_DIRECTORY }}
+        run: ls ./appsettings.json
 
       - name: Build with dotnet
         run: dotnet build --configuration Release
