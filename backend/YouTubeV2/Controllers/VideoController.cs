@@ -66,7 +66,7 @@ namespace YouTubeV2.Api.Controllers
             if (video == null)
                 return NotFound($"Video with id {id} not found");
             if (video!.User.Id != GetUserId())
-                return Forbid("Trying to upload a video file for not owned video");
+                return Forbid();
             if (video.ProcessingProgress != ProcessingProgress.MetadataRecordCreater && video.ProcessingProgress != ProcessingProgress.FailedToUpload)
                 return BadRequest($"Trying to upload video which has processing progress {video.ProcessingProgress}");
 
