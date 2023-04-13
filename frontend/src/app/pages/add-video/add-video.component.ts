@@ -1,15 +1,17 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription, finalize, of, switchMap, tap } from 'rxjs';
 import { VideoMedatadataDTO } from './models/video-metadata-dto';
+import { AddVideoService } from './services/add-video.service';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-add-video',
   templateUrl: './add-video.component.html',
   styleUrls: ['./add-video.component.scss']
 })
-export class AddVideoComponent implements OnInit {
+export class AddVideoComponent implements OnDestroy {
   titleMaxLength = 100;
   descriptionMaxLength = 1000;
   visibilityOptions = ['Public', 'Private'];
@@ -24,9 +26,19 @@ export class AddVideoComponent implements OnInit {
   isProgressSpinnerVisible = false;
   @ViewChild('thumbnailUpload') thumbnailUpload!: FileUpload;
 
-  constructor() { }
+  constructor(private addVideoService: AddVideoService, private messageService: MessageService) { }
 
-  ngOnInit(): void {
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
+  }
+
+  private doWithLoading(observable$: Observable<any>): Observable<any> {
+    return of(this.isProgressSpinnerVisible = true).pipe(
+      switchMap(() => observable$),
+      finalize(() => this.isProgressSpinnerVisible = false)
+    );
   }
 
   onSubmit(): void {
@@ -42,6 +54,17 @@ export class AddVideoComponent implements OnInit {
       tags: this.addVideoForm.get('tags')!.value!,
       visibility: this.addVideoForm.get('visibility')!.value!
     };
+
+    const postVideoMetadata$ = this.addVideoService.postVideoMetadata(videoMedatadaDTO).pipe(
+      tap(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Video metadata added'
+        })
+      }),
+    );
+    this.subscriptions.push(this.doWithLoading(postVideoMetadata$).subscribe());
   }
 
   isInputInvalidAndTouchedOrDirty(inputName: string): boolean {
