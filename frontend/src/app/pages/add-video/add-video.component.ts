@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, ViewChild } from '@angular/core';
 import { AbstractControl, FormControl, FormGroup, Validators } from '@angular/forms';
 import { FileUpload } from 'primeng/fileupload';
 import { Observable, Subscription, finalize, of, switchMap, tap } from 'rxjs';
@@ -24,7 +24,11 @@ export class AddVideoComponent implements OnDestroy {
   });
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
+  video: FormData | null = null;
+  videoUploadTouched = false;
+  supportedVideoTypes = ['video/mp4', 'video/avi', 'video/webm', 'video/x-matroska'];
   @ViewChild('thumbnailUpload') thumbnailUpload!: FileUpload;
+  @ViewChild('videoUpload') videoUpload!: FileUpload;
 
   constructor(private addVideoService: AddVideoService, private messageService: MessageService) { }
 
@@ -42,8 +46,9 @@ export class AddVideoComponent implements OnDestroy {
   }
 
   onSubmit(): void {
-    if (this.addVideoForm.invalid) {
+    if (this.addVideoForm.invalid || this.video === null) {
       this.addVideoForm.markAllAsTouched();
+      this.videoUploadTouched = true;
       return;
     }
 
@@ -55,16 +60,20 @@ export class AddVideoComponent implements OnDestroy {
       visibility: this.addVideoForm.get('visibility')!.value!
     };
 
-    const postVideoMetadata$ = this.addVideoService.postVideoMetadata(videoMedatadaDTO).pipe(
-      tap(() => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Video metadata added'
-        })
+    const uploadVideo$ = this.addVideoService.postVideoMetadata(videoMedatadaDTO).pipe(
+      switchMap(videoId => {
+        return this.addVideoService.uploadVideo(videoId, this.video!).pipe(
+          tap(() => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Video upload accepted'
+            })
+          }),
+        )
       }),
     );
-    this.subscriptions.push(this.doWithLoading(postVideoMetadata$).subscribe());
+    this.subscriptions.push(this.doWithLoading(uploadVideo$).subscribe());
   }
 
   isInputInvalidAndTouchedOrDirty(inputName: string): boolean {
@@ -86,7 +95,7 @@ export class AddVideoComponent implements OnDestroy {
     return control.touched || control.dirty;
   }
 
-  handleOnFileSelect(event: { originalEvent: Event; files: File[] }): void {
+  handleOnThumbnailSelect(event: { originalEvent: Event; files: File[] }): void {
     const thumbnailFile = event.files[0];
     if (thumbnailFile.type === 'image/png' || thumbnailFile.type === 'image/jpeg') {
       const reader = new FileReader();
@@ -97,8 +106,27 @@ export class AddVideoComponent implements OnDestroy {
     }
   }
 
-  handleOnRemove(): void {
+  handleOnThumbnailRemove(): void {
     this.addVideoForm.patchValue({thumbnail: ''});
     this.thumbnailUpload.clear();
+  }
+
+  handleOnVideoSelect(event: { originalEvent: Event; files: File[] }): void {
+    this.videoUploadTouched = true;
+    const uploadedVideo = event.files[0];
+    if (this.supportedVideoTypes.includes(uploadedVideo.type)) {
+      this.video = new FormData();
+      this.video.append('videoFile', new Blob([uploadedVideo], {type: uploadedVideo.type}));
+    }
+  }
+
+  handleOnVideoRemove(): void {
+    this.video = null;
+    this.videoUpload.clear();
+    this.videoUploadTouched = true;
+  }
+
+  isVideoInputInvalidAndTouchedOrDirty(): boolean {
+    return this.videoUploadTouched && this.video === null;
   }
 }

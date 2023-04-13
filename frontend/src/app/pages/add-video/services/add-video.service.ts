@@ -12,10 +12,17 @@ import { getHttpOptionsWithAuthenticationHeader } from 'src/app/core/functions/g
 export class AddVideoService {
   private readonly addVideoPageWebAPIUrl: string = `${environment.webApiUrl}`;
 
-  constructor(private httpClient: HttpClient, private userService: UserService) { }
+  constructor(private httpClient: HttpClient) { }
 
   postVideoMetadata(videoMetadataDTO: VideoMedatadataDTO): Observable<string> {
     const postVideoMetadataWebAPIUrl: string = `${this.addVideoPageWebAPIUrl}/video-metadata`;
     return this.httpClient.post<string>(postVideoMetadataWebAPIUrl, videoMetadataDTO, getHttpOptionsWithAuthenticationHeader());
+  }
+
+  uploadVideo(videoId: string, videoFile: FormData): Observable<void> {
+    return this.httpClient.post<void>(
+      `${this.addVideoPageWebAPIUrl}/video/${videoId}`,
+      videoFile,
+      getHttpOptionsWithAuthenticationHeader());
   }
 }
