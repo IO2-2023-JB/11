@@ -18,7 +18,7 @@ using YouTubeV2.Application.Services.VideoServices;
 namespace YouTubeV2.Api.Tests.VideoControllerTests
 {
     [TestClass]
-    public class UploadVidoeAsyncTests
+    public class UploadVideoAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private readonly Mock<IVideoProcessingService> _videoProcessingServiceMock = new();

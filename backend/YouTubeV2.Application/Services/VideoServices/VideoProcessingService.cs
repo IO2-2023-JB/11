@@ -25,7 +25,9 @@ namespace YouTubeV2.Application.Services.VideoServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official);
+            await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, Directory.GetCurrentDirectory());
+            FFmpeg.SetExecutablesPath(Directory.GetCurrentDirectory());
+
             await foreach (var videoProcessJob in _videoProcessingChannel.Reader.ReadAllAsync(stoppingToken))
             {
                 await ConvertToMP4AndUploadVideoAsync(videoProcessJob, stoppingToken);
@@ -45,6 +47,8 @@ namespace YouTubeV2.Application.Services.VideoServices
 
                 if (video == null) return;
 
+                if (video.ProcessingProgress != ProcessingProgress.Uploading) return;
+
                 if (videoProcessJob.Extension == _mp4Extension)
                 {
 
@@ -55,19 +59,28 @@ namespace YouTubeV2.Application.Services.VideoServices
 
                 await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Processing, cancellationToken);
 
-                var inputFilePath = Path.GetTempFileName() + videoProcessJob.Extension;
-                var outputFilePath = Path.GetTempFileName() + _mp4Extension;
+                var inputFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"{videoProcessJob.VideoId}{videoProcessJob.Extension}");
+                var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"{videoProcessJob.VideoId}{_mp4Extension}");
 
                 await using var inputFileStream = File.Create(inputFilePath);
                 await videoProcessJob.VideoStream.CopyToAsync(inputFileStream, cancellationToken);
+                await inputFileStream.FlushAsync(cancellationToken);
+                inputFileStream.Close();
 
-                var conversion = await FFmpeg.Conversions.FromSnippet.Convert(inputFilePath, outputFilePath);
+                var conversion = FFmpeg.Conversions.New()
+                    .AddParameter($"-i \"{inputFilePath}\"")
+                    .SetOutput(outputFilePath)
+                    .SetOverwriteOutput(true);
+
+
+                //var conversion = await FFmpeg.Conversions.FromSnippet.Convert(inputFilePath, outputFilePath);
                 await conversion.Start(cancellationToken);
 
                 File.Delete(inputFilePath);
 
-                using var outputFileStream = File.OpenRead(outputFilePath);
+                await using var outputFileStream = File.OpenRead(outputFilePath);
                 await blobVideoService.UploadVideoAsync(videoProcessJob.VideoId.ToString(), outputFileStream, cancellationToken);
+                outputFileStream.Close();
                 File.Delete(outputFilePath);
                 await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Ready, cancellationToken);
             }
