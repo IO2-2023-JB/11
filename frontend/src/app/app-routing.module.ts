@@ -5,8 +5,10 @@ import { CreatorComponent } from './pages/creator/creator.component';
 import { LoginComponent } from '../app/pages/login/login.component';
 import { VideoComponent } from './pages/video/video.component';
 import { AddVideoComponent } from './pages/add-video/add-video.component';
+import { HomeComponent } from './pages/home/home.component';
 
 const routes: Routes = [
+  { path: '', component: HomeComponent },
   { path: 'register', component: RegistrationComponent },
   { path: 'creator/:id', component: CreatorComponent },
   { path: 'videos/:videoId', component: VideoComponent },
