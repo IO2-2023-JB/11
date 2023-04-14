@@ -43,12 +43,4 @@ export class UserService {
   loginUser(userForLogin: UserForLoginDTO): Observable<string> {
     return this.httpClient.post<string>(`${this.registrationPageWebAPIUrl}/login`, userForLogin);
   }
-
-  getToken(): string {
-    const token = localStorage.getItem('token');
-    if (token === null) {
-      return '';
-    }
-    return token;
-  }
 }

@@ -12,6 +12,6 @@ namespace YouTubeV2.Application.Services
 
         Task<User?> GetByIdAsync(string id);
 
-        public ClaimsPrincipal? ValidateToken(string token);
+        ClaimsPrincipal? ValidateToken(string token);
     }
 }
