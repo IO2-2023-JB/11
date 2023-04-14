@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
@@ -72,5 +73,7 @@ namespace YouTubeV2.Application.Services
         }
 
         public async Task<User?> GetByIdAsync(string id) => await _userManager.FindByIdAsync(id);
+
+        public ClaimsPrincipal? ValidateToken(string token) => _jwtHandler.ValidateToken(token);
     }
 }

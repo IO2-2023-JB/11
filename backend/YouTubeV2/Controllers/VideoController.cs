@@ -33,11 +33,15 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("video/{id:guid}")]
-        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
-        public async Task<IActionResult> GetVideoAsync(Guid id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetVideoAsync(Guid id, [FromQuery] string access_token, CancellationToken cancellationToken)
         {
-            // + ".mp4" is temporary as adding files from local file system seems to be adding extensions as prefix to the name (will change with uploading video from our portal)
-            Stream videoStream = await _blobVideoService.GetVideoAsync(id.ToString() + ".mp4", cancellationToken);
+            ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(access_token);
+            if (claimsPrincipal == null) return Unauthorized();
+
+            if (!claimsPrincipal.IsInRole(Role.Simple) && !claimsPrincipal.IsInRole(Role.Creator) && !claimsPrincipal.IsInRole(Role.Administrator))
+                return Forbid();
+
+            Stream videoStream = await _blobVideoService.GetVideoAsync(id.ToString(), cancellationToken);
             Response.Headers.AcceptRanges = "bytes";
 
             return File(videoStream, "video/mp4", true);
