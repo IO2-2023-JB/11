@@ -17,5 +17,15 @@ namespace YouTubeV2.Application.Model
         public virtual User Author { get; init; } = null!;
         public virtual Video Video { get; init; } = null!;
         public virtual IReadOnlyCollection<CommentResponse> Responses { get; init; } = null!;
+
+        public Comment() { }
+
+        public Comment(string content, User author, Video video, DateTimeOffset now)
+        {
+            Content = content;
+            Author = author;
+            Video = video;
+            CreateDate = now;
+        }
     }
 }

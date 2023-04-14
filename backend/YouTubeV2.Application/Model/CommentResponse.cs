@@ -16,5 +16,7 @@ namespace YouTubeV2.Application.Model
 
         public virtual User Author { get; init; } = null!;
         public virtual Comment RespondOn { get; init; } = null!;
+
+        public CommentResponse() { }
     }
 }

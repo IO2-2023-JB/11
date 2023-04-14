@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using YouTubeV2.Api.InputFormaters;
 using YouTubeV2.Api.Middleware;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Configurations.BlobStorage;
@@ -19,7 +20,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.InputFormatters.Add(new TextPlainInputFormatter());
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -37,6 +41,7 @@ builder.Services.AddTransient<ISubscriptionService, SubscriptionService>();
 builder.Services.AddSingleton<IBlobImageService, BlobImageService>();
 builder.Services.AddSingleton<IBlobVideoService, BlobVideoService>();
 builder.Services.AddTransient<IVideoService, VideoService>();
+builder.Services.AddTransient<ICommentService, CommentService>();
 builder.Services.AddTransient<IDateTimeProvider, DateTimeProvider>();
 
 builder.Services.AddSingleton<IVideoProcessingService, VideoProcessingService>();
