@@ -39,8 +39,9 @@ namespace YouTubeV2.Application.Model
         public string Duration { get; init; } = "00:00";
 
 
-        public virtual User User { get; init; } = null!;
-        public virtual IReadOnlyCollection<Tag> Tags { get; init; } = null!;
+        public virtual User User { get; init; }
+        public virtual IReadOnlyCollection<Tag> Tags { get; init; }
+        public virtual IReadOnlyCollection<Comment> Comments { get; init; }
 
         public Video() { }
 
@@ -55,6 +56,7 @@ namespace YouTubeV2.Application.Model
             Tags = tags.Select(tag => new Tag(tag)).ToImmutableList();
             User = user;
             UploadDate = EditDate = now;
+            Comments = ImmutableList.Create<Comment>();
         }
     }
 }

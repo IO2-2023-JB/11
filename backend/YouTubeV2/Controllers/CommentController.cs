@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
+using System.Threading;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.Constants;
+using YouTubeV2.Application.DTO.CommentsDTO;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.VideoServices;
@@ -41,6 +43,19 @@ namespace YouTubeV2.Api.Controllers
             await _commentService.AddComment(commentContent, author, video);
 
             return Ok();
+        }
+
+        [HttpGet]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<ActionResult<CommentsDTO>> GetCommentsAsync([FromQuery] Guid id, CancellationToken cancellationToken)
+        {
+            Video? video = await _videoService.GetVideoByIdAsync(
+                id,
+                cancellationToken,
+                video => video.Comments.Select(comment => comment.Author));
+            if (video == null) return NotFound($"Video with id {id} you want to comment not found");
+
+            return _commentService.GetAllComments(video);
         }
 
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
