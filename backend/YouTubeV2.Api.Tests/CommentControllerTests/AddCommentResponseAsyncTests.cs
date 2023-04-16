@@ -18,12 +18,12 @@ using YouTubeV2.Application.Providers;
 namespace YouTubeV2.Api.Tests.CommentControllerTests
 {
     [TestClass]
-    public class AddCommentAsyncTests
+    public class AddCommentResponseAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
         private readonly DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
-        private readonly User _user = new()
+        private readonly User _videoAuthor = new()
         {
             Email = "test@mail.com",
             UserName = "testUsername",
@@ -37,9 +37,18 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             Name = "commentName",
             Surname = "commentSurname",
         };
+        private readonly User _responseAuthor = new()
+        {
+            Email = "response@mail.com",
+            UserName = "responseUsername",
+            Name = "responseName",
+            Surname = "responseSurname",
+        };
+
         private Video _video = null!;
         private string _commentAuthorId = null!;
-        private Guid _videoId;
+        private string _responseAuthorId = null!;
+        private Guid _commentId;
 
 
         [TestInitialize]
@@ -52,7 +61,16 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
                 Visibility = Visibility.Public,
                 UploadDate = DateTimeOffset.UtcNow,
                 EditDate = DateTimeOffset.UtcNow,
-                User = _user,
+                User = _videoAuthor,
+                Comments = new List<Comment>()
+                {
+                    new()
+                    {
+                        Content = "other comment1 content",
+                        CreateDate = DateTimeOffset.UtcNow,
+                        Author = _commentAuthor,
+                    }
+                }
             };
             _dateTimeProviderMock.Setup(x => x.UtcNow).Returns(_utcNow);
             _webApplicationFactory = Setup.GetWebApplicationFactory(_dateTimeProviderMock.Object);
@@ -63,30 +81,33 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
               async userManager =>
               {
-                  await userManager.CreateAsync(_user);
+                  await userManager.CreateAsync(_videoAuthor);
                   await userManager.CreateAsync(_commentAuthor);
+                  await userManager.CreateAsync(_responseAuthor);
                   _commentAuthorId = await userManager.GetUserIdAsync(_commentAuthor);
+                  _responseAuthorId = await userManager.GetUserIdAsync(_responseAuthor);
               });
 
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
-                    context.Users.Attach(_user);
+                    context.Users.Attach(_videoAuthor);
+                    context.Users.Attach(_commentAuthor);
                     var video = await context.Videos.AddAsync(_video);
                     await context.SaveChangesAsync();
-                    _videoId = video.Entity.Id;
+                    _commentId = video.Entity.Comments.Single().Id;
                 });
         }
 
         [TestMethod]
-        public async Task AddCommentAsyncWithValidContent_ShouldAddToDataBase()
+        public async Task AddCommentResponseAsyncWithValidContent_ShouldAddToDataBase()
         {
             // ARRANGE
-            string commentContent = "Test comment content";
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Creator, _commentAuthorId)).CreateClient();
+            string responseCommentContent = "Test comment response content";
+            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Creator, _responseAuthorId)).CreateClient();
 
             // ACT
-            var httpResponseMessage = await httpClient.PostAsync($"comment?id={_videoId}", new StringContent(commentContent, Encoding.UTF8, "text/plain"));
+            var httpResponseMessage = await httpClient.PostAsync($"comment/response?id={_commentId}", new StringContent(responseCommentContent, Encoding.UTF8, "text/plain"));
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -94,29 +115,29 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
-                    Comment? commentResult = await context
-                        .Comments
-                        .Include(comment => comment.Video)
-                        .Include(comment => comment.Author)
-                        .SingleOrDefaultAsync();
+                    CommentResponse? commentResponseResult = await context
+                        .CommentResponses
+                        .Include(commentResponse => commentResponse.Author)
+                        .Include(commentResponse => commentResponse.RespondOn)
+                        .SingleOrDefaultAsync(commentResponse => commentResponse.RespondOn.Id == _commentId);
 
-                    commentResult.Should().NotBeNull();
-                    commentResult!.Content.Should().Be(commentContent);
-                    commentResult.CreateDate.Should().Be(_utcNow);
-                    commentResult.Author.Id.Should().Be(_commentAuthorId);
-                    commentResult.Video.Id.Should().Be(_videoId);
+                    commentResponseResult.Should().NotBeNull();
+                    commentResponseResult!.Content.Should().Be(responseCommentContent);
+                    commentResponseResult.CreateDate.Should().Be(_utcNow);
+                    commentResponseResult.Author.Id.Should().Be(_responseAuthorId);
+                    commentResponseResult.RespondOn.Id.Should().Be(_commentId);
                 });
         }
 
         [TestMethod]
-        public async Task AddCommentAsyncEmptyComment_ShouldReturnStatusCodeBadRequest()
+        public async Task AddCommentResponseAsyncEmptyComment_ShouldReturnStatusCodeBadRequest()
         {
             // ARRANGE
-            string commentContent = new ('a', CommentConstants.commentMaxLength + 1);
+            string responseCommentContent = new('a', CommentConstants.commentMaxLength + 1);
             using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccess(Role.Creator)).CreateClient();
 
             // ACT
-            var httpResponseMessage = await httpClient.PostAsync($"comment?id={_videoId}", new StringContent(commentContent, Encoding.UTF8, "text/plain"));
+            var httpResponseMessage = await httpClient.PostAsync($"comment/response?id={_commentId}", new StringContent(responseCommentContent, Encoding.UTF8, "text/plain"));
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);

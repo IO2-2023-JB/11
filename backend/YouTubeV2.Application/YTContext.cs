@@ -12,7 +12,7 @@ namespace YouTubeV2.Application
         public DbSet<Video> Videos { get; set; }
         public DbSet<Tag> Tags { get; set; }
         public DbSet<Comment> Comments { get; set; }
-        public DbSet<CommentResponse> CommentsResponse { get; set; }
+        public DbSet<CommentResponse> CommentResponses { get; set; }
 
         public YTContext(DbContextOptions<YTContext> options) : base(options) { }
 
@@ -78,7 +78,7 @@ namespace YouTubeV2.Application
                 NormalizedUserName = "TestAdmin".ToUpper(),
             };
 
-            PasswordHasher<User> ph = new PasswordHasher<User>();
+            PasswordHasher<User> ph = new();
             simple.PasswordHash = ph.HashPassword(simple, "123!@#asdASD");
             creator.PasswordHash = ph.HashPassword(creator, "123!@#asdASD");
             admin.PasswordHash = ph.HashPassword(admin, "123!@#asdASD");

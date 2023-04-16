@@ -40,7 +40,7 @@ namespace YouTubeV2.Api.Controllers
             User? author = await _userService.GetByIdAsync(authorId);
             if (author == null) return NotFound($"User with id {authorId} not found");
 
-            await _commentService.AddComment(commentContent, author, video);
+            await _commentService.AddCommentAsync(commentContent, author, video, cancellationToken);
 
             return Ok();
         }
@@ -48,7 +48,26 @@ namespace YouTubeV2.Api.Controllers
         [HttpGet]
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<CommentsDTO>> GetCommentsAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
-            await _commentService.GetAllComments(id, cancellationToken);
+            await _commentService.GetAllCommentsAsync(id, cancellationToken);
+
+        [HttpPost("response")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        [Consumes("text/plain")]
+        public async Task<ActionResult> AddCommentResponseAsync([FromQuery] Guid id, [FromBody] string responseContent, CancellationToken cancellationToken)
+        {
+            if (responseContent.Length > CommentConstants.commentMaxLength) return BadRequest($"Comment must be at most {CommentConstants.commentMaxLength} character long");
+
+            Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken);
+            if (comment == null) return NotFound($"Comment with id {id} you want to comment not found");
+
+            string authorId = GetUserId();
+            User? author = await _userService.GetByIdAsync(authorId);
+            if (author == null) return NotFound($"User with id {authorId} not found");
+
+            await _commentService.AddCommentResponseAsync(responseContent, author, comment, cancellationToken);
+
+            return Ok();
+        }
 
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
     }

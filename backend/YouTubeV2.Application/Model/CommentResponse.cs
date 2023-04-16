@@ -18,5 +18,13 @@ namespace YouTubeV2.Application.Model
         public virtual Comment RespondOn { get; init; } = null!;
 
         public CommentResponse() { }
+
+        public CommentResponse(string content, DateTimeOffset createData, User author, Comment respondOn)
+        {
+            Content = content;
+            CreateDate = createData;
+            Author = author;
+            RespondOn = respondOn;
+        }
     }
 }
