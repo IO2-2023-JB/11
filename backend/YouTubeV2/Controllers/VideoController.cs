@@ -67,10 +67,10 @@ namespace YouTubeV2.Api.Controllers
             string videoExtension = Path.GetExtension(videoFile.FileName).ToLower();
             if (!_allowedVideoExtensions.Contains(videoExtension))
                 return BadRequest($"Video extension provided ({videoExtension}) is not supported. Supported extensions: .mkv, .mp4, .avi, .webm");
-            Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken, video => video.User);
+            Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken, video => video.Author);
             if (video == null)
                 return NotFound($"Video with id {id} not found");
-            if (video!.User.Id != GetUserId())
+            if (video!.Author.Id != GetUserId())
                 return Forbid();
             if (video.ProcessingProgress != ProcessingProgress.MetadataRecordCreater && video.ProcessingProgress != ProcessingProgress.FailedToUpload)
                 return BadRequest($"Trying to upload video which has processing progress {video.ProcessingProgress}");

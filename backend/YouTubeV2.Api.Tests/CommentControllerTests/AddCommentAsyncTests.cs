@@ -52,7 +52,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
                 Visibility = Visibility.Public,
                 UploadDate = DateTimeOffset.UtcNow,
                 EditDate = DateTimeOffset.UtcNow,
-                User = _user,
+                Author = _user,
             };
             _dateTimeProviderMock.Setup(x => x.UtcNow).Returns(_utcNow);
             _webApplicationFactory = Setup.GetWebApplicationFactory(_dateTimeProviderMock.Object);

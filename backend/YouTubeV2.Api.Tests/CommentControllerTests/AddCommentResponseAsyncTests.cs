@@ -61,7 +61,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
                 Visibility = Visibility.Public,
                 UploadDate = DateTimeOffset.UtcNow,
                 EditDate = DateTimeOffset.UtcNow,
-                User = _videoAuthor,
+                Author = _videoAuthor,
                 Comments = new List<Comment>()
                 {
                     new()
