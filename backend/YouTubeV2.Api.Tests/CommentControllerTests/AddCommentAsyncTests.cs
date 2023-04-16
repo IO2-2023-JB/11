@@ -23,29 +23,21 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
         private readonly DateTimeOffset _utcNow = DateTimeOffset.UtcNow;
-        private readonly static User _user = new()
+        private readonly User _user = new()
         {
             Email = "test@mail.com",
             UserName = "testUsername",
             Name = "testName",
             Surname = "testSurname",
         };
-        private readonly static User _commentAuthor = new()
+        private readonly User _commentAuthor = new()
         {
             Email = "comment@mail.com",
             UserName = "commentUsername",
             Name = "commentName",
             Surname = "commentSurname",
         };
-        private readonly static Video _video = new()
-        {
-            Title = "test title",
-            Description = "test description",
-            Visibility = Visibility.Public,
-            UploadDate = DateTimeOffset.UtcNow,
-            EditDate = DateTimeOffset.UtcNow,
-            User = _user,
-        };
+        private Video _video = null!;
         private string _commentAuthorId = null!;
         private Guid _videoId;
 
@@ -53,6 +45,15 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         [TestInitialize]
         public async Task Initialize()
         {
+            _video = new()
+            {
+                Title = "test title",
+                Description = "test description",
+                Visibility = Visibility.Public,
+                UploadDate = DateTimeOffset.UtcNow,
+                EditDate = DateTimeOffset.UtcNow,
+                User = _user,
+            };
             _dateTimeProviderMock.Setup(x => x.UtcNow).Returns(_utcNow);
             _webApplicationFactory = Setup.GetWebApplicationFactory(_dateTimeProviderMock.Object);
             var config = _webApplicationFactory.Services.GetService<IConfiguration>();
@@ -111,7 +112,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         public async Task AddCommentAsyncEmptyComment_ShouldReturnStatusCodeBadRequest()
         {
             // ARRANGE
-            string commentContent = new string('a', CommentConstants.commentMaxLength + 1);
+            string commentContent = new ('a', CommentConstants.commentMaxLength + 1);
             using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Creator, _commentAuthorId)).CreateClient();
 
             // ACT
