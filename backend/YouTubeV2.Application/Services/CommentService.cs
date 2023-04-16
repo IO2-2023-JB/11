@@ -1,4 +1,5 @@
-﻿using YouTubeV2.Application.DTO.CommentsDTO;
+﻿using Microsoft.EntityFrameworkCore;
+using YouTubeV2.Application.DTO.CommentsDTO;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Providers;
 using YouTubeV2.Application.Services.BlobServices;
@@ -28,16 +29,22 @@ namespace YouTubeV2.Application.Services
             await _context.SaveChangesAsync();
         }
 
-        public CommentsDTO GetAllComments(Video video)
+        public async Task<CommentsDTO> GetAllComments(Guid videoId, CancellationToken cancellationToken)
         {
-            return new CommentsDTO(video.Comments.Select(comment =>
-                new CommentsDTO.CommentDTO(
+            var comments = await _context
+                .Comments
+                .Include(comment => comment.Author)
+                .Where(comment => comment.Video.Id == videoId)
+                .Select(comment => new CommentsDTO.CommentDTO(
                     comment.Id,
                     comment.Author.Id,
                     comment.Content,
                     _blobImageService.GetProfilePicture(comment.Author.Id),
                     comment.Author.UserName!,
-                    comment.Responses.Any())).ToArray());
+                    comment.Responses.Any()))
+                .ToArrayAsync(cancellationToken);
+
+            return new CommentsDTO(comments);
         }
     }
 }

@@ -47,16 +47,8 @@ namespace YouTubeV2.Api.Controllers
 
         [HttpGet]
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
-        public async Task<ActionResult<CommentsDTO>> GetCommentsAsync([FromQuery] Guid id, CancellationToken cancellationToken)
-        {
-            Video? video = await _videoService.GetVideoByIdAsync(
-                id,
-                cancellationToken,
-                video => video.Comments.Select(comment => comment.Author));
-            if (video == null) return NotFound($"Video with id {id} you want to comment not found");
-
-            return _commentService.GetAllComments(video);
-        }
+        public async Task<ActionResult<CommentsDTO>> GetCommentsAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
+            await _commentService.GetAllComments(id, cancellationToken);
 
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
     }

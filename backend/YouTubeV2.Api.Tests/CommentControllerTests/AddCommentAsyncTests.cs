@@ -6,15 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
-using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 using YouTubeV2.Api.Enums;
 using YouTubeV2.Api.Tests.Providers;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Constants;
-using YouTubeV2.Application.DTO;
-using YouTubeV2.Application.Enums;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Providers;
 
@@ -81,7 +78,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         }
 
         [TestMethod]
-        public async Task AddCommentAsyncWithValidToken_ShouldAddToDataBase()
+        public async Task AddCommentAsyncWithValidContent_ShouldAddToDataBase()
         {
             // ARRANGE
             string commentContent = "Test comment content";

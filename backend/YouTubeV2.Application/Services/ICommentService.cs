@@ -7,6 +7,6 @@ namespace YouTubeV2.Application.Services
     {
         Task AddComment(string commentContent, User author, Video video);
 
-        CommentsDTO GetAllComments(Video video);
+        Task<CommentsDTO> GetAllComments(Guid videoId, CancellationToken cancellationToken);
     }
 }
