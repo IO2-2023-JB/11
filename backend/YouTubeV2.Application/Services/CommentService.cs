@@ -70,5 +70,23 @@ namespace YouTubeV2.Application.Services
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<CommentsDTO> GetAllCommentResponsesAsync(Guid commentId, CancellationToken cancellationToken)
+        {
+            var commentResponses = await _context
+                .CommentResponses
+                .Include(response => response.Author)
+                .Where(response => response.RespondOn.Id == commentId)
+                .Select(response => new CommentsDTO.CommentDTO(
+                    response.Id,
+                    response.Author.Id,
+                    response.Content,
+                    _blobImageService.GetProfilePicture(response.Author.Id),
+                    response.Author.UserName!,
+                    false))
+                .ToArrayAsync(cancellationToken);
+
+            return new CommentsDTO(commentResponses);
+        }
     }
 }

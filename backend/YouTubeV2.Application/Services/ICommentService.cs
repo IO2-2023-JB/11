@@ -15,5 +15,7 @@ namespace YouTubeV2.Application.Services
         Task AddCommentResponseAsync(string responseContent, User author, Comment comment, CancellationToken cancellationToken);
 
         Task RemoveCommentAsync(Comment comment, CancellationToken cancellationToken);
+
+        Task<CommentsDTO> GetAllCommentResponsesAsync(Guid commentId, CancellationToken cancellationToken);
     }
 }

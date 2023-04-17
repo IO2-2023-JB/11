@@ -83,6 +83,11 @@ namespace YouTubeV2.Api.Controllers
             return Ok();
         }
 
+        [HttpGet("response")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<ActionResult<CommentsDTO>> GetCommentResponsesAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
+            await _commentService.GetAllCommentResponsesAsync(id, cancellationToken);
+
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
 
         private string GetUserRole() => User.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;

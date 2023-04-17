@@ -18,7 +18,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private User _commentOwner = null!;
-        private readonly User _notCommentOwner = new User()
+        private readonly User _notCommentOwner = new ()
         {
             Email = "notOwner@mail.com",
             UserName = "notOwnerUsername",
