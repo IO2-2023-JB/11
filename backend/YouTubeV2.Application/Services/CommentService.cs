@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using YouTubeV2.Application.DTO.CommentsDTO;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Providers;
@@ -47,8 +48,12 @@ namespace YouTubeV2.Application.Services
             return new CommentsDTO(comments);
         }
 
-        public async Task<Comment?> GetCommentByIdAsync(Guid commentId, CancellationToken cancellationToken) =>
-            await _context.Comments.FindAsync(new object[] { commentId }, cancellationToken: cancellationToken);
+        public async Task<Comment?> GetCommentByIdAsync(Guid id, CancellationToken cancellationToken = default, params Expression<Func<Comment, object>>[] includes)
+        {
+            var query = _context.Comments.AsTracking();
+            query = includes.Aggregate(query, (current, includeExpresion) => current.Include(includeExpresion));
+            return await query.FirstOrDefaultAsync(comment => comment.Id == id, cancellationToken);
+        }
 
         public async Task AddCommentResponseAsync(string responseContent, User author, Comment comment, CancellationToken cancellationToken)
         {
@@ -57,6 +62,12 @@ namespace YouTubeV2.Application.Services
             _context.Users.Attach(author);
             _context.Comments.Attach(comment);
             await _context.CommentResponses.AddAsync(commentResponse, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task RemoveCommentAsync(Comment comment, CancellationToken cancellationToken)
+        {
+            _context.Comments.Remove(comment);
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

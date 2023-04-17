@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using System.Threading;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.Constants;
 using YouTubeV2.Application.DTO.CommentsDTO;
@@ -69,6 +67,24 @@ namespace YouTubeV2.Api.Controllers
             return Ok();
         }
 
+        [HttpDelete]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<ActionResult> RemoveCommentAsync([FromQuery] Guid id, CancellationToken cancellationToken)
+        {
+            Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken, comment => comment.Author);
+            if (comment == null) return NotFound($"Comment with id {id} you want to delete not found");
+
+            string userId = GetUserId();
+            string userRole = GetUserRole();
+            if (userId != comment.Author.Id && userRole != Role.Administrator) return Forbid();
+
+            await _commentService.RemoveCommentAsync(comment, cancellationToken);
+
+            return Ok();
+        }
+
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
+
+        private string GetUserRole() => User.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
     }
 }
