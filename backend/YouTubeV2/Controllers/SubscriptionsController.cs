@@ -17,11 +17,13 @@ namespace YouTubeV2.Api.Controllers
 		{
 			_subscriptionsService = subscriptionsService;
 		}
+
         [HttpGet("subscriptions")]
 		public async Task<ActionResult<UserSubscriptionListDTO>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
 		{
 			return Ok((await _subscriptionsService.GetSubscriptionsAsync(id, cancellationToken)));
         }
+
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         [HttpPost("subscriptions")]
         public async Task<IActionResult> PostSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
@@ -32,6 +34,7 @@ namespace YouTubeV2.Api.Controllers
 
             return Ok();
         }
+
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         [HttpDelete("subscriptions")]
         public async Task<IActionResult> DeleteSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
