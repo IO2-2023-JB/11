@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.Constants;
 using YouTubeV2.Application.DTO.CommentsDTO;
@@ -34,7 +33,9 @@ namespace YouTubeV2.Api.Controllers
             Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken);
             if (video == null) return NotFound($"Video with id {id} you want to comment not found");
 
-            string authorId = GetUserId();
+            string? authorId = _userService.GetUserId(User.Claims);
+            if (authorId == null) return Forbid();
+
             User? author = await _userService.GetByIdAsync(authorId);
             if (author == null) return NotFound($"User with id {authorId} not found");
 
@@ -58,7 +59,9 @@ namespace YouTubeV2.Api.Controllers
             Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken);
             if (comment == null) return NotFound($"Comment with id {id} you want to comment not found");
 
-            string authorId = GetUserId();
+            string? authorId = _userService.GetUserId(User.Claims);
+            if (authorId == null) return Forbid();
+
             User? author = await _userService.GetByIdAsync(authorId);
             if (author == null) return NotFound($"User with id {authorId} not found");
 
@@ -74,8 +77,10 @@ namespace YouTubeV2.Api.Controllers
             Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken, comment => comment.Author);
             if (comment == null) return NotFound($"Comment with id {id} you want to delete not found");
 
-            string userId = GetUserId();
-            string userRole = GetUserRole();
+            string? userId = _userService.GetUserId(User.Claims);
+            string? userRole = _userService.GetUserRole(User.Claims);
+            if (userId == null || userRole == null) return Forbid();
+
             if (userId != comment.Author.Id && userRole != Role.Administrator) return Forbid();
 
             await _commentService.RemoveCommentAsync(comment, cancellationToken);
@@ -95,17 +100,15 @@ namespace YouTubeV2.Api.Controllers
             CommentResponse? commentResponse = await _commentService.GetCommentResponseByIdAsync(id, cancellationToken);
             if (commentResponse == null) return NotFound($"Comment response with id {id} you want to delete not found");
 
-            string userId = GetUserId();
-            string userRole = GetUserRole();
+            string? userId = _userService.GetUserId(User.Claims);
+            string? userRole = _userService.GetUserRole(User.Claims);
+            if (userId == null || userRole == null) return Forbid();
+
             if (userId != commentResponse.Author.Id && userRole != Role.Administrator) return Forbid();
 
             await _commentService.RemoveCommentResponseAsync(commentResponse, cancellationToken);
 
             return Ok();
         }
-
-        private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
-
-        private string GetUserRole() => User.Claims.First(claim => claim.Type == ClaimTypes.Role).Value;
     }
 }

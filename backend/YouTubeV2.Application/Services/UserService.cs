@@ -75,5 +75,9 @@ namespace YouTubeV2.Application.Services
         public async Task<User?> GetByIdAsync(string id) => await _userManager.FindByIdAsync(id);
 
         public ClaimsPrincipal? ValidateToken(string token) => _jwtHandler.ValidateToken(token);
+
+        public string? GetUserId(IEnumerable<Claim> claims) => JwtHandler.GetUserId(claims);
+
+        public string? GetUserRole(IEnumerable<Claim> claims) => JwtHandler.GetUserRole(claims);
     }
 }

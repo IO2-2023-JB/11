@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Model;
+using YouTubeV2.Application.Services.JwtFeatures;
 
 namespace YouTubeV2.Application.Services
 {
@@ -13,5 +14,9 @@ namespace YouTubeV2.Application.Services
         Task<User?> GetByIdAsync(string id);
 
         ClaimsPrincipal? ValidateToken(string token);
+
+        string? GetUserId(IEnumerable<Claim> claims) => JwtHandler.GetUserId(claims);
+
+        string? GetUserRole(IEnumerable<Claim> claims) => JwtHandler.GetUserRole(claims);
     }
 }
