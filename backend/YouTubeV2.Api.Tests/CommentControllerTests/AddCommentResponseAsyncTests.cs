@@ -142,7 +142,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.BadRequest);
             string responseBody = await httpResponseMessage.Content.ReadAsStringAsync();
-            responseBody.Should().Be($"Comment must be at most {CommentConstants.commentMaxLength} character long");
+            responseBody.Should().Be($"Comment response must be at most {CommentConstants.commentMaxLength} character long");
         }
     }
 }

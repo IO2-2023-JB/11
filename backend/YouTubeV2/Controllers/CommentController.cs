@@ -53,7 +53,7 @@ namespace YouTubeV2.Api.Controllers
         [Consumes("text/plain")]
         public async Task<ActionResult> AddCommentResponseAsync([FromQuery] Guid id, [FromBody] string responseContent, CancellationToken cancellationToken)
         {
-            if (responseContent.Length > CommentConstants.commentMaxLength) return BadRequest($"Comment must be at most {CommentConstants.commentMaxLength} character long");
+            if (responseContent.Length > CommentConstants.commentMaxLength) return BadRequest($"Comment response must be at most {CommentConstants.commentMaxLength} character long");
 
             Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken);
             if (comment == null) return NotFound($"Comment with id {id} you want to comment not found");
@@ -87,6 +87,22 @@ namespace YouTubeV2.Api.Controllers
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<CommentsDTO>> GetCommentResponsesAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
             await _commentService.GetAllCommentResponsesAsync(id, cancellationToken);
+
+        [HttpDelete("response")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<ActionResult> RemoveCommentResponseAsync([FromQuery] Guid id, CancellationToken cancellationToken)
+        {
+            CommentResponse? commentResponse = await _commentService.GetCommentResponseByIdAsync(id, cancellationToken);
+            if (commentResponse == null) return NotFound($"Comment response with id {id} you want to delete not found");
+
+            string userId = GetUserId();
+            string userRole = GetUserRole();
+            if (userId != commentResponse.Author.Id && userRole != Role.Administrator) return Forbid();
+
+            await _commentService.RemoveCommentResponseAsync(commentResponse, cancellationToken);
+
+            return Ok();
+        }
 
         private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
 

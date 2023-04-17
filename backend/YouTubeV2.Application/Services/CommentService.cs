@@ -20,7 +20,7 @@ namespace YouTubeV2.Application.Services
             _blobImageService = blobImageService;
         }
 
-        public async Task AddCommentAsync(string commentContent, User author, Video video, CancellationToken cancellationToken)
+        public async Task AddCommentAsync(string commentContent, User author, Video video, CancellationToken cancellationToken = default)
         {
             Comment comment = new(commentContent, author, video, _dateTimeProvider.UtcNow);
 
@@ -30,7 +30,7 @@ namespace YouTubeV2.Application.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<CommentsDTO> GetAllCommentsAsync(Guid videoId, CancellationToken cancellationToken)
+        public async Task<CommentsDTO> GetAllCommentsAsync(Guid videoId, CancellationToken cancellationToken = default)
         {
             var comments = await _context
                 .Comments
@@ -55,7 +55,7 @@ namespace YouTubeV2.Application.Services
             return await query.FirstOrDefaultAsync(comment => comment.Id == id, cancellationToken);
         }
 
-        public async Task AddCommentResponseAsync(string responseContent, User author, Comment comment, CancellationToken cancellationToken)
+        public async Task AddCommentResponseAsync(string responseContent, User author, Comment comment, CancellationToken cancellationToken = default)
         {
             CommentResponse commentResponse = new(responseContent, _dateTimeProvider.UtcNow, author, comment);
 
@@ -65,13 +65,13 @@ namespace YouTubeV2.Application.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task RemoveCommentAsync(Comment comment, CancellationToken cancellationToken)
+        public async Task RemoveCommentAsync(Comment comment, CancellationToken cancellationToken = default)
         {
             _context.Comments.Remove(comment);
             await _context.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<CommentsDTO> GetAllCommentResponsesAsync(Guid commentId, CancellationToken cancellationToken)
+        public async Task<CommentsDTO> GetAllCommentResponsesAsync(Guid commentId, CancellationToken cancellationToken = default)
         {
             var commentResponses = await _context
                 .CommentResponses
@@ -87,6 +87,15 @@ namespace YouTubeV2.Application.Services
                 .ToArrayAsync(cancellationToken);
 
             return new CommentsDTO(commentResponses);
+        }
+
+        public async Task<CommentResponse?> GetCommentResponseByIdAsync(Guid commentResponseId, CancellationToken cancellationToken = default) =>
+            await _context.CommentResponses.FindAsync(new object[] { commentResponseId }, cancellationToken);
+
+        public async Task RemoveCommentResponseAsync(CommentResponse commentResponse, CancellationToken cancellationToken = default)
+        {
+            _context.CommentResponses.Remove(commentResponse);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }
