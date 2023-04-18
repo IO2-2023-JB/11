@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
-using YouTubeV2.Application.DTO.SubscribtionDTOS;
+using YouTubeV2.Application.DTO.SubscriptionDTOS;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
@@ -22,7 +22,7 @@ namespace YouTubeV2.Api.Controllers
 
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         [HttpGet]
-		public async Task<ActionResult<UserSubscriptionListDTO>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken) =>
+		public async Task<ActionResult<UserSubscriptionListDto>> GetSubscriptionsAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken) =>
             Ok(await _subscriptionsService.GetSubscriptionsAsync(id.ToString(), cancellationToken));
 
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
