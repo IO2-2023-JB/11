@@ -1,4 +1,4 @@
-﻿using YouTubeV2.Application.DTO;
+﻿using YouTubeV2.Application.DTO.SubscribtionDTOS;
 
 namespace YouTubeV2.Application.Services
 {

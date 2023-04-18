@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
-using YouTubeV2.Application.DTO;
+using YouTubeV2.Application.DTO.SubscribtionDTOS;
+using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 
