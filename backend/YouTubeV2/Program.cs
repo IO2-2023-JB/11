@@ -1,7 +1,9 @@
 using Azure.Storage.Blobs;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -81,6 +83,15 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterDtoValidator>();
 
 builder.Services.AddIdentity<User, Role>()
     .AddEntityFrameworkStores<YTContext>();
+
+builder.Services.Configure<IISServerOptions>(options =>
+{
+    options.MaxRequestBodySize = null;
+});
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = null;
+});
 
 builder.Services.AddCors(options =>
 {
