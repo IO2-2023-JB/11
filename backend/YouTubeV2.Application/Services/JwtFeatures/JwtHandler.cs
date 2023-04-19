@@ -35,7 +35,6 @@ namespace YouTubeV2.Application.Services.JwtFeatures
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.Email!),
                 new Claim(ClaimTypes.NameIdentifier, user.Id)
             };
 
