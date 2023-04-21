@@ -10,7 +10,7 @@ namespace YouTubeV2.Api.Controllers
 {
     [ApiController]
     [Route("comment")]
-    public class CommentController : ControllerBase
+    public class CommentController : IdentityControllerBase
     {
         private readonly IVideoService _videoService;
         private readonly IUserService _userService;
@@ -31,13 +31,13 @@ namespace YouTubeV2.Api.Controllers
             if (commentContent.Length > CommentConstants.commentMaxLength) return BadRequest($"Comment must be at most {CommentConstants.commentMaxLength} character long");
 
             Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken);
-            if (video == null) return NotFound($"Video with id {id} you want to comment not found");
+            if (video is null) return NotFound($"Video with id {id} you want to comment not found");
 
-            string? authorId = _userService.GetUserId(User.Claims);
-            if (authorId == null) return Forbid();
+            string? authorId = GetUserId();
+            if (authorId is null) return Forbid();
 
             User? author = await _userService.GetByIdAsync(authorId);
-            if (author == null) return NotFound($"User with id {authorId} not found");
+            if (author is null) return NotFound($"User with id {authorId} not found");
 
             await _commentService.AddCommentAsync(commentContent, author, video, cancellationToken);
 
@@ -57,13 +57,13 @@ namespace YouTubeV2.Api.Controllers
             if (responseContent.Length > CommentConstants.commentMaxLength) return BadRequest($"Comment response must be at most {CommentConstants.commentMaxLength} character long");
 
             Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken);
-            if (comment == null) return NotFound($"Comment with id {id} you want to comment not found");
+            if (comment is null) return NotFound($"Comment with id {id} you want to comment not found");
 
-            string? authorId = _userService.GetUserId(User.Claims);
-            if (authorId == null) return Forbid();
+            string? authorId = GetUserId();
+            if (authorId is null) return Forbid();
 
             User? author = await _userService.GetByIdAsync(authorId);
-            if (author == null) return NotFound($"User with id {authorId} not found");
+            if (author is null) return NotFound($"User with id {authorId} not found");
 
             await _commentService.AddCommentResponseAsync(responseContent, author, comment, cancellationToken);
 
@@ -75,11 +75,11 @@ namespace YouTubeV2.Api.Controllers
         public async Task<ActionResult> RemoveCommentAsync([FromQuery] Guid id, CancellationToken cancellationToken)
         {
             Comment? comment = await _commentService.GetCommentByIdAsync(id, cancellationToken, comment => comment.Author);
-            if (comment == null) return NotFound($"Comment with id {id} you want to delete not found");
+            if (comment is null) return NotFound($"Comment with id {id} you want to delete not found");
 
-            string? userId = _userService.GetUserId(User.Claims);
-            string? userRole = _userService.GetUserRole(User.Claims);
-            if (userId == null || userRole == null) return Forbid();
+            string? userId = GetUserId();
+            string? userRole = GetUserRole();
+            if (userId is null || userRole is null) return Forbid();
 
             if (userId != comment.Author.Id && userRole != Role.Administrator) return Forbid();
 
@@ -102,11 +102,11 @@ namespace YouTubeV2.Api.Controllers
                 cancellationToken,
                 commentResponse => commentResponse.Author);
 
-            if (commentResponse == null) return NotFound($"Comment response with id {id} you want to delete not found");
+            if (commentResponse is null) return NotFound($"Comment response with id {id} you want to delete not found");
 
-            string? userId = _userService.GetUserId(User.Claims);
-            string? userRole = _userService.GetUserRole(User.Claims);
-            if (userId == null || userRole == null) return Forbid();
+            string? userId = GetUserId();
+            string? userRole = GetUserRole();
+            if (userId is null || userRole is null) return Forbid();
 
             if (userId != commentResponse.Author.Id && userRole != Role.Administrator) return Forbid();
 

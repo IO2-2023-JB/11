@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.DTO.VideoMetadataDTOS;
@@ -13,7 +12,7 @@ using YouTubeV2.Application.Services.VideoServices;
 namespace YouTubeV2.Api.Controllers
 {
     [ApiController]
-    public class VideoController : ControllerBase
+    public class VideoController : IdentityControllerBase
     {
         private readonly IBlobVideoService _blobVideoService;
         private readonly IVideoService _videoService;
@@ -38,7 +37,7 @@ namespace YouTubeV2.Api.Controllers
         {
             string token = UserService.GetTokenFromTokenWithBearerPrefix(access_token);
             ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(token);
-            if (claimsPrincipal == null) return Unauthorized();
+            if (claimsPrincipal is null) return Unauthorized();
 
             if (!claimsPrincipal.IsInRole(Role.Simple) && !claimsPrincipal.IsInRole(Role.Creator) && !claimsPrincipal.IsInRole(Role.Administrator))
                 return Forbid();
@@ -55,9 +54,11 @@ namespace YouTubeV2.Api.Controllers
         [Roles(Role.Creator)]
         public async Task<ActionResult<VideoMetadataPostResponseDto>> AddVideoMetadataAsync([FromBody] VideoMetadataPostDto videoMetadata, CancellationToken cancellationToken)
         {
-            string userId = GetUserId();
+            string? userId = GetUserId();
+            if (userId is null) return Forbid();
+
             User? user = await _userService.GetByIdAsync(userId);
-            if (user == null) return NotFound("There is no user identifiable by given token");
+            if (user is null) return NotFound("There is no user identifiable by given token");
 
             Guid id = await _videoService.AddVideoMetadataAsync(videoMetadata, user, cancellationToken);
             return Ok(new VideoMetadataPostResponseDto(id.ToString()));
@@ -71,7 +72,7 @@ namespace YouTubeV2.Api.Controllers
             if (!_allowedVideoExtensions.Contains(videoExtension))
                 return BadRequest($"Video extension provided ({videoExtension}) is not supported. Supported extensions: .mkv, .mp4, .avi, .webm");
             Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken, video => video.Author);
-            if (video == null)
+            if (video is null)
                 return NotFound($"Video with id {id} not found");
             if (video!.Author.Id != GetUserId())
                 return Forbid();
@@ -91,11 +92,12 @@ namespace YouTubeV2.Api.Controllers
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<VideoMetadataDto>> GetVideoMetadataAsync([FromQuery]Guid id, CancellationToken cancellationToken)
         {
-            await _videoService.AuthorizeVideoAccessAsync(id, GetUserId(), cancellationToken);
+            string? userId = GetUserId();
+            if (userId is null) return Forbid();
+
+            await _videoService.AuthorizeVideoAccessAsync(id, userId, cancellationToken);
 
             return Ok(await _videoService.GetVideoMetadataAsync(id, cancellationToken));
         }
-
-        private string GetUserId() => User.Claims.First(claim => claim.Type == ClaimTypes.NameIdentifier).Value;
     }
 }

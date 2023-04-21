@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using YouTubeV2.Application.Exceptions;
 
 namespace YouTubeV2.Application.Services.JwtFeatures
 {
@@ -66,9 +65,5 @@ namespace YouTubeV2.Application.Services.JwtFeatures
 
             return jwtSecurityTokenHandler.ValidateToken(token, tokenValidationParameters, out var _);
         }
-
-        public static string? GetUserId(IEnumerable<Claim> claims) => claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-
-        public static string? GetUserRole(IEnumerable<Claim> claims) => claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Role)?.Value;
     }
 }

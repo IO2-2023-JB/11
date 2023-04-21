@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.ComponentModel.DataAnnotations;
 using YouTubeV2.Api.Enums;
 using YouTubeV2.Application.DTO.PlaylistDTOS;
 using YouTubeV2.Application.DTO.UserDTOS;

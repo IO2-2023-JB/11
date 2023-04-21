@@ -43,7 +43,7 @@ namespace YouTubeV2.Application.Services
                     _blobImageService.GetProfilePicture(comment.Author.Id),
                     comment.Author.UserName!,
                     comment.Responses.Any()))
-                .ToArrayAsync(cancellationToken);
+                .ToListAsync(cancellationToken);
 
             return new CommentsDTO(comments);
         }

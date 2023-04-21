@@ -15,9 +15,6 @@ namespace YouTubeV2.Application.Services
 
         ClaimsPrincipal? ValidateToken(string token);
 
-        string? GetUserId(IEnumerable<Claim> claims) => JwtHandler.GetUserId(claims);
-
-        string? GetUserRole(IEnumerable<Claim> claims) => JwtHandler.GetUserRole(claims);
         static string GetTokenFromTokenWithBearerPrefix(string tokenWithBearerPrefix) => tokenWithBearerPrefix["Bearer ".Length..];
     }
 }

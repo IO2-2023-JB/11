@@ -168,7 +168,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
             string responseBody = await httpResponseMessage.Content.ReadAsStringAsync();
             var deserializedResponseBody = JsonConvert.DeserializeObject<CommentsDTO>(responseBody);
-            deserializedResponseBody.comments.Length.Should().Be(2);
+            deserializedResponseBody.comments.Count.Should().Be(2);
             deserializedResponseBody.comments.Should().BeEquivalentTo(new CommentsDTO.CommentDTO[]
             {
                 new (
