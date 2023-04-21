@@ -17,6 +17,8 @@ using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Application;
 using YouTubeV2.Application.Enums;
 using YouTubeV2.Application.Providers;
+using YouTubeV2.Application.DTO.VideoMetadataDTOS;
+using YouTubeV2.Application.Services.BlobServices;
 
 namespace YouTubeV2.Api.Tests.VideoControllerTests
 {
@@ -26,6 +28,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
         private readonly Mock<IUserService> _userServiceMock = new();
         private readonly Mock<IDateTimeProvider> _dateTimeProviderMock = new();
+        private readonly Mock<IBlobImageService> _blobImageService = new();
         private readonly User _user = new()
         {
             Email = "test@mail.com",
@@ -40,7 +43,8 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         {
             _userServiceMock.Setup(x => x.GetByIdAsync(It.IsAny<string>())).ReturnsAsync(_user);
             _dateTimeProviderMock.Setup(x => x.UtcNow).Returns(_utcNow);
-            _webApplicationFactory = Setup.GetWebApplicationFactory(_userServiceMock.Object, _dateTimeProviderMock.Object);
+            _blobImageService.Setup(x => x.UploadVideoThumbnailAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()));
+            _webApplicationFactory = Setup.GetWebApplicationFactory(_userServiceMock.Object, _dateTimeProviderMock.Object, _blobImageService.Object);
             var config = _webApplicationFactory.Services.GetService<IConfiguration>();
             var connection = config!.GetConnectionString("Db");
             await Setup.ResetDatabaseAsync(connection!);
@@ -50,7 +54,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         public async Task AddVideoMetadataAsync_ValidInput_ReturnsOk()
         {
             // ARRANGE
-            VideoMetadataPostDTO videoMetadata = new(
+            VideoMetadataPostDto videoMetadata = new(
             "Test Video Title",
                 "Test Video Description",
                 "data:image/png;base64,iVBORw0KGg==",
@@ -73,7 +77,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
             string responseBody = await httpResponseMessage.Content.ReadAsStringAsync();
-            var deserializedResponseBody = JsonConvert.DeserializeObject<VideoMetadataPostResponseDTO>(responseBody);
+            var deserializedResponseBody = JsonConvert.DeserializeObject<VideoMetadataPostResponseDto>(responseBody);
 
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
@@ -103,7 +107,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         public async Task AddVideoMetadataAsyncBeingSimpleUser_ReturnsForbidden()
         {
             // ARRANGE
-            VideoMetadataPostDTO videoMetadata = new(
+            VideoMetadataPostDto videoMetadata = new(
             "Test Video Title",
                 "Test Video Description",
                 "data:image/png;base64,iVBORw0KGg==",
@@ -131,7 +135,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         public async Task AddVideoMetadataAsyncWithoutBeingAuthorized_ReturnsUnauthorized()
         {
             // ARRANGE
-            VideoMetadataPostDTO videoMetadata = new(
+            VideoMetadataPostDto videoMetadata = new(
             "Test Video Title",
                 "Test Video Description",
                 "data:image/png;base64,iVBORw0KGg==",

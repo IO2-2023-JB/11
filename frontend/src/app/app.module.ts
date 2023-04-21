@@ -13,8 +13,10 @@ import { VideoModule } from './pages/video/video.module';
 import { CreatorModule } from './pages/creator/creator.module';
 import { LoginModule } from './pages/login/login.module';
 import { AddVideoModule } from './pages/add-video/add-video.module';
-import { HomeComponent } from './pages/home/home.component';
 import { HomeModule } from './pages/home/home.module';
+import { PlaylistModule } from './pages/playlist/playlist.module';
+import { UserPlaylistsComponent } from './pages/user-playlists/user-playlists.component';
+import { UserPlaylistsModule } from './pages/user-playlists/user-playlists.module';
 
 @NgModule({
     declarations: [
@@ -26,7 +28,7 @@ import { HomeModule } from './pages/home/home.module';
             provide: HTTP_INTERCEPTORS,
             useClass: HttpErrorInterceptor,
             multi: true,
-        }
+        },
     ],
     bootstrap: [AppComponent],
     imports: [
@@ -41,6 +43,9 @@ import { HomeModule } from './pages/home/home.module';
         CreatorModule,
         AddVideoModule,
         HomeModule,
+        PlaylistModule,
+        UserPlaylistsModule,
+        PlaylistModule
     ]
 })
 export class AppModule { }

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using YouTubeV2.Application.DTO;
+using YouTubeV2.Application.DTO.UserDTOS;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services.BlobServices;
@@ -39,7 +40,7 @@ namespace YouTubeV2.Application.Services
             if (!await _userManager.CheckPasswordAsync(user, loginDto.password))
                 throw new BadRequestException(new ErrorResponseDTO[] { new ErrorResponseDTO("Provided password is invalid") });
 
-            return new LoginResponseDto(await _jwtHandler.GenerateTokenAsync(user));
+            return new LoginResponseDto($"Bearer {await _jwtHandler.GenerateTokenAsync(user)}");
         }
 
         public async Task RegisterAsync(RegisterDto registerDto, CancellationToken cancellationToken)
@@ -78,6 +79,7 @@ namespace YouTubeV2.Application.Services
 
         public string? GetUserId(IEnumerable<Claim> claims) => JwtHandler.GetUserId(claims);
 
+        public static string GetTokenFromTokenWithBearerPrefix(string tokenWithBearerPrefix) => tokenWithBearerPrefix["Bearer ".Length..];
         public string? GetUserRole(IEnumerable<Claim> claims) => JwtHandler.GetUserRole(claims);
     }
 }
