@@ -4,7 +4,6 @@ using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.DTO.PlaylistDTOS;
 using YouTubeV2.Application.DTO.UserDTOS;
-using YouTubeV2.Application.Migrations;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 

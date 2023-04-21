@@ -47,10 +47,10 @@ namespace YouTubeV2.Application.Model
 
         public Video() { }
 
-        public static Video FromDTO(VideoMetadataPostDto videoMetadata, User user, DateTimeOffset now) =>
-            new (videoMetadata.title, videoMetadata.description, videoMetadata.visibility, videoMetadata.tags, user, now);
+        public static Video FromDTO(VideoMetadataPostDto videoMetadata, User author, DateTimeOffset now) =>
+            new (videoMetadata.title, videoMetadata.description, videoMetadata.visibility, videoMetadata.tags, author, now);
 
-        public Video(string title, string description, Visibility visibility, IReadOnlyCollection<string> tags, User user, DateTimeOffset now)
+        public Video(string title, string description, Visibility visibility, IReadOnlyCollection<string> tags, User author, DateTimeOffset now)
         {
             Title = title;
             Description = description;
