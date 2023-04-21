@@ -89,8 +89,15 @@ namespace YouTubeV2.Application.Services
             return new CommentsDTO(commentResponses);
         }
 
-        public async Task<CommentResponse?> GetCommentResponseByIdAsync(Guid commentResponseId, CancellationToken cancellationToken = default) =>
-            await _context.CommentResponses.FindAsync(new object[] { commentResponseId }, cancellationToken);
+        public async Task<CommentResponse?> GetCommentResponseByIdAsync(
+            Guid id,
+            CancellationToken cancellationToken = default,
+            params Expression<Func<CommentResponse, object>>[] includes)
+        {
+            var query = _context.CommentResponses.AsTracking();
+            query = includes.Aggregate(query, (current, includeExpresion) => current.Include(includeExpresion));
+            return await query.FirstOrDefaultAsync(commentResponse => commentResponse.Id == id, cancellationToken);
+        }
 
         public async Task RemoveCommentResponseAsync(CommentResponse commentResponse, CancellationToken cancellationToken = default)
         {

@@ -17,62 +17,54 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
     public class RemoveCommentResponseAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
-        private User _user = null!;
-        private readonly User _notCommentOwner = new()
+        private readonly User _otherUser = new()
         {
             Email = "notOwner@mail.com",
             UserName = "notOwnerUsername",
             Name = "notOwnerName",
             Surname = "notOwnerSurname",
         };
-        private readonly User _notCommentOwner = new()
+        private readonly User _commentsOwner = new()
         {
-            Email = "notOwner@mail.com",
-            UserName = "notOwnerUsername",
-            Name = "notOwnerName",
-            Surname = "notOwnerSurname",
+            Email = "owner@mail.com",
+            UserName = "ownerUsername",
+            Name = "ownerName",
+            Surname = "ownerSurname",
         };
         private Video _video = null!;
         private Comment _comment = null!;
-        private string _commentOwnerId = null!;
         private Guid _commentId;
         private CommentResponse _commentResponse1 = null!;
         private CommentResponse _commentResponse2 = null!;
+        private Guid _commentResponse1Id;
+
 
         [TestInitialize]
         public async Task Initialize()
         {
-            _user = new()
-            {
-                Email = "owner@mail.com",
-                UserName = "ownerUsername",
-                Name = "ownerName",
-                Surname = "ownerSurname",
-            };
-
             _commentResponse1 = new CommentResponse()
             {
                 Content = "comment response1",
                 CreateDate = DateTimeOffset.UtcNow,
-                Author = _user,
+                Author = _commentsOwner,
             };
 
             _commentResponse2 = new CommentResponse()
             {
                 Content = "comment response2",
                 CreateDate = DateTimeOffset.UtcNow,
-                Author = _user,
+                Author = _commentsOwner,
             };
 
             _comment = new()
             {
                 Content = "comment content",
                 CreateDate = DateTimeOffset.UtcNow,
-                Author = _user,
+                Author = _otherUser,
                 Responses = new List<CommentResponse>()
                 {
                     _commentResponse1,
-                    
+                    _commentResponse2,
                 },
             };
 
@@ -83,7 +75,7 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
                 Visibility = Visibility.Public,
                 UploadDate = DateTimeOffset.UtcNow,
                 EditDate = DateTimeOffset.UtcNow,
-                Author = _user,
+                Author = _otherUser,
                 Comments = new[]
                 {
                     _comment,
@@ -98,18 +90,22 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             await _webApplicationFactory.DoWithinScope<UserManager<User>>(
               async userManager =>
               {
-                  await userManager.CreateAsync(_user);
-                  await userManager.CreateAsync(_notCommentOwner);
-                  _commentOwnerId = await userManager.GetUserIdAsync(_user);
+                  await userManager.CreateAsync(_otherUser);
+                  _otherUser.Id = await userManager.GetUserIdAsync(_otherUser);
+                  await userManager.CreateAsync(_commentsOwner);
+                  _commentsOwner.Id = await userManager.GetUserIdAsync(_commentsOwner);
               });
 
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
-                    context.Users.Attach(_user);
+                    context.Users.Attach(_otherUser);
+                    context.Users.Attach(_commentsOwner);
                     var video = await context.Videos.AddAsync(_video);
                     await context.SaveChangesAsync();
-                    _commentId = video.Entity.Comments.Single(comment => comment.Content == _comment.Content).Id;
+                    var comment = video.Entity.Comments.Single();
+                    _commentId = comment.Id;
+                    _commentResponse1Id = comment.Responses.Single(response => response.Content == _commentResponse1.Content).Id;
                 });
         }
 
@@ -117,10 +113,10 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         public async Task RemoveCommentAsync_WhenYouAreTheOwner_ShouldRemoveCommentAndItsResponsesFromDataBase()
         {
             // ARRANGE
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Creator, _commentOwnerId)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Creator, _commentsOwner.Id)).CreateClient();
 
             // ACT
-            var httpResponseMessage = await httpClient.DeleteAsync($"comment?id={_commentId}");
+            var httpResponseMessage = await httpClient.DeleteAsync($"comment/response?id={_commentResponse1Id}");
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -128,15 +124,19 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
-                    Comment? deletedComment = await context.Comments.FindAsync(_commentId);
-                    deletedComment.Should().BeNull();
+                    Comment? comment = await context
+                        .Comments
+                        .Include(comment => comment.Responses)
+                        .ThenInclude(response => response.Author)
+                        .FirstOrDefaultAsync(comment => comment.Id == _commentId);
 
-                    var deletedCommentResponses = await context.CommentResponses.Where(commentResponse => commentResponse.RespondOn.Id == _commentId).ToListAsync();
-                    deletedCommentResponses.Should().BeEmpty();
-
-                    Comment? notDeletedComment = await context.Comments.Include(comment => comment.Responses).FirstOrDefaultAsync(comment => comment.Id == _comment2Id);
-                    notDeletedComment.Should().NotBeNull();
-                    notDeletedComment!.Responses.Should().HaveCount(1);
+                    comment.Should().NotBeNull();
+                    comment!.Responses.Should().HaveCount(1);
+                    CommentResponse commentResponse = comment.Responses.Single();
+                    commentResponse.Content.Should().Be(_commentResponse2.Content);
+                    commentResponse.CreateDate.Should().Be(_commentResponse2.CreateDate);
+                    commentResponse.Author.Id.Should().Be(_commentsOwner.Id);
+                    commentResponse.RespondOn.Id.Should().Be(_commentId);
                 });
         }
 
@@ -144,10 +144,10 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         public async Task RemoveCommentAsync_WhenYouAreNotTheOwnerButAdministrator_ShouldRemoveCommentAndItsResponsesFromDataBase()
         {
             // ARRANGE
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Administrator, _notCommentOwnerId)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Administrator, _otherUser.Id)).CreateClient();
 
             // ACT
-            var httpResponseMessage = await httpClient.DeleteAsync($"comment?id={_commentId}");
+            var httpResponseMessage = await httpClient.DeleteAsync($"comment/response?id={_commentResponse1.Id}");
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -155,15 +155,19 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
             await _webApplicationFactory.DoWithinScope<YTContext>(
                 async context =>
                 {
-                    Comment? deletedComment = await context.Comments.FindAsync(_commentId);
-                    deletedComment.Should().BeNull();
+                    Comment? comment = await context
+                        .Comments
+                        .Include(comment => comment.Responses)
+                        .ThenInclude(response => response.Author)
+                        .FirstOrDefaultAsync(comment => comment.Id == _commentId);
 
-                    var deletedCommentResponses = await context.CommentResponses.Where(commentResponse => commentResponse.RespondOn.Id == _commentId).ToListAsync();
-                    deletedCommentResponses.Should().BeEmpty();
-
-                    Comment? notDeletedComment = await context.Comments.Include(comment => comment.Responses).FirstOrDefaultAsync(comment => comment.Id == _comment2Id);
-                    notDeletedComment.Should().NotBeNull();
-                    notDeletedComment!.Responses.Should().HaveCount(1);
+                    comment.Should().NotBeNull();
+                    comment!.Responses.Should().HaveCount(1);
+                    CommentResponse commentResponse = comment.Responses.Single();
+                    commentResponse.Content.Should().Be(_commentResponse2.Content);
+                    commentResponse.CreateDate.Should().Be(_commentResponse2.CreateDate);
+                    commentResponse.Author.Id.Should().Be(_commentsOwner.Id);
+                    commentResponse.RespondOn.Id.Should().Be(_commentId);
                 });
         }
 
@@ -171,10 +175,10 @@ namespace YouTubeV2.Api.Tests.CommentControllerTests
         public async Task RemoveCommentAsync_WhenYouAreNotTheOwnerNeitherAdministrator_ShouldReturnForbidden()
         {
             // ARRANGE
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Simple, _notCommentOwnerId)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Simple, _otherUser.Id)).CreateClient();
 
             // ACT
-            var httpResponseMessage = await httpClient.DeleteAsync($"comment?id={_commentId}");
+            var httpResponseMessage = await httpClient.DeleteAsync($"comment/response?id={_commentResponse1Id}");
 
             // ASSERT
             httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Forbidden);

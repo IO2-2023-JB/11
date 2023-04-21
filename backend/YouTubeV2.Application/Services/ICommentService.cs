@@ -18,7 +18,7 @@ namespace YouTubeV2.Application.Services
 
         Task<CommentsDTO> GetAllCommentResponsesAsync(Guid commentId, CancellationToken cancellationToken = default);
 
-        Task<CommentResponse?> GetCommentResponseByIdAsync(Guid commentResponseId, CancellationToken cancellationToken = default);
+        Task<CommentResponse?> GetCommentResponseByIdAsync(Guid id, CancellationToken cancellationToken = default, params Expression<Func<CommentResponse, object>>[] includes);
 
         Task RemoveCommentResponseAsync(CommentResponse commentResponse, CancellationToken cancellationToken = default);
     }

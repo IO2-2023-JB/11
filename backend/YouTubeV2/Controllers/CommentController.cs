@@ -97,7 +97,11 @@ namespace YouTubeV2.Api.Controllers
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult> RemoveCommentResponseAsync([FromQuery] Guid id, CancellationToken cancellationToken)
         {
-            CommentResponse? commentResponse = await _commentService.GetCommentResponseByIdAsync(id, cancellationToken);
+            CommentResponse? commentResponse = await _commentService.GetCommentResponseByIdAsync(
+                id,
+                cancellationToken,
+                commentResponse => commentResponse.Author);
+
             if (commentResponse == null) return NotFound($"Comment response with id {id} you want to delete not found");
 
             string? userId = _userService.GetUserId(User.Claims);
