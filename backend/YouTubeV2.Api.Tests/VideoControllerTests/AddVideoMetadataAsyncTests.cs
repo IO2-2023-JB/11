@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using YouTubeV2.Api.Enums;
-using YouTubeV2.Application.DTO;
 using YouTubeV2.Application.Model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;

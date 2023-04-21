@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using YouTubeV2.Application.DTO.UserDTOS;
 using YouTubeV2.Application.Model;
-using YouTubeV2.Application.Services.JwtFeatures;
 
 namespace YouTubeV2.Application.Services
 {
