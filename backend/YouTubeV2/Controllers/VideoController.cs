@@ -36,7 +36,8 @@ namespace YouTubeV2.Api.Controllers
         [HttpGet("video/{id:guid}")]
         public async Task<IActionResult> GetVideoAsync(Guid id, [FromQuery] string access_token, CancellationToken cancellationToken)
         {
-            ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(access_token);
+            string token = UserService.GetTokenFromTokenWithBearerPrefix(access_token);
+            ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(token);
             if (claimsPrincipal == null) return Unauthorized();
 
             if (!claimsPrincipal.IsInRole(Role.Simple) && !claimsPrincipal.IsInRole(Role.Creator) && !claimsPrincipal.IsInRole(Role.Administrator))
