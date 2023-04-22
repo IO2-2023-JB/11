@@ -16,8 +16,23 @@ export class CommentsComponent {
       content: 'comment content 1 jest to barddooooo dlu gi kom ale dlugi wogdsha dsklh sladf  jsjdjkdsa ldk kj j',
       avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/431fbad7-2b0b-4232-ae7a-e3ba6af1b933',
       nickname: 'surfer',
-      hasResponses: false,
-      responses: null,
+      hasResponses: true,
+      responses: [
+        {
+          id: '1',
+          authorId: '1',
+          content: 'comment content 1 jest to barddooooo dlu gi kom ale dlugi wogdsha dsklh sladf  jsjdjkdsa ldk kj j',
+          avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/431fbad7-2b0b-4232-ae7a-e3ba6af1b933',
+          nickname: 'surfer',
+        },
+        {
+          id: '2',
+          authorId: '2',
+          content: 'comment content 2',
+          avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/53_square.jpg',
+          nickname: 'karol',
+        },
+      ],
       isResponsesVisible: false,
     },
     {
@@ -42,6 +57,18 @@ export class CommentsComponent {
       label: 'Report',
       icon: 'pi pi-flag',
       command: this.reportComment,
+    },
+  ];
+  commentResponseMenuItems: MenuItem[] = [
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: this.deleteCommentResponse,
+    },
+    {
+      label: 'Report',
+      icon: 'pi pi-flag',
+      command: this.reportCommentResponse,
     },
   ];
 
@@ -71,6 +98,23 @@ export class CommentsComponent {
   }
 
   reportComment(): void {
+    // REPORT COMMENT LOGIC HERE
+  }
+
+  handleOnHideResponsesClick(comment: Comment): void {
+    comment.isResponsesVisible = false;
+  }
+
+  handleOnShowResponsesClick(comment: Comment): void {
+    // GET RESPONSES IF THEY ARE NULL
+    comment.isResponsesVisible = true;
+  }
+
+  deleteCommentResponse(): void {
+    // DELETE COMMENT LOGIC HERE
+  }
+
+  reportCommentResponse(): void {
     // REPORT COMMENT LOGIC HERE
   }
 }

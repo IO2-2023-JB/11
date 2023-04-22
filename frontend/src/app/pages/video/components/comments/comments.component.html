@@ -31,20 +31,56 @@
 </div>
 
 
-<div class="flex comment-container mt-2" *ngFor="let comment of comments; let i = index">
-  <div class="flex-none flex mt-1 mr-2">
-    <p-avatar [image]="comment.avatarImage" shape="circle" size="48"></p-avatar>
+<div class="flex comment-container mt-2" *ngFor="let comment of comments">
+  <div class="flex-none flex mt-1 mr-2 ">
+    <p-avatar [image]="comment.avatarImage" shape="circle" size="large"></p-avatar>
   </div>
+
   <div class="flex-grow-1 flex flex-column">
     <strong>{{ comment.nickname }}</strong>
     <div>{{ comment.content }}</div>
+    <div *ngIf="comment.hasResponses" class="mt-1 comment-responses">
+      <div *ngIf="comment.isResponsesVisible; else showResponsesButton">
+        <p-button
+          label="Hide Responses"
+          styleClass="p-button-rounded p-button-text p-button-sm response-button"
+          icon="pi pi-chevron-up"
+          class="px-10"
+          (onClick)="handleOnHideResponsesClick(comment)"></p-button>
+        <div class="flex comment-response-container mt-2" *ngFor="let response of comment.responses">
+          <div class="flex-none flex mt-1 mr-2">
+            <p-avatar [image]="response.avatarImage" shape="circle"></p-avatar>
+          </div>
+          <div class="flex-grow-1 flex flex-column">
+            <strong>{{ response.nickname }}</strong>
+            <div>{{ response.content }}</div>
+          </div>
+          <div class="flex-none">
+            <p-menu #commentResponseMenu [model]="commentResponseMenuItems" [popup]="true" class="comment-p-menu"></p-menu>
+            <p-button
+              icon="pi pi-ellipsis-v"
+              class="comment-response-menu-button"
+              styleClass="p-button-rounded p-button-text p-button-secondary"
+              (click)="commentMenu.toggle($event)"></p-button>
+          </div>
+        </div>
+      </div>
+      <ng-template #showResponsesButton>
+        <p-button
+          label="Show Responses"
+          styleClass="p-button-rounded p-button-text p-button-sm response-button"
+          icon="pi pi-chevron-down"
+          (onClick)="handleOnShowResponsesClick(comment)"></p-button>
+      </ng-template>
+    </div>
   </div>
-  <div class="flex-none flex align-items-center justify-content-center">
-    <p-menu #commentMenu [model]="commentMenuItems" [popup]="true"></p-menu>
+
+  <div class="flex-none">
+    <p-menu #commentMenu [model]="commentMenuItems" [popup]="true" class="comment-p-menu"></p-menu>
     <p-button
-    icon="pi pi-ellipsis-v"
-    class="three-dots-button"
-    styleClass="p-button-rounded p-button-text p-button-secondary"
-    (click)="commentMenu.toggle($event)"></p-button>
+      icon="pi pi-ellipsis-v"
+      class="comment-menu-button"
+      styleClass="p-button-rounded p-button-text p-button-secondary"
+      (click)="commentMenu.toggle($event)"></p-button>
   </div>
 </div>
