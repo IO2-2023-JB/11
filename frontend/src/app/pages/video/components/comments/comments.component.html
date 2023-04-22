@@ -1,0 +1,30 @@
+<h3>Comments</h3>
+<div class="p-fluid">
+  <textarea
+    type="text"
+    pInputTextarea
+    [autoResize]="true"
+    placeholder="Add comment"
+    [formControl]="newComment">
+  </textarea>
+  <div class="flex justify-content-between flex-wrap">
+    <div>
+      <small class="p-error" *ngIf="isEmptyAndTouchOrDirty(newComment)">
+        Comment must have a body
+      </small>
+    </div>
+    <div *ngIf="isTouchOrDirty(newComment)" class="flex flex-wrap">
+      <p-button
+        label="Cancel"
+        styleClass="p-button-rounded p-button-raised p-button-text"
+        class="mr-1 mt-2"
+        (onClick)="handleOnCancelCommentClick(newComment)"></p-button>
+      <p-button
+        label="Comment"
+        styleClass="p-button-rounded p-button-raised"
+        class="ml-1 mt-2"
+        (onClick)="handleOnAddCommentClick(newComment)"
+        [disabled]="isEmpty(newComment)"></p-button>
+    </div>
+  </div>
+</div>
