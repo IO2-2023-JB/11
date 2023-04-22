@@ -107,7 +107,7 @@ namespace YouTubeV2.Api.Tests.UserControllerTests
         }
 
         [TestMethod]
-        public async Task LoginUser_IncorrectPassword_ShouldReturnNotFound()
+        public async Task LoginUser_IncorrectPassword_ShouldReturnUnauthorized()
         {
             // Arrange
             var httpClient = _webApplicationFactory.CreateClient();
