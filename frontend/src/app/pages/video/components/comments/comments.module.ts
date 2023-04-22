@@ -5,8 +5,8 @@ import { InputTextareaModule } from 'primeng/inputtextarea';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
-
-
+import { AvatarModule } from 'primeng/avatar';
+import { MenuModule } from 'primeng/menu';
 
 @NgModule({
   declarations: [
@@ -18,6 +18,8 @@ import { RippleModule } from 'primeng/ripple';
     ReactiveFormsModule,
     ButtonModule,
     RippleModule,
+    AvatarModule,
+    MenuModule,
   ],
   exports: [
     CommentsComponent,

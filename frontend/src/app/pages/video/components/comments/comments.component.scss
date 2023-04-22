@@ -1,0 +1,7 @@
+.comment-container .three-dots-button {
+  visibility: hidden;
+}
+
+.comment-container:hover .three-dots-button {
+  visibility: visible;
+}

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Comment } from './models/comment';
 import { FormControl, Validators } from '@angular/forms';
+import { MenuItem } from 'primeng/api';
 
 @Component({
   selector: 'app-comments',
@@ -12,7 +13,7 @@ export class CommentsComponent {
     {
       id: '1',
       authorId: '1',
-      content: 'comment content 1',
+      content: 'comment content 1 jest to barddooooo dlu gi kom ale dlugi wogdsha dsklh sladf  jsjdjkdsa ldk kj j',
       avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/431fbad7-2b0b-4232-ae7a-e3ba6af1b933',
       nickname: 'surfer',
       hasResponses: false,
@@ -31,6 +32,18 @@ export class CommentsComponent {
     },
   ];
   newComment = new FormControl('', Validators.required);
+  commentMenuItems: MenuItem[] = [
+    {
+      label: 'Delete',
+      icon: 'pi pi-trash',
+      command: this.deleteComment,
+    },
+    {
+      label: 'Report',
+      icon: 'pi pi-flag',
+      command: this.reportComment,
+    },
+  ];
 
   isEmptyAndTouchOrDirty(formControl: FormControl): boolean {
     return formControl.invalid && (formControl.touched || formControl.dirty);
@@ -51,5 +64,13 @@ export class CommentsComponent {
 
   isEmpty(formControl: FormControl): boolean {
     return formControl.value === '';
+  }
+
+  deleteComment(): void {
+    // DELETE COMMENT LOGIC HERE
+  }
+
+  reportComment(): void {
+    // REPORT COMMENT LOGIC HERE
   }
 }
