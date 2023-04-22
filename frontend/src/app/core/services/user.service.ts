@@ -5,6 +5,8 @@ import { environment } from "../../../environments/environment";
 import { UserForRegistrationDTO } from "../../authentication/models/user-for-registration-dto";
 import { UserDTO } from "../models/user-dto";
 import { UserForLoginDTO } from "src/app/authentication/models/user-login-dto";
+import { UpdateUserDTO } from "../models/update-user-dto";
+import { getHttpOptionsWithAuthenticationHeader } from "../functions/get-http-options-with-authorization-header";
 
 @Injectable({
   providedIn: 'root'
@@ -34,10 +36,29 @@ export class UserService {
     return this.httpClient.post<void>(`${this.registrationPageWebAPIUrl}/register`, userForRegistration);
   }
 
-  getUser(id: string): Observable<UserDTO> {
+  getUser(id: string | null): Observable<UserDTO> {
+    let params = new HttpParams()
+    
+    if (id !== null)
+      params = params.set('id', id);
+
+    const httpOptions = {
+      params: params,
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
+    
+    return this.httpClient.get<UserDTO>(`${this.registrationPageWebAPIUrl}/user`, httpOptions);
+  }
+
+  editUser(id: string, updateUserDTO: UpdateUserDTO): Observable<void>{
     let params = new HttpParams().set('id', id);
 
-    return this.httpClient.get<UserDTO>(`${this.registrationPageWebAPIUrl}/user`, { params: params });
+    const httpOptions = {
+      params: params,
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
+
+    return this.httpClient.put<void>(`${this.registrationPageWebAPIUrl}/user`, updateUserDTO, httpOptions);
   }
 
   loginUser(userForLogin: UserForLoginDTO): Observable<string> {

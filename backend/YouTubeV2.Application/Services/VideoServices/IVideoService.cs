@@ -18,5 +18,7 @@ namespace YouTubeV2.Application.Services.VideoServices
         Task AuthorizeVideoAccessAsync(Guid videoId, string userId, CancellationToken cancellationToken = default);
 
         Task SetVideoLengthAsync(Video video, double length, CancellationToken cancellationToken = default);
+
+        Task<int> GetVideoCountAsync(User user, CancellationToken cancellationToke = default);
     }
 }

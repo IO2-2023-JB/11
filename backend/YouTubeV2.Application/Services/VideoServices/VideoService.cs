@@ -1,5 +1,7 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.Linq.Expressions;
 using YouTubeV2.Api.Enums;
 using YouTubeV2.Application.DTO.VideoMetadataDTOS;
@@ -106,5 +108,9 @@ namespace YouTubeV2.Application.Services.VideoServices
             vid.Duration = formattedTime;
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<int> GetVideoCountAsync(User user, CancellationToken cancellationToken = default) => 
+            await _context.Videos.CountAsync(video => video.Author == user, cancellationToken);
+
     }
 }

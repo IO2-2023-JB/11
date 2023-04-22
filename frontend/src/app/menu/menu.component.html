@@ -11,6 +11,16 @@
         (click)="homeButtonOnClick()">
       </button>
       <button
+        *ngIf="isUserAuthenticated"
+        id="search-button"
+        pButton
+        pRipple
+        type="search"
+        label="Search"
+        class="p-button-secondary p-button-text"
+        (click)="searchButtonOnClick()">
+      </button>
+      <button
         id="playlists-button"
         pButton
         pRipple
@@ -41,6 +51,16 @@
         class="p-button-secondary p-button-text"
         (click)="registerButtonOnClick()">
       </button>
+      <button
+      *ngIf="isUserAuthenticated"
+      id="account-button"
+      pButton
+      pRipple
+      type="account"
+      label="Account"
+      class="p-button-secondary p-button-text"
+      (click)="accountButtonOnClick()">
+    </button>
       <button
         *ngIf="isUserAuthenticated"
         id="logout-button"

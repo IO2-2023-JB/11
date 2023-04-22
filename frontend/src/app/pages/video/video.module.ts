@@ -8,9 +8,6 @@ import { CardModule } from 'primeng/card';
 
 @NgModule({
   declarations: [
-    VideoComponent,
-  ],
-  exports: [
     VideoComponent
   ],
   imports: [

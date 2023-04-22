@@ -10,7 +10,8 @@ namespace YouTubeV2.Application.Utils
             return regex.IsMatch(input);
         }
 
-        public static bool IsValidBase64ImageOrEmpty(this string input) => input == string.Empty || IsValidBase64Image(input);
+        public static bool IsValidBase64ImageOrNullOrEmpty(this string? input) => input == null 
+            || input == string.Empty || IsValidBase64Image(input);
 
         public static string GetImageFormat(this string base64Input)
         {

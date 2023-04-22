@@ -28,6 +28,10 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.router.navigate(['']);
   }
 
+  searchButtonOnClick(): void {
+    this.router.navigate(['search']);
+  }
+
   playlistsButtonOnClick(): void {
     this.router.navigate(['playlists']);
   }
@@ -38,6 +42,10 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   loginButtonOnClick(): void {
     this.router.navigate(['login']);
+  }
+
+  accountButtonOnClick(): void {
+    this.router.navigate(['user']);
   }
 
   logoutButtonOnClick(): void {
