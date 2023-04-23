@@ -1,76 +1,70 @@
-import { Component } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { Comment } from './models/comment';
 import { FormControl, Validators } from '@angular/forms';
 import { MenuItem } from 'primeng/api';
+import { CommentsService } from './services/comments.service';
+import { Subscription, tap } from 'rxjs';
+import { CommentsDTO } from './models/comments-dto';
 
 @Component({
   selector: 'app-comments',
   templateUrl: './comments.component.html',
   styleUrls: ['./comments.component.scss']
 })
-export class CommentsComponent {
-  comments: Comment[] = [
-    {
-      id: '1',
-      authorId: '1',
-      content: 'comment content 1 jest to barddooooo dlu gi kom ale dlugi wogdsha dsklh sladf  jsjdjkdsa ldk kj j',
-      avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/431fbad7-2b0b-4232-ae7a-e3ba6af1b933',
-      nickname: 'surfer',
-      hasResponses: true,
-      responses: [
-        {
-          id: '1',
-          authorId: '1',
-          content: 'comment content 1 jest to barddooooo dlu gi kom ale dlugi wogdsha dsklh sladf  jsjdjkdsa ldk kj j',
-          avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/431fbad7-2b0b-4232-ae7a-e3ba6af1b933',
-          nickname: 'surfer',
-        },
-        {
-          id: '2',
-          authorId: '2',
-          content: 'comment content 2',
-          avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/53_square.jpg',
-          nickname: 'karol',
-        },
-      ],
-      isResponsesVisible: false,
-    },
-    {
-      id: '2',
-      authorId: '2',
-      content: 'comment content 2',
-      avatarImage: 'https://filesdevelop.blob.core.windows.net/useravatars/53_square.jpg',
-      nickname: 'karol',
-      hasResponses: false,
-      responses: null,
-      isResponsesVisible: false,
-    },
-  ];
+export class CommentsComponent implements OnInit, OnDestroy {
+  @Input() videoId!: string;
+  comments!: Comment[];
   newComment = new FormControl('', Validators.required);
-  commentMenuItems: MenuItem[] = [
-    {
-      label: 'Delete',
-      icon: 'pi pi-trash',
-      command: this.deleteComment,
-    },
-    {
-      label: 'Report',
-      icon: 'pi pi-flag',
-      command: this.reportComment,
-    },
-  ];
-  commentResponseMenuItems: MenuItem[] = [
-    {
-      label: 'Delete',
-      icon: 'pi pi-trash',
-      command: this.deleteCommentResponse,
-    },
-    {
-      label: 'Report',
-      icon: 'pi pi-flag',
-      command: this.reportCommentResponse,
-    },
-  ];
+  subscriptions: Subscription[] = [];
+  isProgressSpinnerVisible = false;
+
+  constructor(private commentService: CommentsService) { }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
+  }
+  ngOnInit(): void {
+    this.getAllComments();
+  }
+
+  getAllComments(): void {
+    const $getAllComments = this.commentService.getAllComments(this.videoId).pipe(
+      tap((commentsDTO: CommentsDTO) => {
+        this.comments = commentsDTO.comments.map(comment => ({
+          id: comment.id,
+          authorId: comment.authorId,
+          content: comment.content,
+          avatarImage: comment.avatarImage,
+          nickname: comment.nickname,
+          hasResponses: comment.hasResponses,
+          responses: null,
+          isResponsesVisible: false,
+          isResponseGettingAdded: false,
+          responseFormControl: new FormControl('', Validators.required),
+        }))
+      }),
+    );
+
+    this.subscriptions.push($getAllComments.subscribe());
+  }
+
+  getAllCommentResponses(comment: Comment): void {
+    const $getAllCommentResponses = this.commentService.getAllCommentResponses(comment.id).pipe(
+      tap((commentsDTO: CommentsDTO) => {
+        comment.responses = commentsDTO.comments.map(response => ({
+          id: response.id,
+          authorId: response.authorId,
+          content: response.content,
+          avatarImage: response.avatarImage,
+          nickname: response.nickname,
+        }))
+      }),
+    );
+
+    this.subscriptions.push($getAllCommentResponses.subscribe());
+  }
 
   isEmptyAndTouchOrDirty(formControl: FormControl): boolean {
     return formControl.invalid && (formControl.touched || formControl.dirty);
@@ -85,19 +79,35 @@ export class CommentsComponent {
   }
 
   handleOnAddCommentClick(formControl: FormControl): void {
-    // ADD LOGIC REGARDING ADDING COMMENTS
-    formControl.reset();
+    if (formControl.invalid) {
+      formControl.markAsDirty();
+      return;
+    }
+
+    const $addComment = this.commentService.addComment(formControl.value, this.videoId).pipe(
+      tap(() => {
+        this.getAllComments();
+        formControl.reset();
+      }),
+    );
+    this.subscriptions.push($addComment.subscribe());
   }
 
   isEmpty(formControl: FormControl): boolean {
     return formControl.value === '';
   }
 
-  deleteComment(): void {
-    // DELETE COMMENT LOGIC HERE
+  deleteComment(commentIndex: number): void {
+    const $deleteComment = this.commentService.deleteComment(this.comments[commentIndex].id).pipe(
+      tap(() => {
+        this.comments.splice(commentIndex, 1);
+      }),
+    );
+
+    this.subscriptions.push($deleteComment.subscribe());
   }
 
-  reportComment(): void {
+  reportComment(commentIndex: number): void {
     // REPORT COMMENT LOGIC HERE
   }
 
@@ -106,15 +116,79 @@ export class CommentsComponent {
   }
 
   handleOnShowResponsesClick(comment: Comment): void {
-    // GET RESPONSES IF THEY ARE NULL
+    this.getAllCommentResponses(comment);
     comment.isResponsesVisible = true;
   }
 
-  deleteCommentResponse(): void {
-    // DELETE COMMENT LOGIC HERE
+  deleteCommentResponse(comment: Comment, responseIndex: number): void {
+    const $deleteCommentResponse = this.commentService.deleteCommentResponse(comment.responses![responseIndex].id).pipe(
+      tap(() => {
+        this.getAllCommentResponses(comment);
+      }),
+    );
+
+    this.subscriptions.push($deleteCommentResponse.subscribe());
   }
 
-  reportCommentResponse(): void {
-    // REPORT COMMENT LOGIC HERE
+  reportCommentResponse(comment: Comment, responseIndex: number): void {
+    // REPORT COMMENT RESPONSE LOGIC HERE
+  }
+
+  handleOnAddResponseClick(comment: Comment): void {
+    comment.isResponseGettingAdded = true;
+  }
+
+  handleOnCancelCommentResponseClick(comment: Comment): void {
+    comment.isResponseGettingAdded = false;
+    comment.responseFormControl.reset();
+  }
+
+  handleOnAddCommentResponseClick(comment: Comment): void {
+    if (comment.responseFormControl.invalid) {
+      comment.responseFormControl.markAsDirty();
+      return;
+    }
+
+    const $addCommentResponse = this.commentService.addCommentResponse(comment.responseFormControl.value, comment.id).pipe(
+      tap(() => {
+        if (comment.isResponsesVisible) {
+          this.getAllCommentResponses(comment);
+        }
+        comment.responseFormControl.reset();
+        comment.isResponseGettingAdded = false;
+        comment.hasResponses = true;
+      }),
+    );
+    this.subscriptions.push($addCommentResponse.subscribe());
+  }
+
+  getCommentMenuModel(commentIndex: number): MenuItem[] {
+    return [
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => this.deleteComment(commentIndex),
+      },
+      {
+        label: 'Report',
+        icon: 'pi pi-flag',
+        command: () => this.reportComment(commentIndex),
+      },
+    ];
+  }
+
+  getCommentResponseMenuModel(comment: Comment, responseIndex: number): MenuItem[] {
+    return [
+      {
+        label: 'Delete',
+        icon: 'pi pi-trash',
+        command: () => this.deleteCommentResponse(comment, responseIndex),
+      },
+      {
+        label: 'Report',
+        icon: 'pi pi-flag',
+        command: () => this.reportCommentResponse(comment, responseIndex),
+      },
+    ];
   }
 }

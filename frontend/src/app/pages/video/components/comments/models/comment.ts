@@ -1,3 +1,4 @@
+import { FormControl } from '@angular/forms';
 import { CommentResponse } from './comment-response';
 
 export interface Comment {
@@ -9,4 +10,6 @@ export interface Comment {
   hasResponses: boolean;
   responses: CommentResponse[] | null;
   isResponsesVisible: boolean;
+  isResponseGettingAdded: boolean;
+  responseFormControl: FormControl;
 }
