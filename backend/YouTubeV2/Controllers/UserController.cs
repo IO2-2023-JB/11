@@ -53,7 +53,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("user/videos")]
-        public async Task<ActionResult<VideoListDto>> GetVideosAsync([FromQuery] string? id, CancellationToken cancellationToken)
+        public async Task<ActionResult<VideoListDto>> GetUserVideosAsync([FromQuery] string? id, CancellationToken cancellationToken)
         {
             string? userId = GetUserId();
             if (userId is null) return Forbid();

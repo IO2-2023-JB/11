@@ -6,22 +6,20 @@ namespace YouTubeV2.Application.Services.VideoServices
 {
     internal static class VideoExtensions
     {
-        internal static IQueryable<VideoMetadataDto> ToVideoMetadataDto(this IQueryable<Video> query, IBlobImageService blobImageService)
-        {
-            return query.Select(video => new VideoMetadataDto(
-                video.Id.ToString(),
+        internal static IQueryable<VideoMetadataDto> ToVideoMetadataDto(this IQueryable<Video> query, IBlobImageService blobImageService) =>
+            query.Select(video => new VideoMetadataDto(
+                video.Id,
                 video.Title,
                 video.Description,
-                blobImageService.GetVideoThumbnail(video.Id.ToString()).ToString(),
+                blobImageService.GetVideoThumbnail(video.Id.ToString()),
                 video.Author.Id,
                 video.Author.UserName!,
                 video.ViewCount,
                 video.Tags.Select(tag => tag.Value).ToList(),
-                video.Visibility.ToString(),
-                video.ProcessingProgress.ToString(),
+                video.Visibility,
+                video.ProcessingProgress,
                 video.UploadDate.ToUniversalTime().Date,
                 video.EditDate.ToUniversalTime().Date,
                 video.Duration));
-        }
     }
 }

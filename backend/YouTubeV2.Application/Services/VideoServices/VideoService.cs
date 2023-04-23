@@ -74,16 +74,16 @@ namespace YouTubeV2.Application.Services.VideoServices
             await _context.SaveChangesAsync(cancellationToken);
 
             return new VideoMetadataDto(
-                video.Id.ToString(),
+                video.Id,
                 video.Title,
                 video.Description,
-                thumbnail.ToString(),
+                thumbnail,
                 video.Author.Id,
                 video.Author.UserName!,
                 video.ViewCount,
                 video.Tags.Select(tag => tag.Value).ToList(),
-                video.Visibility.ToString(),
-                video.ProcessingProgress.ToString(),
+                video.Visibility,
+                video.ProcessingProgress,
                 video.UploadDate.DateTime,
                 video.EditDate.DateTime,
                 video.Duration);
