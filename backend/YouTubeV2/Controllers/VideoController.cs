@@ -102,6 +102,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("user/videos")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<VideoListDto>> GetUserVideosAsync([FromQuery] string? id, CancellationToken cancellationToken)
         {
             string? userId = GetUserId();
@@ -110,6 +111,16 @@ namespace YouTubeV2.Api.Controllers
             return userId == id || id is null
                 ? await _videoService.GetAllUserVideos(userId, cancellationToken)
                 : await _videoService.GetAllAvailableUserVideos(id, cancellationToken);
+        }
+
+        [HttpGet("user/videos/subscribed")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
+        public async Task<ActionResult<VideoListDto>> GetVideosFromSubscriptionsAsync(CancellationToken cancellationToken)
+        {
+            string? userId = GetUserId();
+            if (userId is null) return Forbid();
+
+            return await _videoService.GetVideosFromSubscriptionsAsync(userId, cancellationToken);
         }
     }
 }
