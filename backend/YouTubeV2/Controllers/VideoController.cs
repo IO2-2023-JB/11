@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
+using YouTubeV2.Application.DTO.VideoDTOS;
 using YouTubeV2.Application.DTO.VideoMetadataDTOS;
 using YouTubeV2.Application.Enums;
 using YouTubeV2.Application.Jobs;
@@ -98,6 +99,17 @@ namespace YouTubeV2.Api.Controllers
             await _videoService.AuthorizeVideoAccessAsync(id, userId, cancellationToken);
 
             return Ok(await _videoService.GetVideoMetadataAsync(id, cancellationToken));
+        }
+
+        [HttpGet("user/videos")]
+        public async Task<ActionResult<VideoListDto>> GetUserVideosAsync([FromQuery] string? id, CancellationToken cancellationToken)
+        {
+            string? userId = GetUserId();
+            if (userId is null) return Forbid();
+
+            return userId == id || id is null
+                ? await _videoService.GetAllUserVideos(userId, cancellationToken)
+                : await _videoService.GetAllAvailableUserVideos(id, cancellationToken);
         }
     }
 }
