@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { UserDTO } from 'src/app/core/models/user-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { UserService } from 'src/app/core/services/user.service';
@@ -16,7 +17,7 @@ export class CreatorComponent {
   videos!: VideoMetadataDto[];
 
   constructor(
-    private route: ActivatedRoute, 
+    private route: ActivatedRoute,
     private userService: UserService,
     private router: Router,
     private videoService: VideoService
@@ -41,5 +42,9 @@ export class CreatorComponent {
 
   public goToUserProfile(id: string): void {
     this.router.navigate(['creator/' + id]);
+  }
+
+  public getTimeAgo(video: VideoMetadataDto): string {
+    return getTimeAgo(video.uploadDate);
   }
 }
