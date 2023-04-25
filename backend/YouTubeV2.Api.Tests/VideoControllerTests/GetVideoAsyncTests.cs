@@ -43,7 +43,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
             // ARRANGE
             int from = 2, to = 6;
             string testToken = "Bearer token";
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccess(Role.Simple)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.CreateClient();
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"video/{It.IsAny<Guid>()}?access_token={testToken}");
             requestMessage.Headers.Range = new RangeHeaderValue(from, to);
 
@@ -61,7 +61,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         {
             // ARRANGE
             string testToken = $"Bearer token";
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccess(Role.Simple)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.CreateClient();
 
             // ACT
             HttpResponseMessage httpResponseMessage = await httpClient.GetAsync($"video/{It.IsAny<Guid>()}?access_token={testToken}");
@@ -78,7 +78,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
             // ARRANGE
             int from = 10, to = _wholeFileStreamContent.Length;
             string testToken = "Bearer token";
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccess(Role.Simple)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.CreateClient();
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"video/{It.IsAny<Guid>()}?access_token={testToken}");
             requestMessage.Headers.Range = new RangeHeaderValue(from, to);
 
@@ -97,7 +97,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
             // ARRANGE
             int from = _wholeFileStreamContent.Length, to = _wholeFileStreamContent.Length + 1;
             string testToken = "Bearer token";
-            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccess(Role.Simple)).CreateClient();
+            using HttpClient httpClient = _webApplicationFactory.CreateClient();
             using var requestMessage = new HttpRequestMessage(HttpMethod.Get, $"video/{It.IsAny<Guid>()}?access_token={testToken}");
             requestMessage.Headers.Range = new RangeHeaderValue(from, to);
 
@@ -128,7 +128,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
         }
 
         [TestMethod]
-        public async Task GetVideoAsyncWithAccessTokenWithWrongRoleShouldReturnStatusCodeUnauthorized()
+        public async Task GetVideoAsyncWithAccessTokenWithWrongRoleShouldReturnStatusCodeForbidden()
         {
             // ARRANGE
             _userService
@@ -145,7 +145,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
             HttpResponseMessage httpResponseMessage = await httpClient.SendAsync(requestMessage);
 
             // ASSERT
-            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+            httpResponseMessage.StatusCode.Should().Be(HttpStatusCode.Forbidden);
         }
     }
 }

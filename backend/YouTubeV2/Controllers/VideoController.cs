@@ -35,7 +35,6 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("video/{id:guid}")]
-        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<IActionResult> GetVideoAsync(Guid id, [FromQuery] string access_token, CancellationToken cancellationToken)
         {
             string token = UserService.GetTokenFromTokenWithBearerPrefix(access_token);
