@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
+using System.Reflection.Metadata.Ecma335;
 using System.Security.Claims;
 using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.DTO.VideoDTOS;
@@ -34,6 +36,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("video/{id:guid}")]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<IActionResult> GetVideoAsync(Guid id, [FromQuery] string access_token, CancellationToken cancellationToken)
         {
             string token = UserService.GetTokenFromTokenWithBearerPrefix(access_token);
@@ -121,6 +124,23 @@ namespace YouTubeV2.Api.Controllers
             if (userId is null) return Forbid();
 
             return await _videoService.GetVideosFromSubscriptionsAsync(userId, cancellationToken);
+        }
+
+        [HttpDelete("video")]
+        [Roles(Role.Creator, Role.Administrator)]
+        public async Task<ActionResult> DeleteVideoAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
+        {
+            Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken, video => video.Author);
+            if (video is null) return NotFound();
+
+            string? userId = GetUserId();
+            string? role = GetUserRole();
+            if (userId is null || role is null) return Forbid();
+
+            if (video.Author.Id != userId && role != Role.Administrator) return Forbid();
+
+            await _videoService.DeleteVideoAsync(video, cancellationToken);
+            return Ok();
         }
     }
 }
