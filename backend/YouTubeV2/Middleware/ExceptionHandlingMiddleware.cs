@@ -45,7 +45,7 @@ namespace YouTubeV2.Api.Middleware
             }
             catch (Exception exception)
             {
-                 HandleException(httpContext, exception);
+                HandleException(httpContext, exception);
             }
         }
 
