@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription, forkJoin } from 'rxjs';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { UserDTO } from 'src/app/core/models/user-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
@@ -11,10 +12,11 @@ import { VideoService } from 'src/app/core/services/video.service';
   templateUrl: './creator.component.html',
   styleUrls: ['./creator.component.scss']
 })
-export class CreatorComponent {
+export class CreatorComponent implements OnInit, OnDestroy {
   id!: string;
   user!: UserDTO;
   videos!: VideoMetadataDto[];
+  subscriptions: Subscription[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -23,21 +25,20 @@ export class CreatorComponent {
     private videoService: VideoService
     ) {
     this.id = this.route.snapshot.paramMap.get('id')!;
-    userService.getUser(this.id).subscribe(user => this.user = user);
+  }
 
-    this.videos = [];
+  ngOnInit(): void {
+    const getUser$ = this.userService.getUser(this.id);
+    const getVideos$ = this.videoService.getUserVideos(this.id);
 
-    this.getVideos();
+    this.subscriptions.push(forkJoin([getUser$, getVideos$]).subscribe(([user, videosList]) => {
+      this.user = user;
+      this.videos = videosList.videos;
+    }));
   }
 
   public goToVideo(id: string): void {
     this.router.navigate(['videos/' + id]);
-  }
-
-  public getVideos() {
-    this.videoService.getUserVideos(this.id).subscribe(videos => {
-      this.videos = videos.videos;
-    });
   }
 
   public goToUserProfile(id: string): void {
@@ -46,5 +47,11 @@ export class CreatorComponent {
 
   public getTimeAgo(video: VideoMetadataDto): string {
     return getTimeAgo(video.uploadDate);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
+    });
   }
 }
