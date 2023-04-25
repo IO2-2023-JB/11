@@ -12,7 +12,7 @@ using YouTubeV2.Application;
 namespace YouTubeV2.Application.Migrations
 {
     [DbContext(typeof(YTContext))]
-    [Migration("20230422134024_UserData")]
+    [Migration("20230425211429_UserData")]
     partial class UserData
     {
         /// <inheritdoc />
@@ -150,15 +150,15 @@ namespace YouTubeV2.Application.Migrations
 
             modelBuilder.Entity("PlaylistVideo", b =>
                 {
-                    b.Property<Guid>("PlaylistsId")
+                    b.Property<Guid>("PlaylistId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("VideosId")
+                    b.Property<Guid>("VideoId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("PlaylistsId", "VideosId");
+                    b.HasKey("PlaylistId", "VideoId");
 
-                    b.HasIndex("VideosId");
+                    b.HasIndex("VideoId");
 
                     b.ToTable("PlaylistVideo");
                 });
@@ -413,7 +413,7 @@ namespace YouTubeV2.Application.Migrations
                             Id = "02174cf0–9412–4cfe-afbf-59f706d72cf6",
                             AccessFailedCount = 0,
                             AccountBalance = 0m,
-                            ConcurrencyStamp = "7169a59c-8b2e-4ff2-993f-5c329b2a6fc2",
+                            ConcurrencyStamp = "d0a68b9e-243b-49cf-b33b-7b946eca71db",
                             CreationDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "simple@test.com",
                             EmailConfirmed = false,
@@ -421,9 +421,9 @@ namespace YouTubeV2.Application.Migrations
                             Name = "Simple",
                             NormalizedEmail = "SIMPLE@TEST.COM",
                             NormalizedUserName = "TESTSIMPLE",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEzyGjyVkSp5sE5gTxf4PXdS6Kt2cnKOKBWVwA9k4HFMXC/eCC4y4E2poVQiTJ75VQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEN8lpLfxrRkY3X3x+OAjkbsEN7hfQR1X0v5t2fuQNSaIslnfgu980CyYa0pHDsuPTw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "43370052-db22-4706-8023-7b2d4840b8ac",
+                            SecurityStamp = "973ab52b-55fc-45c2-80fa-e54107d588af",
                             Surname = "Test",
                             TwoFactorEnabled = false,
                             UserName = "TestSimple"
@@ -433,7 +433,7 @@ namespace YouTubeV2.Application.Migrations
                             Id = "6EBD31DD-0321-4FDA-92FA-CD22A1190DC8",
                             AccessFailedCount = 0,
                             AccountBalance = 0m,
-                            ConcurrencyStamp = "e20dd8e7-62b9-4eda-9c13-60b07d79b630",
+                            ConcurrencyStamp = "68b288dd-58aa-4c4a-8f9f-27110e97451c",
                             CreationDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "creator@test.com",
                             EmailConfirmed = false,
@@ -441,9 +441,9 @@ namespace YouTubeV2.Application.Migrations
                             Name = "Creator",
                             NormalizedEmail = "CREATOR@TEST.COM",
                             NormalizedUserName = "TESTCREATOR",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF0Gnim241fnVknmVI9f9O3TunQC4YKo5fGNi88FKRM9XhvBAWwzmqTqpgFaVcrozw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAECAPE+K/CoSs7Jf0SUrg359awex4pVLKw4oun9itkSJwrcJ5uHdx6IHZtujxlZ1F5g==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "42134827-5567-428e-8e2a-c5f19aa3d341",
+                            SecurityStamp = "5fd85a84-97c7-434c-806b-9c22f5e3e4cb",
                             Surname = "Test",
                             TwoFactorEnabled = false,
                             UserName = "TestCreator"
@@ -453,7 +453,7 @@ namespace YouTubeV2.Application.Migrations
                             Id = "CB6A6951-E91A-4A13-B6AC-8634883F5B93",
                             AccessFailedCount = 0,
                             AccountBalance = 0m,
-                            ConcurrencyStamp = "2a011fd1-6a12-4600-9084-9aa307cd0e16",
+                            ConcurrencyStamp = "d85119b4-a417-46f5-950d-6cea1873f9c6",
                             CreationDate = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             Email = "admin@test.com",
                             EmailConfirmed = false,
@@ -461,9 +461,9 @@ namespace YouTubeV2.Application.Migrations
                             Name = "Admin",
                             NormalizedEmail = "ADMIN@TEST.COM",
                             NormalizedUserName = "TESTADMIN",
-                            PasswordHash = "AQAAAAIAAYagAAAAEIEBhT4QAFjbHWsVx986wj/7BxLb3L00h/L8U3KqYmjXNSzgDlstMQ5I+R73qY3ajg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJpRJOUuUIpKr4RTXQ/KF8LvfLMP1o6yv32pTdmKK4mta5sgv+05pFcoJEKa2d2wLw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9d0f50d9-3cbe-478f-94b2-11733885d787",
+                            SecurityStamp = "9e83c101-7a02-47a9-8918-a5638bc1ee4a",
                             Surname = "Test",
                             TwoFactorEnabled = false,
                             UserName = "TestAdmin"
@@ -571,13 +571,13 @@ namespace YouTubeV2.Application.Migrations
                 {
                     b.HasOne("YouTubeV2.Application.Model.Playlist", null)
                         .WithMany()
-                        .HasForeignKey("PlaylistsId")
+                        .HasForeignKey("PlaylistId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("YouTubeV2.Application.Model.Video", null)
                         .WithMany()
-                        .HasForeignKey("VideosId")
+                        .HasForeignKey("VideoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

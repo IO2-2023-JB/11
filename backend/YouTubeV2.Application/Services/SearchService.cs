@@ -36,8 +36,8 @@ namespace YouTubeV2.Application.Services
             var matchingUsers = searchableUsers.Where(user => user.UserName!
                 .Contains(query, StringComparison.InvariantCultureIgnoreCase)).AsQueryable();
 
-            ClipUsersBasedOnDate(matchingUsers, dateBegin, dateEnd);
-            SortUsers(matchingUsers, sortingDirection, sortingType, cancellationToken);
+            ClipUsersBasedOnDate(ref matchingUsers, dateBegin, dateEnd);
+            SortUsers(ref matchingUsers, sortingDirection, sortingType, cancellationToken);
 
             var sortedUsers = matchingUsers.ToList();
 
@@ -51,58 +51,58 @@ namespace YouTubeV2.Application.Services
             return userDtos;
         }
 
-        private void ClipUsersBasedOnDate(IQueryable<User> users, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd)
+        private void ClipUsersBasedOnDate(ref IQueryable<User> users, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd)
         {
             if (dateBegin > dateEnd)
                 throw new BadRequestException("Begin date cannot be bigger than end date");
 
             if (dateBegin != null)
-                users.Where(user => user.CreationDate > dateBegin);
+                users = users.Where(user => user.CreationDate > dateBegin);
             if (dateBegin != null)
-                users.Where(user => user.CreationDate < dateEnd);
+                users = users.Where(user => user.CreationDate < dateEnd);
         }
 
-        private void SortUsers(IQueryable<User> users, SortingDirections sortingDirection, SortingTypes sortingType, 
+        private void SortUsers(ref IQueryable<User> users, SortingDirections sortingDirection, SortingTypes sortingType, 
             CancellationToken cancellationToken = default)
         {
             switch (sortingType)
             {
                 case SortingTypes.Alphabetical:
-                    SortUsersAlphabetical(users, sortingDirection);
+                    SortUsersAlphabetical(ref users, sortingDirection);
                     break;
                 case SortingTypes.PublishDate:
-                    SortUsersPublish(users, sortingDirection);
+                    SortUsersPublish(ref users, sortingDirection);
                     break;
                 case SortingTypes.Popularity:
-                    SortUsersPopularity(users, sortingDirection, cancellationToken);
+                    SortUsersPopularity(ref users, sortingDirection, cancellationToken);
                     break;
             }
         }
 
-        private void SortUsersAlphabetical(IQueryable<User> users, SortingDirections sortingDirection)
+        private void SortUsersAlphabetical(ref IQueryable<User> users, SortingDirections sortingDirection)
         {
             if (sortingDirection == SortingDirections.Ascending)
-                users.OrderBy(x => x.UserName);
+                users = users.OrderBy(x => x.UserName);
             else
-                users.OrderByDescending(x => x.UserName);
+                users = users.OrderByDescending(x => x.UserName);
         }
 
-        private void SortUsersPublish(IQueryable<User> users, SortingDirections sortingDirection)
+        private void SortUsersPublish(ref IQueryable<User> users, SortingDirections sortingDirection)
         {
             if (sortingDirection == SortingDirections.Ascending)
-                users.OrderBy(x => x.CreationDate);
+                users = users.OrderBy(x => x.CreationDate);
             else
-                users.OrderByDescending(x => x.CreationDate);
+                users = users.OrderByDescending(x => x.CreationDate);
         }
 
-        private void SortUsersPopularity(IQueryable<User> users, SortingDirections sortingDirection, 
+        private void SortUsersPopularity(ref IQueryable<User> users, SortingDirections sortingDirection, 
             CancellationToken cancellationToken = default)
         {
             if (sortingDirection == SortingDirections.Ascending)
-                users.OrderBy(x =>
+                users = users.OrderBy(x =>
                     _subscriptionService.GetSubscriptionCountAsync(x.Id, cancellationToken).GetAwaiter().GetResult());
             else
-                users.OrderByDescending(x => 
+                users = users.OrderByDescending(x => 
                     _subscriptionService.GetSubscriptionCountAsync(x.Id, cancellationToken).GetAwaiter().GetResult());
         }
     }
