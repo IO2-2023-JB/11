@@ -1,11 +1,10 @@
-import { Component, EventEmitter, Output, OnInit  } from '@angular/core';
-import { UserDTO } from 'src/app/core/models/user-dto';
+import { Component,} from '@angular/core';
 import { SearchResultsDTO } from 'src/app/core/models/search-results-dto';
 import { SearchService } from 'src/app/core/services/search.service';
 import { SortingTypes } from 'src/app/core/models/enums/sorting-types';
 import { SortingDirections } from 'src/app/core/models/enums/sorting-directions';
-import { Router, NavigationExtras } from '@angular/router';
-import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
+import { Router } from '@angular/router';
+import { finalize, Observable, of, Subscription, switchMap } from 'rxjs';
 
 interface SortTypeOption {
   label: string;
@@ -55,12 +54,8 @@ export class SearchComponent {
     let routerState = this.router.getCurrentNavigation()?.extras.state;
     if (routerState != undefined) {
       this.query = routerState['query'];
-      console.log(this.query)
       this.performSearch();
     }
-  }
-
-  ngOnInit() {
   }
 
   onSearchButtonClick() {
