@@ -67,11 +67,10 @@ namespace YouTubeV2.Application.Services
             var subscriptions = await _context.Subscriptions.Where(
                 subscription => subscription.Subscriber == user || subscription.Subscribee == user).ToListAsync(cancellationToken);
 
-            if (subscriptions == null || subscriptions.Count == 0)
+            if (subscriptions.Count == 0)
                 return;
 
-            foreach (var subscription in subscriptions)
-                _context.Remove(subscription);
+            _context.RemoveRange(subscriptions);
                 
             await _context.SaveChangesAsync(cancellationToken);
         }
@@ -80,11 +79,10 @@ namespace YouTubeV2.Application.Services
         {
             var subscriptions = await _context.Subscriptions.Where(subscription => subscription.Subscribee == user).ToListAsync(cancellationToken);
 
-            if (subscriptions == null || subscriptions.Count == 0)
+            if (subscriptions.Count == 0)
                 return;
 
-            foreach (var subscription in subscriptions)
-                _context.Remove(subscription);
+            _context.RemoveRange(subscriptions);
 
             await _context.SaveChangesAsync(cancellationToken);
         }

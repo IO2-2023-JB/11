@@ -3,8 +3,9 @@ import { UserDTO } from 'src/app/core/models/user-dto';
 import { SearchResultsDTO } from 'src/app/core/models/search-results-dto';
 import { SearchService } from 'src/app/core/services/search.service';
 import { SortingTypes } from 'src/app/core/models/enums/sorting-types';
-import { SorintgDirections } from 'src/app/core/models/enums/sorting-directions';
-import { Router } from '@angular/router';
+import { SortingDirections } from 'src/app/core/models/enums/sorting-directions';
+import { Router, NavigationExtras } from '@angular/router';
+import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 
 interface SortTypeOption {
   label: string;
@@ -13,7 +14,7 @@ interface SortTypeOption {
 
 interface SortDirectionOption {
   label: string;
-  value: SorintgDirections;
+  value: SortingDirections;
 }
 
 @Component({
@@ -22,6 +23,8 @@ interface SortDirectionOption {
   styleUrls: ['./search.component.scss']
 })
 export class SearchComponent {
+  isProgressSpinnerVisible: boolean = false;
+  subscriptions: Subscription[] = [];
   query: string = '';
   beginDate?: Date;
   endDate?: Date;
@@ -42,14 +45,22 @@ export class SearchComponent {
     ];
 
     this.sortingDirections = [
-      { label: 'Ascending', value: SorintgDirections.Asceding },
-      { label: 'Descending', value: SorintgDirections.Descending }
+      { label: 'Ascending', value: SortingDirections.Asceding },
+      { label: 'Descending', value: SortingDirections.Descending }
     ]
+
+    this.sortingDirection = this.sortingDirections[0];
+    this.sortingType = this.sortingTypes[0];
+
+    let routerState = this.router.getCurrentNavigation()?.extras.state;
+    if (routerState != undefined) {
+      this.query = routerState['query'];
+      console.log(this.query)
+      this.performSearch();
+    }
   }
 
   ngOnInit() {
-    this.sortingDirection = this.sortingDirections[0];
-    this.sortingType = this.sortingTypes[0];
   }
 
   onSearchButtonClick() {
@@ -65,16 +76,29 @@ export class SearchComponent {
     return true;
   }
 
-  performSearch() {
-    this.searchService.getSearchResults(this.query, this.sortingType.value, this.sortingDirection.value,
-      this.beginDate, this.endDate).subscribe(result => this.searchResults = result);
+  isQueryEmpty() {
+    return (this.query.length === 0);
   }
+
+  performSearch() {
+    const search$ = this.searchService.getSearchResults(this.query, this.sortingType.value, this.sortingDirection.value,
+      this.beginDate, this.endDate);
+    this.subscriptions.push(this.doWithLoading(search$).subscribe(result => this.searchResults = result));
+
+    }
 
   searchResultsNone() {
     return this.searchResults !== undefined && this.searchResults.users.length === 0; 
   }
 
-  public goToUserProfile(id: string): void {
+  doWithLoading(observable$: Observable<any>): Observable<any> {
+    return of(this.isProgressSpinnerVisible = true).pipe(
+      switchMap(() => observable$),
+      finalize(() => this.isProgressSpinnerVisible = false)
+    );
+  }
+
+  goToUserProfile(id: string): void {
     this.router.navigate(['creator/' + id]);
   }
 }

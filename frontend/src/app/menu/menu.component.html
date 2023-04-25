@@ -11,16 +11,6 @@
         (click)="homeButtonOnClick()">
       </button>
       <button
-        *ngIf="isUserAuthenticated"
-        id="search-button"
-        pButton
-        pRipple
-        type="search"
-        label="Search"
-        class="p-button-secondary p-button-text"
-        (click)="searchButtonOnClick()">
-      </button>
-      <button
         id="playlists-button"
         pButton
         pRipple
@@ -29,6 +19,12 @@
         class="p-button-secondary p-button-text"
         (click)="playlistsButtonOnClick()">
       </button>
+    </div>
+    <div *ngIf="isUserAuthenticated">
+      <div class="p-inputgroup">
+        <input type="text" pInputText placeholder="Search..." [(ngModel)]="query">
+        <button pButton type="button" (click)="searchButtonOnClick()" [disabled]="isQueryEmpty()" label="Search"></button>
+      </div>
     </div>
     <div style="margin-left: auto;">
       <button

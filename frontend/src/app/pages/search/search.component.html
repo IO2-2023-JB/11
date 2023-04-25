@@ -1,3 +1,7 @@
+<div class="progress-spinner" *ngIf="isProgressSpinnerVisible">
+  <p-progressSpinner></p-progressSpinner>
+</div>
+
 <p-panel>
   <div class="searchGroup">
     <div class="searchItem">
@@ -26,7 +30,7 @@
   </div>
 <div class="p-inputgroup" style="width: 50%">
   <input type="text" pInputText placeholder="Search..." [(ngModel)]="query">
-  <button pButton type="button" (click)="onSearchButtonClick()" label="Search"></button>
+  <button pButton type="button" (click)="onSearchButtonClick()" [disabled]="isQueryEmpty()" label="Search"></button>
 </div>
 
 <div *ngIf="searchResultsNone()">

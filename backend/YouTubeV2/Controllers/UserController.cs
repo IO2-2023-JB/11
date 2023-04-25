@@ -25,7 +25,7 @@ namespace YouTubeV2.Api.Controllers
         {
             string createdID = await _userService.RegisterAsync(registerDto, cancellationToken);
 
-            return Created($"~/user/{createdID}", registerDto);
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         [HttpPost("login")]
@@ -36,7 +36,7 @@ namespace YouTubeV2.Api.Controllers
             return Ok(loginResponseDto);
         }
 
-        [HttpGet("/user")]
+        [HttpGet("user")]
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<UserDto>> GetAsync([FromQuery] Guid id, CancellationToken cancellationToken)
         {
@@ -50,7 +50,7 @@ namespace YouTubeV2.Api.Controllers
             return Ok(await _userService.GetAsync(callerID, userID, cancellationToken));
         }
 
-        [HttpPut("/user")]
+        [HttpPut("user")]
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<IActionResult> PutAsync([FromQuery] Guid id, [FromBody][Required] UpdateUserDto updateUserDTO, 
             CancellationToken cancellationToken)
@@ -67,7 +67,7 @@ namespace YouTubeV2.Api.Controllers
             return Ok();
         }
 
-        [HttpDelete("/user")]
+        [HttpDelete("user")]
         [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<IActionResult> DeleteAsync([FromQuery][Required] Guid id, CancellationToken cancellationToken)
         {

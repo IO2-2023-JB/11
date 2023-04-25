@@ -8,7 +8,7 @@ namespace YouTubeV2.Application.Model
         public string Name { get; set; } = null!;
         public string Surname { get; set; } = null!;
         public decimal AccountBalance { get; set; } = decimal.Zero;
-        public DateTimeOffset CreationDate { get; set; }
+        public DateTimeOffset CreationDate { get; init; }
         public virtual ICollection<Subscription> Subscriptions { get; init; } = null!;
         public virtual IReadOnlyCollection<Video> Videos { get; init; } = null!;
         public virtual ICollection<Playlist> Playlists { get; init; } = null!;

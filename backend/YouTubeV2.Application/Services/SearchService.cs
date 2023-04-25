@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Application.DTO.SearchDTOS;
 using YouTubeV2.Application.DTO.UserDTOS;
 using YouTubeV2.Application.Enums;
@@ -32,67 +33,77 @@ namespace YouTubeV2.Application.Services
             SortingTypes sortingType, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd, CancellationToken cancellationToken)
         {
             var searchableUsers = await _userManager.GetUsersInRoleAsync(Role.Creator);
-            var matchingUsers = searchableUsers.Select(user => user).Where(user => user.UserName!
-                .Contains(query, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            var matchingUsers = searchableUsers.Where(user => user.UserName!
+                .Contains(query, StringComparison.InvariantCultureIgnoreCase)).AsQueryable();
 
             ClipUsersBasedOnDate(ref matchingUsers, dateBegin, dateEnd);
-            SortUsers(ref matchingUsers, sortingDirection, sortingType);
+            SortUsers(ref matchingUsers, sortingDirection, sortingType, cancellationToken);
 
-            return matchingUsers.Select(async user =>
-                await _userService.GetDTOForUser(user, false, cancellationToken)).Select(task => task.Result).ToList(); 
+            var sortedUsers = matchingUsers.ToList();
+
+            var userDtos = new List<UserDto>();
+            foreach (var user in sortedUsers)
+            {
+                var userDto = await _userService.GetDTOForUser(user, false, cancellationToken);
+                userDtos.Add(userDto);
+            }
+
+            return userDtos;
         }
 
-        private void ClipUsersBasedOnDate(ref List<User> users, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd)
+        private void ClipUsersBasedOnDate(ref IQueryable<User> users, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd)
         {
             if (dateBegin > dateEnd)
                 throw new BadRequestException("Begin date cannot be bigger than end date");
 
             if (dateBegin != null)
-                users = users.Select(user => user).Where(user => user.CreationDate > dateBegin).ToList();
+                users = users.Where(user => user.CreationDate > dateBegin);
             if (dateBegin != null)
-                users = users.Select(user => user).Where(user => user.CreationDate < dateEnd).ToList();
+                users = users.Where(user => user.CreationDate < dateEnd);
         }
 
-        private void SortUsers(ref List<User> usres, SortingDirections sortingDirection, SortingTypes sortingType)
+        private void SortUsers(ref IQueryable<User> users, SortingDirections sortingDirection, SortingTypes sortingType, 
+            CancellationToken cancellationToken = default)
         {
             switch (sortingType)
             {
                 case SortingTypes.Alphabetical:
-                    SortUsersAlphabetical(ref usres, sortingDirection);
+                    SortUsersAlphabetical(ref users, sortingDirection);
                     break;
                 case SortingTypes.PublishDate:
-                    SortUsersPublish(ref usres, sortingDirection);
+                    SortUsersPublish(ref users, sortingDirection);
                     break;
                 case SortingTypes.Popularity:
-                    SortUsersPopularity(ref usres, sortingDirection);
+                    SortUsersPopularity(ref users, sortingDirection, cancellationToken);
                     break;
             }
         }
 
-        private void SortUsersAlphabetical(ref List<User> users, SortingDirections sortingDirection)
+        private void SortUsersAlphabetical(ref IQueryable<User> users, SortingDirections sortingDirection)
         {
             if (sortingDirection == SortingDirections.Ascending)
-                users = users.OrderBy(x => x.UserName).ToList();
+                users = users.OrderBy(x => x.UserName);
             else
-                users = users.OrderByDescending(x => x.UserName).ToList();
+                users = users.OrderByDescending(x => x.UserName);
         }
 
-        private void SortUsersPublish(ref List<User> users, SortingDirections sortingDirection)
+        private void SortUsersPublish(ref IQueryable<User> users, SortingDirections sortingDirection)
         {
             if (sortingDirection == SortingDirections.Ascending)
-                users = users.OrderBy(x => x.CreationDate).ToList();
+                users = users.OrderBy(x => x.CreationDate);
             else
-                users = users.OrderByDescending(x => x.CreationDate).ToList();
+                users = users.OrderByDescending(x => x.CreationDate);
         }
 
-        private void SortUsersPopularity(ref List<User> users, SortingDirections sortingDirection)
+        private void SortUsersPopularity(ref IQueryable<User> users, SortingDirections sortingDirection, 
+            CancellationToken cancellationToken = default)
         {
             if (sortingDirection == SortingDirections.Ascending)
                 users = users.OrderBy(x =>
-                    _subscriptionService.GetSubscriptionCountAsync(x.Id).GetAwaiter().GetResult()).ToList();
+                    _subscriptionService.GetSubscriptionCountAsync(x.Id, cancellationToken).GetAwaiter().GetResult());
             else
                 users = users.OrderByDescending(x => 
-                    _subscriptionService.GetSubscriptionCountAsync(x.Id).GetAwaiter().GetResult()).ToList();
+                    _subscriptionService.GetSubscriptionCountAsync(x.Id, cancellationToken).GetAwaiter().GetResult());
         }
     }
 }

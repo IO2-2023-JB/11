@@ -90,10 +90,10 @@ namespace YouTubeV2.Application.Services
 
         public async Task<UserDto> GetAsync(string callerID, string userID, CancellationToken cancellationToken)
         {
-            var callingUser = await GetByIdAsync(callerID);
+            var callingUser = await GetByIdAsync(callerID) ?? throw new UnauthorizedException();
             bool getAllData = false;
 
-            User userToGet = callingUser!;
+            User userToGet = callingUser;
 
             if (userID.IsNullOrEmpty())
             {
@@ -152,9 +152,6 @@ namespace YouTubeV2.Application.Services
             var userRoles = await _userManager.GetRolesAsync(user);
             var userClaims = await _userManager.GetClaimsAsync(user);
 
-            if (await _videoService.GetVideoCountAsync(user) > 0)
-                throw new BadRequestException("Cannot delete account - there are still some videos uploaded");
-
             foreach (var role in userRoles)
             {
                 var roleResult = await _userManager.RemoveFromRoleAsync(user, role);
@@ -198,11 +195,11 @@ namespace YouTubeV2.Application.Services
 
         private async Task<User> VerifyAccessAndGetUserToModify(string callerID, string userID)
         {
-            var callingUser = await GetByIdAsync(callerID);
+            var callingUser = await GetByIdAsync(callerID) ?? throw new UnauthorizedException();
 
-            User userToModify = callingUser!;
+            User userToModify = callingUser;
 
-            if (await _userManager.IsInRoleAsync(callingUser!, Role.Administrator))
+            if (await _userManager.IsInRoleAsync(callingUser, Role.Administrator))
             {
                 userToModify = await GetByIdAsync(userID) ?? throw new BadRequestException("User not found");
             }

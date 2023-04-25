@@ -7,7 +7,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AbstractControl, FormBuilder, FormControl, FormGroup, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MessageService } from 'primeng/api';
-import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-user',
@@ -79,7 +78,7 @@ export class UserComponent implements OnInit, OnDestroy {
         this.messageService.add({
           severity: 'success',
           summary: 'Success',
-          detail: 'Your account info has benn updated.'
+          detail: 'Your account info has been updated.'
         })
       })
     );
