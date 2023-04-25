@@ -52,6 +52,10 @@ export class UserService {
 
   editUser(id: string, updateUserDTO: UpdateUserDTO): Observable<void>{
     let params = new HttpParams().set('id', id);
+    const httpOptions = {
+      params: params,
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
 
     const httpOptions = {
       params: params,

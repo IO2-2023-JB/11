@@ -34,13 +34,13 @@ namespace YouTubeV2.Application.Services.BlobServices
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
 
-            return blobContainerClient.GetBlobClient(fileName).Uri;
+            return blobContainerClient.GetBlobClient(fileName.ToLower()).Uri;
         }
 
         private async Task UploadImageAsync(string base64Content, string fileName, string blobContainerName, CancellationToken cancellationToken = default)
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
-            BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
+            BlobClient blobClient = blobContainerClient.GetBlobClient(fileName.ToLower());
 
             string imageFormat = base64Content.GetImageFormat();
             string imageData = base64Content.GetImageData();
@@ -49,14 +49,13 @@ namespace YouTubeV2.Application.Services.BlobServices
             await blobClient.UploadAsync(memoryStream, new BlobHttpHeaders { ContentType = imageFormat }, cancellationToken: cancellationToken);
         }
 
+        public async Task DeleteThumbnailAsync(string fileName, CancellationToken cancellationToken = default) =>
+            await DeleteImageAsync(fileName, _blobStorageConfig.VideoThumbnailsContainerName, cancellationToken);
+
         private async Task DeleteImageAsync(string fileName, string blobContainerName, CancellationToken cancellationToken = default)
         {
             BlobContainerClient blobContainerClient = _blobServiceClient.GetBlobContainerClient(blobContainerName);
-            BlobClient blobClient = blobContainerClient.GetBlobClient(fileName);
-            bool exists = await blobClient.ExistsAsync();
-
-            if (exists)
-                await blobClient.DeleteAsync();
+            await blobContainerClient.DeleteBlobIfExistsAsync(fileName.ToLower(), DeleteSnapshotsOption.IncludeSnapshots, cancellationToken: cancellationToken);
         }
     }
 }

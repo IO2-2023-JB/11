@@ -4,6 +4,7 @@ import { VideoComponent } from './video.component';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { CommentsModule } from './components/comments/comments.module';
+import { MenuModule } from 'primeng/menu';
 
 
 
@@ -16,6 +17,7 @@ import { CommentsModule } from './components/comments/comments.module';
     ButtonModule,
     CardModule,
     CommentsModule,
+    MenuModule,
   ]
 })
 export class VideoModule { }
