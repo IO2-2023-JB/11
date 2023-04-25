@@ -33,4 +33,14 @@ export class VideoService {
 
     return this.httpClient.get<VideoMetadataDto>(`${this.videoPageWebAPIUrl}/video-metadata`, httpOptions);
   }
+
+  deleteVideo(id: string): Observable<void> {
+    let params = new HttpParams().set('id', id);
+    const httpOptions = {
+      params: params,
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
+
+    return this.httpClient.delete<void>(`${this.videoPageWebAPIUrl}/video`, httpOptions);
+  }
 }
