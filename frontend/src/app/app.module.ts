@@ -18,6 +18,7 @@ import { AddVideoModule } from './pages/add-video/add-video.module';
 import { HomeModule } from './pages/home/home.module';
 import { PlaylistModule } from './pages/playlist/playlist.module';
 import { UserPlaylistsModule } from './pages/user-playlists/user-playlists.module';
+import { CommentsModule } from './pages/video/components/comments/comments.module';
 
 @NgModule({
     declarations: [
@@ -48,6 +49,8 @@ import { UserPlaylistsModule } from './pages/user-playlists/user-playlists.modul
         HomeModule,
         PlaylistModule,
         UserPlaylistsModule,
+        PlaylistModule,
+        CommentsModule,
     ]
 })
 export class AppModule { }
