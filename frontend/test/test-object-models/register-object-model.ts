@@ -50,7 +50,7 @@ export class RegisterObjectModel {
     }
 
     private getRandomNickname() {
-        return Math.random().toString(36).substring(2, 15);
+        return Math.random().toString(36).substring(2, 15) + 'name';
     }
 
     async goToHome() {
@@ -114,11 +114,13 @@ export class RegisterObjectModel {
 
     async checkUserData() {
         await this.accountLink.click();
+        await this.page.waitForTimeout(5000);
+
         await expect(this.page).toHaveURL('http://localhost:4200/user');
-        await expect(this.page.locator('#name').innerText()).resolves.toBe(this.name);
-        await expect(this.page.locator('#surname').innerText()).resolves.toBe(this.surname);
-        await expect(this.page.locator('#nickname').innerText()).resolves.toBe(this.nickname);
-        await expect(this.page.locator('#email').innerText()).resolves.toBe(this.email);
+        await expect(this.nameInput.inputValue()).resolves.toBe(this.name);
+        await expect(this.surnameInput.inputValue()).resolves.toBe(this.surname);
+        await expect(this.nicknameInput.inputValue()).resolves.toBe(this.nickname);
+        await expect(this.emailInput.inputValue()).resolves.toBe(this.email);
     }
 
     async logout() {
