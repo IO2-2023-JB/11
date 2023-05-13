@@ -4,16 +4,12 @@
   }
   
   .left-column {
-    width: 30%;
-    background-color: #f0f0f0;
-    overflow-y: scroll;
+    width: 40%;
     padding: 20px;
   }
   
   .right-column {
-    width: 70%;
-    background-color: #e0e0e0;
-    overflow-y: scroll;
+    width: 60%;
     height: 100%;
   }
 
@@ -33,14 +29,14 @@
     display: inline-block;
   }
   
-  .video {
-    max-width: 200px;
-    max-height: 200px;
-    width: auto;
-    height: auto;
-    display: block;
-    margin: 0 auto;
-  }
+  // .video {
+  //   max-width: 200px;
+  //   max-height: 200px;
+  //   width: auto;
+  //   height: auto;
+  //   display: block;
+  //   margin: 0 auto;
+  // }
 
   .avatarImage {
     max-width: 200px;
@@ -64,4 +60,45 @@
     padding: 0px;
     margin-top: 0;
     margin-bottom: 0;
+  }
+
+  .thumbnail-container {
+    overflow: hidden;
+    position: relative;
+    height: 9em;
+    width: 16em;
+  }
+  
+  .thumbnail {
+    display: block;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+  }
+
+  .video-length {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    z-index: 1;
+  }
+  
+  .video-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 3em;
+    line-height: 1.5;
+  }
+  
+  .video {
+    width: 16em;
+  }
+  
+  .video:hover {
+    cursor: pointer;
   }

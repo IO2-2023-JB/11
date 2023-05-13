@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './home.component';
 import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 
 
 
@@ -14,7 +15,8 @@ import { ButtonModule } from 'primeng/button';
   ],
   imports: [
     CommonModule,
-    ButtonModule
+    ButtonModule,
+    CardModule
   ]
 })
 export class HomeModule { }

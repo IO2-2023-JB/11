@@ -1,28 +1,45 @@
-<div class="container">
+<p-card
+  styleClass="p-card-style shadow-7">
+  <div class="container">
     <div class="left-column">
-        <ul *ngIf="subscriptions">
-            <div class="grid">
-                <div class="videoCol" *ngFor="let sub of subscriptions">
-                    <div class="image-container">
-                        <img [src] = "sub.avatarImage" class="avatarImage" (click)="goToCreator(sub.id)">
-                        <span class="image-label">{{ sub.nickname }}</span>
+        <p-card header = "Subscriptions">
+            <ul *ngIf="subscriptions">
+                <div class="grid">
+                    <div class="videoCol" *ngFor="let sub of subscriptions">
+                        <div class="image-container">
+                            <img [src] = "sub.avatarImage" class="avatarImage" (click)="goToCreator(sub.id)">
+                            <span class="image-label">{{ sub.nickname }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </ul>
+            </ul>
+        </p-card>
     </div>
     <div class="right-column">
-        <ul *ngIf="videos">
-            <div class="grid">
-                <div class="videoCol" *ngFor="let video of videos">
-                    <div class="image-container">
-                        <img [src] = "video.thumbnail" class="video" (click)="goToVideo(video.id)">
-                        <span class="image-label">{{ video.duration }}</span>
+        <p-card header = "Recommended">
+            <div class="mt-4">
+                <div *ngIf="videos !== null && videos.length !== 0; else noVideos">
+                  <div class="grid">
+                    <div class="m-2 video" *ngFor="let video of videos" (click)="goToVideo(video.id)">
+                      <div class="thumbnail-container">
+                        <img [src] = "video.thumbnail" class="thumbnail">
+                        <span class="video-length">{{ video.duration }}</span>
+                      </div>
+                      <strong class="video-title">{{ video.title }}</strong>
+                      <div>
+                        {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
+                      </div>
                     </div>
-                    <h3 class="noPadding">{{ video.title }}</h3>
-                    <p class="noPadding">{{ video.viewCount }} views</p>
+                  </div>
                 </div>
-            </div>
-        </ul>
+                <ng-template #noVideos>
+                  <div style="text-align: center;">
+                    No videos to reccomend
+                  </div>
+                </ng-template>
+              </div>
+        </p-card>      
     </div>
 </div>
+
+</p-card>
