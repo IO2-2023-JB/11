@@ -3,15 +3,23 @@ import { RegisterObjectModel } from '../test-object-models/register-object-model
 
 test('Register', async ({ page }) => {
 
-  const loginObjectModel = new RegisterObjectModel(page);
-  await loginObjectModel.goToHome();
+  const registerObjectModel = new RegisterObjectModel(page);
+  await registerObjectModel.goToHome();
 
-  await loginObjectModel.login();
-  await loginObjectModel.expectLoginFail();
+  await registerObjectModel.login();
+  await registerObjectModel.expectLoginFail();
 
-  await loginObjectModel.login();
-  await loginObjectModel.expectLoginSuccess();
+  await registerObjectModel.registerFail();
+  await registerObjectModel.expectRegisterFail();
 
-  await loginObjectModel.logout();
-  await loginObjectModel.expectLogoutSuccess();
+  await registerObjectModel.register();
+  await registerObjectModel.expectRegisterSuccess();
+
+  await registerObjectModel.login();
+  await registerObjectModel.expectLoginSuccess();
+
+  await registerObjectModel.checkUserData();
+
+  await registerObjectModel.logout();
+  await registerObjectModel.expectLogoutSuccess();
 });
