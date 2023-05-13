@@ -18,9 +18,9 @@ export class AuthGuard implements CanActivate {
 
     // redirect to login page if not logged in and trying to access a restricted page
     const isLoginPage = state.url === '/login';
-    const isAdminPage = state.url === '/register';
+    const isRegisterPage = state.url === '/register';
 
-    if (isLoggedIn || isLoginPage || isAdminPage) {
+    if (isLoggedIn || isLoginPage || isRegisterPage) {
       return true;
     }
 
