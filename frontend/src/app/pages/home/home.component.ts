@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
+import { Subscription } from 'rxjs/internal/Subscription';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { getToken } from 'src/app/core/functions/get-token';
 import { SubscriptionDto } from 'src/app/core/models/subscribtion-dto';
 import { VideoFromPlaylistDto } from 'src/app/core/models/video-from-playlist-dto';
-import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { SubscriptionService } from 'src/app/core/services/subscription.service';
 
@@ -16,32 +16,38 @@ import { SubscriptionService } from 'src/app/core/services/subscription.service'
 })
 export class HomeComponent {
   videos!: VideoFromPlaylistDto[];
-  subscriptions!: SubscriptionDto[];
+  userSubscriptions!: SubscriptionDto[];
+  subscriptions: Subscription[] = [];
 
   constructor(
     private playlistService: PlaylistService,
     private subscriptionService: SubscriptionService,
     private messageService: MessageService,
     private router: Router) {
-      if (getToken() === '') {
-        this.messageService.add({severity: 'error', summary: 'Error', detail: 'You must be logged in to view this page!'});
-        this.router.navigate(['login']);
-        return;
-      }
       this.getRecommended();
       this.getSubscriptions();
   }
 
-  getRecommended() {
-    this.playlistService.getRecommended().subscribe(recommended => {
-      this.videos = recommended.videos;
+  ngOnDestroy(): void {
+    this.subscriptions.forEach(subscription => {
+      subscription.unsubscribe();
     });
   }
 
+  getRecommended() {
+    this.subscriptions.push(this.playlistService
+      .getRecommended()
+      .subscribe(recommended => {
+        this.videos = recommended.videos;
+    }));
+  }
+
   getSubscriptions() {
-    this.subscriptionService.getSubscriptions().subscribe(userSubs => {
-      this.subscriptions = userSubs.subscriptions;
-    });
+    this.subscriptions.push(this.subscriptionService
+      .getSubscriptions()
+      .subscribe(userSubs => {
+        this.userSubscriptions = userSubs.subscriptions;
+    }));
   }
 
   public goToVideo(id: string): void {
