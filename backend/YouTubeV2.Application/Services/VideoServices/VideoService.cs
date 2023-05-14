@@ -30,7 +30,7 @@ namespace YouTubeV2.Application.Services.VideoServices
             _dateTimeProvider = dateTimeProvider;
         }
 
-        public async Task<Guid> AddVideoMetadataAsync(VideoMetadataPostDto videoMetadata, User user, CancellationToken cancellationToken = default)
+        public async Task<Guid> AddVideoMetadataAsync(VideoMetadataAddOrUpdateDto videoMetadata, User user, CancellationToken cancellationToken = default)
         {
             await _videoMetadataDtoValidator.ValidateAndThrowAsync(videoMetadata, cancellationToken);
             var video = Video.FromDTO(videoMetadata, user, _dateTimeProvider.UtcNow);
@@ -168,5 +168,18 @@ namespace YouTubeV2.Application.Services.VideoServices
         public async Task<int> GetVideoCountAsync(User user, CancellationToken cancellationToken = default) => 
             await _context.Videos.CountAsync(video => video.Author == user, cancellationToken);
 
+        public async Task UpdateVideoMetadataAsync(VideoMetadataAddOrUpdateDto videoMetadata, Video video, CancellationToken cancellationToken = default)
+        {
+            await _videoMetadataDtoValidator.ValidateAndThrowAsync(videoMetadata, cancellationToken);
+
+            video.Title = videoMetadata.title;
+            video.Description = videoMetadata.description;
+            video.Visibility = videoMetadata.visibility;
+            _context.Tags.RemoveRange(video.Tags);
+            await _context.Tags.AddRangeAsync(videoMetadata.tags.Select(tag => new Tag(tag, video)));
+            await _context.SaveChangesAsync(cancellationToken);
+
+            await _blobImageService.UploadVideoThumbnailAsync(videoMetadata.thumbnail, video.Id.ToString(), cancellationToken);
+        }
     }
 }
