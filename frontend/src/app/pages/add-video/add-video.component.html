@@ -59,6 +59,7 @@
       </label>
       <p-fileUpload
         #thumbnailUpload
+        id="thumbnail-file-upload"
         name="thumbnail[]"
         accept="image/png, image/jpeg"
         [fileLimit]="1"
@@ -137,6 +138,7 @@
       </label>
       <p-fileUpload
         #videoUpload
+        id="video-file-upload"
         name="video[]"
         [accept]="supportedVideoTypes.join(', ')"
         [fileLimit]="1"
