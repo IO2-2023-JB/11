@@ -4,10 +4,10 @@
 
 export const environment = {
     production: false,
-    webApiUrl: 'https://wetubeback.azurewebsites.net',
-    webUrl: 'https://wetubeback.azurewebsites.net',
+    webApiUrl: 'https://localhost:7133',
+    webUrl: 'https://localhost:7133',
   };
-
+  
   /*
    * For easier debugging in development mode, you can import the following file
    * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
