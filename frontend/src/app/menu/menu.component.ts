@@ -25,6 +25,7 @@ export class MenuComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.userService.authenticationStateChanged.subscribe(isAuthenticated => {
         this.isUserAuthenticated = isAuthenticated;
+        this.role = getRole();
     }));
   }
 

@@ -41,8 +41,8 @@
     </div>
     <div *ngIf="isUserAuthenticated">
       <div class="p-inputgroup">
-        <input type="text" pInputText placeholder="Search..." [(ngModel)]="query">
-        <button pButton type="button" (click)="searchButtonOnClick()" [disabled]="isQueryEmpty()" label="Search"></button>
+        <input id="search-input" type="text" pInputText placeholder="Search..." [(ngModel)]="query">
+        <button id="search-button" pButton type="button" (click)="searchButtonOnClick()" [disabled]="isQueryEmpty()" label="Search"></button>
       </div>
     </div>
     <div style="margin-left: auto;">

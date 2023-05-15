@@ -5,6 +5,7 @@ export class VideoObjectModel {
     readonly password = '123!@#asdASD';
     readonly title = this.getRandomTitle();
     readonly description = 'description';
+    readonly authorNickname = 'TestCreator';
 
     readonly page: Page;
 
@@ -19,6 +20,8 @@ export class VideoObjectModel {
     readonly videoDescriptionInput: Locator;
     readonly thumbnailFileUpload: Locator;
     readonly videoFileUpload: Locator;
+    readonly searchInput: Locator;
+    readonly searchButton: Locator;
 
 
     constructor(page: Page) {
@@ -31,10 +34,12 @@ export class VideoObjectModel {
         this.emailInput = page.locator('#email-input');
         this.passwordInput = page.locator('#password-input');
         this.submitButton = page.locator('p-button[type="submit"]');
-        this.videoTitleInput = page.locator('#video-title-input');
-        this.videoDescriptionInput = page.locator('#video-description-input');
+        this.videoTitleInput = page.locator('#title-input');
+        this.videoDescriptionInput = page.locator('#description-input');
         this.thumbnailFileUpload = page.locator('#thumbnail-file-upload');
         this.videoFileUpload = page.locator('#video-file-upload');
+        this.searchInput = page.locator('#search-input');
+        this.searchButton = page.locator('#search-button');
     }
 
     private getRandomTitle() {
@@ -62,13 +67,21 @@ export class VideoObjectModel {
         await this.addVideoLink.click();
         await this.videoTitleInput.fill(this.title);
         await this.videoDescriptionInput.fill(this.description);
-        await this.thumbnailFileUpload.setInputFiles('../test-data/thumbnail.png');
-        await this.videoFileUpload.setInputFiles('../test-data/video.mp4');
-        await this.submitButton.click();
+        await this.page.setInputFiles('#thumbnail-file-upload input[type="file"]', 'test/test-data/thumbnail.png');
+        await this.page.setInputFiles('#video-file-upload input[type="file"]', 'test/test-data/video.mp4');
+        await this.page.waitForTimeout(3000);
+        await this.page.locator('#submit-video-button').click();
     }
 
     async expectAddVideoSuccess() {
-        // Waiting for search video feature to be implemented
+        await this.page.waitForTimeout(3000);
+        await this.searchInput.fill(this.title);
+        await this.searchButton.click();
+        await this.page.waitForTimeout(3000);
+        await this.page.click('.video:first-child');
+        await this.page.waitForTimeout(3000);
+        await expect(this.page.locator('#title').innerText()).resolves.toBe(this.title);
+        await expect(this.page.locator('#author-nickname').innerText()).resolves.toBe(this.authorNickname);
     }
 
     async logout() {
