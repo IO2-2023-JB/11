@@ -65,7 +65,7 @@ namespace YouTubeV2.Application.Services.VideoServices
                     .Include(video => video.Tags)
                     .Include(video => video.Author)
                     .SingleAsync(video => video.Id == id, cancellationToken);
-                thumbnail = _blobImageService.GetVideoThumbnail(video.Id.ToString());
+                thumbnail = _blobImageService.GetVideoThumbnailUrl(video.Id.ToString());
             }
             catch
             {
