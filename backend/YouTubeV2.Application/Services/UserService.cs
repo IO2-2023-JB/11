@@ -26,7 +26,7 @@ namespace YouTubeV2.Application.Services
 
         public UserService(
             UserManager<User> userManager,
-            BlobImageService blobImageService,
+            IBlobImageService blobImageService,
             RegisterDtoValidator registerDtoValidator,
             LoginDtoValidator loginDtoValidator, 
             JwtHandler jwtHandler,
