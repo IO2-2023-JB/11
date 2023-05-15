@@ -65,5 +65,7 @@ namespace YouTubeV2.Application.Services.JwtFeatures
 
             return jwtSecurityTokenHandler.ValidateToken(token, tokenValidationParameters, out var _);
         }
+
+        public static string GetTokenFromTokenWithBearerPrefix(string tokenWithBearerPrefix) => tokenWithBearerPrefix["Bearer ".Length..];
     }
 }
