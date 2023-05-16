@@ -58,6 +58,12 @@ export class CreatorComponent implements OnInit, OnDestroy {
     return false;
   }
 
+  private updateSubCount(): void {
+    this.subscriptions.push(this.userService.getUser(this.user.id).subscribe(user => {
+      this.user.subscriptionsCount = user.subscriptionsCount;
+    }));
+  }
+
   public handleSubscribtionOnClick(): void {
     if (this.isCreatorSubscribed) {
       const checkIfCreatorIsSubscribed$ = this.subscriptionService.deleteSubscription(this.user.id).pipe(
@@ -76,6 +82,8 @@ export class CreatorComponent implements OnInit, OnDestroy {
 
       this.subscriptions.push(checkIfCreatorIsSubscribed$.subscribe());
     }
+
+    this.updateSubCount();
   }
 
   public goToVideo(id: string): void {
