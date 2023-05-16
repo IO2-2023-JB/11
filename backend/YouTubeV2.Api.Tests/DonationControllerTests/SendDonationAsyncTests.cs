@@ -198,10 +198,5 @@ namespace YouTubeV2.Api.Tests.DonationControllerTests
             // ASSERT
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
-
-
-
-
-
     }
 }
