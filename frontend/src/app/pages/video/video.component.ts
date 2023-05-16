@@ -5,6 +5,7 @@ import { UserDTO } from 'src/app/core/models/user-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { UserService } from 'src/app/core/services/user.service';
 import { VideoService } from 'src/app/core/services/video.service';
+import { SubscriptionService } from 'src/app/core/services/subscription.service';
 import { environment } from 'src/environments/environment';
 import { switchMap, tap } from 'rxjs/operators';
 import { Subscription, forkJoin } from 'rxjs';
@@ -13,6 +14,7 @@ import { Location } from '@angular/common';
 import { ReactionsDTO } from './models/reactions-dto';
 import { ReactionsService } from './services/reactions.service';
 import { AddReactionDTO } from './models/add-reaction-dto';
+import { userSubscriptionListDto } from 'src/app/core/models/user-subscription-list-dto';
 
 @Component({
   selector: 'app-video',
@@ -24,6 +26,7 @@ export class VideoComponent implements OnInit, OnDestroy {
   videoUrl: string;
   videoMetadata!: VideoMetadataDto;
   author!: UserDTO;
+  isAuthorSubscribed!: boolean;
   videos: VideoMetadataDto[] = [];
   reactions!: ReactionsDTO;
   subscriptions: Subscription[] = [];
@@ -41,6 +44,11 @@ export class VideoComponent implements OnInit, OnDestroy {
       icon: 'pi pi-flag',
       command: () => this.reportVideo(),
     },
+    {
+      label: 'Edit metadata',
+      icon: 'pi pi-file-edit',
+      command: () => this.editMetadata(),
+    },
   ];
 
   constructor(
@@ -49,7 +57,8 @@ export class VideoComponent implements OnInit, OnDestroy {
     private router: Router,
     private videoService: VideoService,
     private location: Location,
-    private reactionsService: ReactionsService
+    private reactionsService: ReactionsService,
+    private subscriptionService: SubscriptionService
   ) {
     this.videoId = this.route.snapshot.params['videoId'];
     this.videoUrl = `${environment.webApiUrl}/video/${this.videoId}?access_token=${getToken()}`;
@@ -64,13 +73,15 @@ export class VideoComponent implements OnInit, OnDestroy {
 
           return forkJoin({
             user: this.userService.getUser(this.videoMetadata.authorId),
-            userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId)
+            userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId),
+            subscriptionList: this.subscriptionService.getSubscriptions()
           });
         })
       )
-      .subscribe(({ user, userVideos }) => {
+      .subscribe(({ user, userVideos, subscriptionList }) => {
         this.author = user;
         this.videos = userVideos.videos;
+        this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptionList);
       }));
 
     this.getReactions();
@@ -86,6 +97,27 @@ export class VideoComponent implements OnInit, OnDestroy {
     this.subscriptions.push(this.reactionsService.getReactions(this.videoId).subscribe(reactions => this.reactions = reactions));
   }
 
+  private checkIfAuthorIsSubscribed(): void {
+    this.subscriptions.push(this.subscriptionService.getSubscriptions().subscribe(subscriptions => 
+        this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptions)
+      ));
+  }
+
+  private isThisAuthorSubscribed(subscriptionList: userSubscriptionListDto): boolean {
+    for (let subscription of subscriptionList.subscriptions) {
+      if (subscription.id === this.videoMetadata.authorId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private updateSubCount(): void {
+    this.subscriptions.push(this.userService.getUser(this.author.id).subscribe(user => {
+      this.author.subscriptionsCount = user.subscriptionsCount;
+    }));
+  }
+
   private deleteVideo(): void {
     const deleteVideo$ = this.videoService.deleteVideo(this.videoMetadata.id).pipe(
       tap(() => {
@@ -97,6 +129,10 @@ export class VideoComponent implements OnInit, OnDestroy {
 
   private reportVideo(): void {
     // REPORT VIDEO LOGIC HERE
+  }
+
+  private editMetadata(): void {
+    this.router.navigate(['update-video-metadata/' + this.videoId]);
   }
 
   public goToUserProfile(id: string): void {
@@ -121,6 +157,28 @@ export class VideoComponent implements OnInit, OnDestroy {
       : { value: this.negativeReaction };
 
     this.addOrUpdateReaction(addReaction);
+  }
+
+  handleSubscribtionOnClick(): void {
+    if (this.isAuthorSubscribed) {
+      const checkIfAuthorIsSubscribed$ = this.subscriptionService.deleteSubscription(this.author.id).pipe(
+        tap(() => {
+          this.checkIfAuthorIsSubscribed();
+        }),
+      );
+
+      this.subscriptions.push(checkIfAuthorIsSubscribed$.subscribe());
+    } else {
+      const checkIfAuthorIsSubscribed$ = this.subscriptionService.postSubscription(this.author.id).pipe(
+        tap(() => {
+          this.checkIfAuthorIsSubscribed();
+        }),
+      );
+
+      this.subscriptions.push(checkIfAuthorIsSubscribed$.subscribe());
+    }
+
+    this.updateSubCount();
   }
 
   private addOrUpdateReaction(addReaction: AddReactionDTO): void {

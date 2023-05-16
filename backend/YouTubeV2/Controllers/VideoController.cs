@@ -9,6 +9,7 @@ using YouTubeV2.Application.Jobs;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
 using YouTubeV2.Application.Services.BlobServices;
+using YouTubeV2.Application.Services.JwtFeatures;
 using YouTubeV2.Application.Services.VideoServices;
 
 namespace YouTubeV2.Api.Controllers
@@ -37,8 +38,7 @@ namespace YouTubeV2.Api.Controllers
         [HttpGet("video/{id:guid}")]
         public async Task<IActionResult> GetVideoAsync(Guid id, [FromQuery] string access_token, CancellationToken cancellationToken)
         {
-            string token = UserService.GetTokenFromTokenWithBearerPrefix(access_token);
-            ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(token);
+            ClaimsPrincipal? claimsPrincipal = _userService.ValidateToken(access_token);
             if (claimsPrincipal is null) return Unauthorized();
 
             if (!claimsPrincipal.IsInRole(Role.Simple) && !claimsPrincipal.IsInRole(Role.Creator) && !claimsPrincipal.IsInRole(Role.Administrator))
@@ -54,7 +54,7 @@ namespace YouTubeV2.Api.Controllers
 
         [HttpPost("video-metadata")]
         [Roles(Role.Creator)]
-        public async Task<ActionResult<VideoMetadataPostResponseDto>> AddVideoMetadataAsync([FromBody] VideoMetadataPostDto videoMetadata, CancellationToken cancellationToken)
+        public async Task<ActionResult<VideoMetadataPostResponseDto>> AddVideoMetadataAsync([FromBody] VideoMetadataAddOrUpdateDto videoMetadata, CancellationToken cancellationToken)
         {
             string? userId = GetUserId();
             if (userId is null) return Forbid();
@@ -64,6 +64,23 @@ namespace YouTubeV2.Api.Controllers
 
             Guid id = await _videoService.AddVideoMetadataAsync(videoMetadata, user, cancellationToken);
             return Ok(new VideoMetadataPostResponseDto(id.ToString()));
+        }
+
+        [HttpPut("video-metadata")]
+        [Roles(Role.Creator)]
+        public async Task<ActionResult> UpdateVideoMetadataAsync([FromQuery][Required] Guid id, [FromBody] VideoMetadataAddOrUpdateDto videoMetadata, CancellationToken cancellationToken)
+        {
+            string? userId = GetUserId();
+            if (userId is null) return Forbid();
+
+            Video? video = await _videoService.GetVideoByIdAsync(id, cancellationToken, video => video.Author, video => video.Tags);
+            if (video is null) return NotFound($"Video with id {id} not found");
+
+            if (userId != video.Author.Id) return Forbid("You are not the owner of the video");
+
+            await _videoService.UpdateVideoMetadataAsync(videoMetadata, video, cancellationToken);
+
+            return Ok();
         }
 
         [HttpPost("video/{id:guid}")]
