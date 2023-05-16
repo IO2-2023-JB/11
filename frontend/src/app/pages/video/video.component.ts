@@ -68,17 +68,18 @@ export class VideoComponent implements OnInit, OnDestroy {
 
           return forkJoin({
             user: this.userService.getUser(this.videoMetadata.authorId),
-            userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId)
+            userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId),
+            subscriptionList: this.subscriptionService.getSubscriptions()
           });
         })
       )
-      .subscribe(({ user, userVideos }) => {
+      .subscribe(({ user, userVideos, subscriptionList }) => {
         this.author = user;
         this.videos = userVideos.videos;
+        this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptionList);
       }));
 
     this.getReactions();
-    this.checkIfAuthorIsSubscribed();
   }
 
   ngOnDestroy(): void {
@@ -93,7 +94,12 @@ export class VideoComponent implements OnInit, OnDestroy {
 
   private checkIfAuthorIsSubscribed(): void {
     this.subscriptions.push(this.subscriptionService.getSubscriptions().subscribe(subscriptions => 
-      this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptions)));
+      {
+       
+        this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptions)
+        console.log(`We are subed: ${this.isAuthorSubscribed}`);
+      }
+      ));
   }
 
   private isThisAuthorSubscribed(subscriptionList: userSubscriptionListDto): boolean {
