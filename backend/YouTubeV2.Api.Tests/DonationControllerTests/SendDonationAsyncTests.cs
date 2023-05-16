@@ -12,7 +12,7 @@ using YouTubeV2.Application.Model;
 namespace YouTubeV2.Api.Tests.DonationControllerTests
 {
     [TestClass]
-    public class SendDonationAsyncTest
+    public class SendDonationAsyncTests
     {
         private WebApplicationFactory<Program> _webApplicationFactory = null!;
 
