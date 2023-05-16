@@ -44,6 +44,11 @@ export class VideoComponent implements OnInit, OnDestroy {
       icon: 'pi pi-flag',
       command: () => this.reportVideo(),
     },
+    {
+      label: 'Edit metadata',
+      icon: 'pi pi-file-edit',
+      command: () => this.editMetadata(),
+    },
   ];
 
   constructor(
@@ -124,6 +129,10 @@ export class VideoComponent implements OnInit, OnDestroy {
 
   private reportVideo(): void {
     // REPORT VIDEO LOGIC HERE
+  }
+
+  private editMetadata(): void {
+    this.router.navigate(['update-video-metadata/' + this.videoId]);
   }
 
   public goToUserProfile(id: string): void {

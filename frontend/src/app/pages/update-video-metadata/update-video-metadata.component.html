@@ -3,9 +3,9 @@
 </div>
 
 <p-card
-  header="Add new video"
+  header="Update video metadata"
   styleClass="p-card-style shadow-7">
-  <form [formGroup]="addVideoForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="updateVideoMetadataForm" (ngSubmit)="onSubmit()">
     <div class="p-fluid">
       <label for="title-input" class="field-label">
         <p class="required">Title</p>
@@ -59,7 +59,6 @@
       </label>
       <p-fileUpload
         #thumbnailUpload
-        id="thumbnail-file-upload"
         name="thumbnail[]"
         accept="image/png, image/jpeg"
         [fileLimit]="1"
@@ -71,7 +70,7 @@
         styleClass="p-fileupload-style">
 
         <ng-template pTemplate="content" let-files>
-          <div *ngIf="addVideoForm.get('thumbnail')!.value == ''">
+          <div *ngIf="updateVideoMetadataForm.get('thumbnail')!.value == ''">
             <div class="flex flex-column justify-content-center">
               <i class="flex justify-content-center pi pi-download download-icon"></i>
               <div class="flex justify-content-center">
@@ -87,6 +86,7 @@
 
         <ng-template pTemplate="file" let-file>
           <div class="flex justify-content-evenly flex align-items-center flex-wrap">
+            <img [src]="file.objectURL" [width]=100>
             {{file.name}}
             <button
               pButton
@@ -132,55 +132,6 @@
         This field is required
       </small>
     </div>
-    <div>
-      <label for="video-input" class="field-label">
-        <p class="required">Video</p>
-      </label>
-      <p-fileUpload
-        #videoUpload
-        id="video-file-upload"
-        name="video[]"
-        [accept]="supportedVideoTypes.join(', ')"
-        [fileLimit]="1"
-        invalidFileTypeMessageSummary="Allowed file type is .mp4/.avi/.webm/.mkv"
-        invalidFileTypeMessageDetail=""
-        [showUploadButton]="false"
-        [showCancelButton]="false"
-        (onSelect)="handleOnVideoSelect($event)"
-        styleClass="p-fileupload-style">
-
-        <ng-template pTemplate="content" let-files>
-          <div *ngIf="video === null">
-            <div class="flex flex-column justify-content-center">
-              <i class="flex justify-content-center pi pi-download download-icon"></i>
-              <div class="flex justify-content-center">
-                Drop or&nbsp;
-                <span class="browse-button" (click)="videoUpload.choose()">
-                  browse
-                </span>
-                &nbsp;video file
-              </div>
-            </div>
-          </div>
-        </ng-template>
-
-        <ng-template pTemplate="file" let-file>
-          <div class="flex justify-content-evenly flex align-items-center flex-wrap">
-            {{file.name}}
-            <button
-            pButton
-            pRipple
-            type="button"
-            icon="pi pi-times"
-            class="p-button-rounded p-button-danger p-button-remove"
-            (click)="handleOnVideoRemove()"></button>
-          </div>
-        </ng-template>
-      </p-fileUpload>
-      <small class="p-error" *ngIf="isVideoInputInvalidAndTouchedOrDirty()">
-        This field is required
-      </small>
-    </div>
-    <button id="submit-video-button" pButton pRipple type="submit" class="p-button-style" label="Add video"></button>
+    <button pButton pRipple type="submit" class="p-button-style" label="Update video metadata"></button>
   </form>
 </p-card>
