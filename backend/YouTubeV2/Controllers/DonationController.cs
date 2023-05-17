@@ -22,7 +22,7 @@ namespace YouTubeV2.Api.Controllers
         public async Task<ActionResult> SendDontaionAsync([FromQuery][Required] Guid id, [FromQuery][Required] decimal amount)
         {
             string? senderId = GetUserId();
-            if (senderId is null) return Forbid();
+            if (senderId is null) return BadRequest();
 
             await _donationService.SendDonationAsync(senderId, id.ToString(), amount);
 
@@ -34,7 +34,7 @@ namespace YouTubeV2.Api.Controllers
         public async Task<ActionResult> WithdrawMoneyAsync([FromQuery][Required] decimal amount)
         {
             string? withdrawerId = GetUserId();
-            if (withdrawerId is null) return Forbid();
+            if (withdrawerId is null) return BadRequest();
 
             await _donationService.WithdrawMoneyAsync(withdrawerId, amount);
 

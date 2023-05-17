@@ -27,7 +27,7 @@ namespace YouTubeV2.Application.Services
                 ?? throw new BadRequestException("Recipient does not exist");
 
             User? sender = await _userService.GetByIdAsync(senderId)
-                ?? throw new ForbiddenException();
+                ?? throw new BadRequestException();
 
             if (!await _userManager.IsInRoleAsync(recipient, Role.Creator))
                 throw new BadRequestException("You can only support Creators");
@@ -52,7 +52,7 @@ namespace YouTubeV2.Application.Services
                 throw new BadRequestException("Ammount has to be positive");
 
             User? withdrawer = await _userService.GetByIdAsync(withdrawerId)
-                ?? throw new ForbiddenException();
+                ?? throw new BadRequestException();
 
             if (withdrawer.AccountBalance < ammount)
                 throw new BadRequestException("Not enough ballance");
