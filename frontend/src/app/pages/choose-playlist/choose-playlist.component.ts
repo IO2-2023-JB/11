@@ -51,13 +51,13 @@ export class ChoosePlaylistComponent {
           this.messageService.add({
             severity: 'success',
             summary: 'Success',
-            detail: 'Operation successful.'
+            detail: 'Video added to playlist'
           })
           this.getOwnPlaylists();
         })
       );
       this.subscriptions.push(this.doWithLoading(playlist$).subscribe()); 
-    //this.router.navigate(['videos/' + this.videoId]);
+    this.router.navigate(['videos/' + this.videoId]);
   }
 
   openDialog() {
