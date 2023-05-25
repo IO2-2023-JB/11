@@ -19,7 +19,7 @@
 
 on:
   push:
-    branches: [ "DeploySptint5" ]
+    branches: [ "DeploySprint5" ]
   workflow_dispatch:
 
 env:
