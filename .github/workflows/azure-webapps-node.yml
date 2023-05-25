@@ -19,7 +19,7 @@
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "sprint5" ]
   workflow_dispatch:
 
 env:

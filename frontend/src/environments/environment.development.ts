@@ -4,10 +4,10 @@
 
 export const environment = {
     production: false,
-    webApiUrl: 'https://localhost:7133',
-    webUrl: 'https://localhost:7133',
-    //webApiUrl: 'https://wetubeback.azurewebsites.net',
-    //webUrl: 'https://wetubeback.azurewebsites.net',
+    //webApiUrl: 'https://localhost:7133',
+    //webUrl: 'https://localhost:7133',
+    webApiUrl: 'https://wetubeback.azurewebsites.net/api',
+    webUrl: 'https://wetubeback.azurewebsites.net/api',
   };
   
   /*
