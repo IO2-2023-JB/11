@@ -18,6 +18,14 @@ interface SortDirectionOption {
   value: SortingDirections;
 }
 
+interface PlaylistSearchResult {
+  name: string;
+  id: string;
+  videoCount: Int16Array;
+  authorId: string;
+  authorNickname: string;
+}
+
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -26,12 +34,16 @@ interface SortDirectionOption {
 export class SearchComponent {
   isProgressSpinnerVisible: boolean = false;
   subscriptions: Subscription[] = [];
+
   query: string = '';
   beginDate?: Date;
   endDate?: Date;
   searchResults!: SearchResultsDTO;
+  playlistSearchResult!: PlaylistSearchResult[];
+
   sortingTypes: SortTypeOption[];
   sortingDirections: SortDirectionOption[];
+
   sortingType!: SortTypeOption;
   sortingDirection!: SortDirectionOption;
 
@@ -85,7 +97,10 @@ export class SearchComponent {
     }
 
   searchResultsNone() {
-    return this.searchResults !== undefined && this.searchResults.users.length === 0 && this.searchResults.videos.length === 0; 
+    return this.searchResults !== undefined 
+    && this.searchResults.users.length === 0 
+    && this.searchResults.videos.length === 0
+    && this.searchResults.playlists.length === 0; 
   }
 
   doWithLoading(observable$: Observable<any>): Observable<any> {
@@ -100,7 +115,11 @@ export class SearchComponent {
   }
 
   goToVideo(id: string): void {
-    this.router.navigate(['videos/' +id]);
+    this.router.navigate(['videos/' + id]);
+  }
+
+  goToPlaylist(id: string): void {
+    this.router.navigate(['playlist/' + id]);
   }
 
   public getTimeAgo(video: VideoMetadataDto): string {
