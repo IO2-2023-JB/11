@@ -22,10 +22,12 @@ import { CommentsModule } from './pages/video/components/comments/comments.modul
 import { SubscriptionsVideosModule } from './pages/subscriptions-videos/subscriptions-videos.module';
 import { UpdateVideoMetadataModule } from './pages/update-video-metadata/update-video-metadata.module';
 import { ChoosePlaylistModule } from './pages/choose-playlist/choose-playlist.module';
+import { ReportButtonComponent } from './core/components/report-button/report-button.component';
 
 @NgModule({
     declarations: [
         AppComponent,
+        ReportButtonComponent,
     ],
     providers: [
         MessageService,
