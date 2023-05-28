@@ -14,7 +14,7 @@ import { SubmitTicketDto } from '../models/tickets/submit-ticket-dto';
 })
 export class TicketService {
 
-  private readonly videoPageWebAPIUrl: string = `${environment.webApiUrl}`;
+  private readonly videoPageWebAPIUrl: string = `${environment.webApiUrl}/ticket`;
 
   constructor(private httpClient: HttpClient) { }
 

@@ -17,6 +17,7 @@ export class ReportButtonComponent {
 
   report() {
     this.showDialog = false;  // close the dialog
+    
     if(this.targetId && this.reason) {
       const dto: SubmitTicketDto = {
         targetId: this.targetId,

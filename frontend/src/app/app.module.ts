@@ -22,12 +22,12 @@ import { CommentsModule } from './pages/video/components/comments/comments.modul
 import { SubscriptionsVideosModule } from './pages/subscriptions-videos/subscriptions-videos.module';
 import { UpdateVideoMetadataModule } from './pages/update-video-metadata/update-video-metadata.module';
 import { ChoosePlaylistModule } from './pages/choose-playlist/choose-playlist.module';
-import { ReportButtonComponent } from './core/components/report-button/report-button.component';
+import { TicketModule } from './pages/ticket/ticket.module';
+import { ReportButtonModule } from './core/components/report-button/report-button.module';
 
 @NgModule({
     declarations: [
         AppComponent,
-        ReportButtonComponent,
     ],
     providers: [
         MessageService,
@@ -58,7 +58,9 @@ import { ReportButtonComponent } from './core/components/report-button/report-bu
         CommentsModule,
         SubscriptionsVideosModule,
         UpdateVideoMetadataModule,
-        ChoosePlaylistModule
+        ChoosePlaylistModule,
+        TicketModule,
+        ReportButtonModule
     ]
 })
 export class AppModule { }
