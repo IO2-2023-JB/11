@@ -6,6 +6,7 @@ import { GetTicketDto } from 'src/app/core/models/tickets/get-ticket-dto';
 import { RespondToTicketDto } from 'src/app/core/models/tickets/respond-to-ticket-dto';
 import { TicketService } from 'src/app/core/services/ticket.service';
 import { ChangeDetectorRef } from '@angular/core';
+import { CommentsService } from '../video/components/comments/services/comments.service';
 
 
 @Component({
@@ -20,11 +21,15 @@ export class TicketComponent {
   showDialog = false;
   response = '';
   ticketId = '';
+  showCommentDialog = false;
+  comment = '';
+  comments!: Comment[];
 
   constructor(
     private ticketService: TicketService,
     private messageService: MessageService,
-    private router: Router) {
+    private router: Router,
+    private commentService: CommentsService) {
       this.getTickets();
     }
 
@@ -49,10 +54,10 @@ export class TicketComponent {
           this.router.navigate(['playlist/' + ticket.targetId]);
           break;
         case 'Comment':
-          
+          this.showCommentDialog = true;
           break;
         case 'CommentResponse':
-          
+          this.showCommentDialog = true;
           break;
       }
     }
