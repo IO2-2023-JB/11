@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { TicketComponent } from './ticket.component';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -16,7 +18,9 @@ import { ButtonModule } from 'primeng/button';
   imports: [
     CommonModule,
     TableModule,
-    ButtonModule
+    ButtonModule,
+    DialogModule,
+    FormsModule
   ]
 })
 export class TicketModule { }

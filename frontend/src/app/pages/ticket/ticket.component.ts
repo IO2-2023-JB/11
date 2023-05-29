@@ -1,9 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, IterableDiffers, NgZone } from '@angular/core';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
 import { Observable, Subscription, finalize, of, switchMap } from 'rxjs';
 import { GetTicketDto } from 'src/app/core/models/tickets/get-ticket-dto';
+import { RespondToTicketDto } from 'src/app/core/models/tickets/respond-to-ticket-dto';
 import { TicketService } from 'src/app/core/services/ticket.service';
+import { ChangeDetectorRef } from '@angular/core';
+
 
 @Component({
   selector: 'app-ticket',
@@ -14,7 +17,9 @@ export class TicketComponent {
   tickets!: GetTicketDto[];
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
-
+  showDialog = false;
+  response = '';
+  ticketId = '';
 
   constructor(
     private ticketService: TicketService,
@@ -23,16 +28,46 @@ export class TicketComponent {
       this.getTickets();
     }
 
+    public onResponseButtonClicked(ticketId: string) {
+      this.showDialog = true;
+      this.ticketId = ticketId;
+    }  
+
     goToSubmitter(submitterId: string) {
       this.router.navigate(['creator/' + submitterId]);
     }
   
-    goToTarget(targetId: string) {
-      // Implement your logic to navigate to the target's page
+    goToTarget(ticket: GetTicketDto) {
+      switch (ticket.targetType) {
+        case 'Video':
+          this.router.navigate(['video/' + ticket.targetId]);
+          break;
+        case 'User':
+          this.router.navigate(['creator/' + ticket.targetId]);
+          break;
+        case 'Playlist':
+          this.router.navigate(['playlist/' + ticket.targetId]);
+          break;
+        case 'Comment':
+          
+          break;
+        case 'CommentResponse':
+          
+          break;
+      }
     }
   
-    respondToTicket(ticketId: string) {
-      // Implement your logic to respond to the ticket
+    respondToTicket() {
+      const responseToTicket: RespondToTicketDto = {
+        response: this.response
+      };
+      this.subscriptions.push(
+        this.ticketService.respondToTicket(this.ticketId, responseToTicket).subscribe());
+      
+      this.tickets = [...this.tickets.filter(ticket => ticket.ticketId !== this.ticketId)];
+      this.ticketId = '';
+      this.response = '';
+      this.showDialog = false;
     }
 
   getTickets() {
