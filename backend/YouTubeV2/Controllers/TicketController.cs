@@ -7,7 +7,7 @@ using YouTubeV2.Application.Services;
 namespace YouTubeV2.Api.Controllers
 {
     [ApiController]
-    [Route("ticket")]
+    [Route("api/ticket")]
     public class TicketController : IdentityControllerBase
     {
         ITicketService _ticketService;
