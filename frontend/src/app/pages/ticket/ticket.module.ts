@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
+import { AvatarModule } from 'primeng/avatar';
 
 
 
@@ -20,7 +21,8 @@ import { FormsModule } from '@angular/forms';
     TableModule,
     ButtonModule,
     DialogModule,
-    FormsModule
+    FormsModule,
+    AvatarModule
   ]
 })
 export class TicketModule { }

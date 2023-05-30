@@ -114,5 +114,15 @@ namespace YouTubeV2.Api.Controllers
 
             return Ok();
         }
+
+        [HttpGet("commentById")]
+        [Roles(Role.Administrator)]
+        public async Task<ActionResult<Comment>> GetCommentByIdAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
+            Ok(await _commentService.GetCommentDTOByIdAsync(id, cancellationToken));
+
+        [HttpGet("responseById")]
+        [Roles(Role.Administrator)]
+        public async Task<ActionResult<CommentResponse>> GetCommentResponseByIdAsync([FromQuery] Guid id, CancellationToken cancellationToken) =>
+            Ok(await _commentService.GetCommentResponseByIdAsync(id, cancellationToken));
     }
 }

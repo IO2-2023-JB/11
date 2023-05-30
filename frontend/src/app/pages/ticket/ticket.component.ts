@@ -7,6 +7,7 @@ import { RespondToTicketDto } from 'src/app/core/models/tickets/respond-to-ticke
 import { TicketService } from 'src/app/core/services/ticket.service';
 import { ChangeDetectorRef } from '@angular/core';
 import { CommentsService } from '../video/components/comments/services/comments.service';
+import { CommentDTO } from '../video/components/comments/models/comment-dto';
 
 
 @Component({
@@ -21,9 +22,8 @@ export class TicketComponent {
   showDialog = false;
   response = '';
   ticketId = '';
-  showCommentDialog = false;
-  comment = '';
-  comments!: Comment[];
+  showCommentDialog = false;;
+  comment: CommentDTO | undefined;
 
   constructor(
     private ticketService: TicketService,
@@ -54,10 +54,10 @@ export class TicketComponent {
           this.router.navigate(['playlist/' + ticket.targetId]);
           break;
         case 'Comment':
-          this.showCommentDialog = true;
+          this.getComment(ticket.targetId);
           break;
         case 'CommentResponse':
-          this.showCommentDialog = true;
+          this.getCommentResponse(ticket.targetId);
           break;
       }
     }
@@ -87,5 +87,21 @@ export class TicketComponent {
       switchMap(() => observable$),
       finalize(() => this.isProgressSpinnerVisible = false)
     );
+  }
+
+  getComment(id: string) {
+    this.subscriptions.push(
+      this.commentService.getCommentByIdAsync(id).subscribe(comment => {
+        this.comment = comment;
+        this.showCommentDialog = true;
+      }));
+  }
+
+  getCommentResponse(id: string) {
+    this.subscriptions.push(
+      this.commentService.getCommentResponseByIdAsync(id).subscribe(comment => {
+        this.comment = comment;
+        this.showCommentDialog = true;
+      }));
   }
 }
