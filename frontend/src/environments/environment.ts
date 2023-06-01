@@ -4,8 +4,8 @@
 
 export const environment = {
     production: false,
-    webApiUrl: 'https://wetubeback.azurewebsites.net/api,
-    webUrl: 'https://wetubeback.azurewebsites.net/api,
+    webApiUrl: 'https://wetubeback.azurewebsites.net/api',
+    webUrl: 'https://wetubeback.azurewebsites.net/api',
   };
 
   /*
