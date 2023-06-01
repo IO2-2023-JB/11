@@ -18,14 +18,6 @@ interface SortDirectionOption {
   value: SortingDirections;
 }
 
-interface PlaylistSearchResult {
-  name: string;
-  id: string;
-  videoCount: Int16Array;
-  authorId: string;
-  authorNickname: string;
-}
-
 @Component({
   selector: 'app-search',
   templateUrl: './search.component.html',
@@ -39,7 +31,6 @@ export class SearchComponent {
   beginDate?: Date;
   endDate?: Date;
   searchResults!: SearchResultsDTO;
-  playlistSearchResult!: PlaylistSearchResult[];
 
   sortingTypes: SortTypeOption[];
   sortingDirections: SortDirectionOption[];
@@ -92,9 +83,12 @@ export class SearchComponent {
   performSearch() {
     const search$ = this.searchService.getSearchResults(this.query, this.sortingType.value, this.sortingDirection.value,
       this.beginDate, this.endDate);
-    this.subscriptions.push(this.doWithLoading(search$).subscribe(result => this.searchResults = result));
+    this.subscriptions.push(this.doWithLoading(search$).subscribe(result => {
+      this.searchResults = result;
+      console.log(result.playlists);
+    }));
 
-    }
+  }
 
   searchResultsNone() {
     return this.searchResults !== undefined 
