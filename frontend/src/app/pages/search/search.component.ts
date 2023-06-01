@@ -85,7 +85,6 @@ export class SearchComponent {
       this.beginDate, this.endDate);
     this.subscriptions.push(this.doWithLoading(search$).subscribe(result => {
       this.searchResults = result;
-      console.log(result.playlists);
     }));
 
   }
