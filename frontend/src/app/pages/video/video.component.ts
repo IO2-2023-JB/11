@@ -171,10 +171,10 @@ export class VideoComponent implements OnInit, OnDestroy {
           this.getOwnPlaylists();
         })
       );
-      this.subscriptions.push(this.doWithLoading(playlist$).subscribe()); 
+      this.subscriptions.push(this.doWithLoading(playlist$).subscribe());
     this.showPlaylistDialog = false;
   }
-  
+
   private doWithLoading(observable$: Observable<any>): Observable<any> {
     return of(this.isProgressSpinnerVisible = true).pipe(
       switchMap(() => observable$),
@@ -278,7 +278,7 @@ export class VideoComponent implements OnInit, OnDestroy {
 
   report() {
     this.showReportDialog = false;  // close the dialog
-    
+
     if(this.targetId && this.reportReason) {
       const dto: SubmitTicketDto = {
         targetId: this.targetId,
@@ -314,7 +314,7 @@ export class VideoComponent implements OnInit, OnDestroy {
        }
       }));
       this.showDonateDialog = false;
-    } 
+    }
   }
 
   isDonateImpossible() : boolean {
@@ -330,12 +330,5 @@ export class VideoComponent implements OnInit, OnDestroy {
       }),
     );
     this.subscriptions.push(this.doWithLoading(getUserData$).subscribe());
-  }
-
-  private doWithLoading(observable$: Observable<any>): Observable<any> {
-    return of(this.isProgressSpinnerVisible = true).pipe(
-      switchMap(() => observable$),
-      finalize(() => this.isProgressSpinnerVisible = false)
-    );
   }
 }
