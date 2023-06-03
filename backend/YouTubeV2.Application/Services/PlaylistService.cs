@@ -8,6 +8,7 @@ using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Providers;
 using YouTubeV2.Application.Services.BlobServices;
+using YouTubeV2.Application.Services.VideoServices;
 
 namespace YouTubeV2.Application.Services
 {
@@ -17,12 +18,18 @@ namespace YouTubeV2.Application.Services
         private readonly UserManager<User> _userManager;
         private readonly IBlobImageService _blobImageService;
         private readonly IDateTimeProvider _dateTimeProvider;
-        public PlaylistService(YTContext context, UserManager<User> userManager, IBlobImageService blobImageService, IDateTimeProvider dateTimeProvider)
+        private readonly IVideoService _videoService;
+        public PlaylistService(YTContext context,
+                               UserManager<User> userManager,
+                               IBlobImageService blobImageService,
+                               IDateTimeProvider dateTimeProvider,
+                               IVideoService videoService)
         {
             _context = context;
             _userManager = userManager;
             _blobImageService = blobImageService;
             _dateTimeProvider = dateTimeProvider;
+            _videoService = videoService;
         }
 
         public async Task<CreatePlaylistResponseDto> CreatePlaylist(string requesterUserId, CreatePlaylistRequestDto request, CancellationToken cancellationToken)
@@ -77,25 +84,20 @@ namespace YouTubeV2.Application.Services
                 throw new ForbiddenException();
             }
 
+            var videos = playlist.Videos
+                .Select(async video => await _videoService.GetVideoMetadataAsync(video.Id, cancellationToken))
+                .Select(task => task.Result);
+
             return new PlaylistDto(
                 playlist.Name,
                 playlist.Visibility,
-                playlist.Videos.Select(
-                    v => new VideoBaseDto(
-                        v.Id.ToString(),
-                        v.Title,
-                        v.Duration,
-                        _blobImageService.GetVideoThumbnailUrl(v.Id.ToString()).ToString(),
-                        v.Description,
-                        v.UploadDate.ToString(),
-                        v.ViewCount)
-                    )
-                );
+                videos);
         }
 
         public async Task<PlaylistDto> GetRecommendedPlaylist(string userId, CancellationToken cancellationToken)
         {
-            var user = await _userManager.FindByIdAsync(userId);
+            var user = await _userManager.FindByIdAsync(userId)
+                ?? throw new UnauthorizedException();
 
             var videos = _context.Videos
                 .Where(v => v.Visibility == Visibility.Public)
@@ -103,21 +105,11 @@ namespace YouTubeV2.Application.Services
                 .Take(8)
                 .ToList();
 
-            var result = new PlaylistDto(
+            return new PlaylistDto(
                 user.UserName + "'s Playlist",
                 Visibility.Private,
-                videos.Select(
-                    v => new VideoBaseDto(
-                        v.Id.ToString(),
-                        v.Title,
-                        v.Duration,
-                        _blobImageService.GetVideoThumbnailUrl(v.Id.ToString()).ToString(),
-                        v.Description,
-                        v.UploadDate.ToString(),
-                        v.ViewCount)
-                    )
-                );
-            return result;
+                videos.Select(async video => await _videoService.GetVideoMetadataAsync(video.Id, cancellationToken))
+                      .Select(task => task.Result));
         }
 
         public async Task<IEnumerable<PlaylistBaseDto>> GetUserPlaylists(string requesterUserId, string userId, CancellationToken cancellationToken)
