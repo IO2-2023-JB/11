@@ -91,7 +91,9 @@ namespace YouTubeV2.Application.Services
             return new PlaylistDto(
                 playlist.Name,
                 playlist.Visibility,
-                videos);
+                videos,
+                playlist.Creator.Id,
+                playlist.Creator.Name);
         }
 
         public async Task<PlaylistDto> GetRecommendedPlaylist(string userId, CancellationToken cancellationToken)
@@ -109,7 +111,9 @@ namespace YouTubeV2.Application.Services
                 user.UserName + "'s Playlist",
                 Visibility.Private,
                 videos.Select(async video => await _videoService.GetVideoMetadataAsync(video.Id, cancellationToken))
-                      .Select(task => task.Result));
+                      .Select(task => task.Result),
+                user.Id,
+                user.UserName!);
         }
 
         public async Task<IEnumerable<PlaylistBaseDto>> GetUserPlaylists(string requesterUserId, string userId, CancellationToken cancellationToken)
