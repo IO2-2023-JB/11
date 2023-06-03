@@ -4,5 +4,7 @@ export interface PlaylistVideosDto {
     name: string;
     visibility: string;
     videos: VideoMetadataDto[];
+    authorId: string;
+    authorNickname: string;
   }
   
