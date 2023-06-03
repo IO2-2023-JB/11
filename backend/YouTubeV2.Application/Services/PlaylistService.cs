@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Api.Enums;
 using YouTubeV2.Application.DTO.PlaylistDTOS;
 using YouTubeV2.Application.DTO.UserDTOS;
-using YouTubeV2.Application.DTO.VideoDTOS;
+using YouTubeV2.Application.Enums;
 using YouTubeV2.Application.Exceptions;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Providers;
@@ -102,7 +102,9 @@ namespace YouTubeV2.Application.Services
                 ?? throw new UnauthorizedException();
 
             var videos = _context.Videos
-                .Where(v => v.Visibility == Visibility.Public)
+                .Where(v => 
+                    v.Visibility == Visibility.Public
+                    && v.ProcessingProgress == ProcessingProgress.Ready)
                 .OrderBy(v => Guid.NewGuid())
                 .Take(8)
                 .ToList();
