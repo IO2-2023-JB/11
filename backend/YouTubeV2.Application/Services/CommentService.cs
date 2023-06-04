@@ -1,5 +1,4 @@
-﻿using Azure;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using YouTubeV2.Application.DTO.CommentsDTO;
 using YouTubeV2.Application.Exceptions;

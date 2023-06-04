@@ -1,9 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using YouTubeV2.Application.DTO.TicketDTOS;
 using YouTubeV2.Application.Enums;
 using YouTubeV2.Application.Exceptions;

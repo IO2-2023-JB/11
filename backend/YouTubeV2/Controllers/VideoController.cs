@@ -5,6 +5,7 @@ using YouTubeV2.Api.Attributes;
 using YouTubeV2.Application.DTO.VideoDTOS;
 using YouTubeV2.Application.DTO.VideoMetadataDTOS;
 using YouTubeV2.Application.Enums;
+using YouTubeV2.Application.FileInspector;
 using YouTubeV2.Application.Jobs;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services;
@@ -22,17 +23,20 @@ namespace YouTubeV2.Api.Controllers
         private readonly IUserService _userService;
         private readonly IVideoProcessingService _videoProcessingService;
         private readonly IReadOnlyCollection<string> _allowedVideoExtensions = new string[] { ".mkv", ".mp4", ".avi", ".webm" };
+        private readonly IFileInspector _fileInspector;
 
         public VideoController(
             IBlobVideoService blobVideoService,
             IVideoService videoService,
             IUserService userService,
-            IVideoProcessingService videoProcessingService)
+            IVideoProcessingService videoProcessingService,
+            IFileInspector fileInspector)
         {
             _blobVideoService = blobVideoService;
             _videoService = videoService;
             _userService = userService;
             _videoProcessingService = videoProcessingService;
+            _fileInspector = fileInspector;
         }
 
         [HttpGet("video/{id:guid}")]
@@ -100,10 +104,15 @@ namespace YouTubeV2.Api.Controllers
                 return BadRequest($"Trying to upload video which has processing progress {video.ProcessingProgress}");
 
             await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Uploading, cancellationToken);
-            MemoryStream videoFileStream = new();
-            await videoFile.CopyToAsync(videoFileStream, cancellationToken);
-            videoFileStream.Seek(0, SeekOrigin.Begin);
-            await _videoProcessingService.EnqueVideoProcessingJobAsync(new VideoProcessJob(id, videoFileStream, videoExtension));
+
+            VideoProcessJob videoProcessJob = new VideoProcessJob(
+                id,
+                Path.Combine(Directory.GetCurrentDirectory(), id.ToString()),
+                videoExtension);
+            using Stream videoFileStream = videoFile.OpenReadStream();
+            await _fileInspector.CreateFileAsync(videoProcessJob.Path, videoFileStream, cancellationToken);
+
+            await _videoProcessingService.EnqueVideoProcessingJobAsync(videoProcessJob);
 ;
             return StatusCode(StatusCodes.Status202Accepted);
         }
@@ -117,7 +126,9 @@ namespace YouTubeV2.Api.Controllers
 
             await _videoService.AuthorizeVideoAccessAsync(id, userId, cancellationToken);
 
-            return Ok(await _videoService.GetVideoMetadataAsync(id, cancellationToken));
+            var res = await _videoService.GetVideoMetadataAsync(id, cancellationToken);
+
+            return Ok(res);
         }
 
         [HttpGet("user/videos")]
