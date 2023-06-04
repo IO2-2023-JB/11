@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Downloader;
 using YouTubeV2.Application.Enums;
+using YouTubeV2.Application.FileInspector;
 using YouTubeV2.Application.Jobs;
 using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services.BlobServices;
@@ -14,11 +15,16 @@ namespace YouTubeV2.Application.Services.VideoServices
     {
         private readonly Channel<VideoProcessJob> _videoProcessingChannel = Channel.CreateUnbounded<VideoProcessJob>();
         private readonly IServiceScopeFactory _serviceScopeFactory;
+        IHostApplicationLifetime _hostApplicationLifetime;
+        private IVideoService _videoService = null!;
+        private IBlobVideoService _blobVideoService = null!;
+        private IFileInspector _fileInspector = null!;
         private const string _mp4Extension = ".mp4";
 
-        public VideoProcessingService(IServiceScopeFactory serviceScopeFactory)
+        public VideoProcessingService(IServiceScopeFactory serviceScopeFactory, IHostApplicationLifetime hostApplicationLifetime)
         {
             _serviceScopeFactory = serviceScopeFactory;
+            _hostApplicationLifetime = hostApplicationLifetime;
         }
 
         public async ValueTask EnqueVideoProcessingJobAsync(VideoProcessJob videoProcessJob) => await _videoProcessingChannel.Writer.WriteAsync(videoProcessJob);
@@ -28,70 +34,81 @@ namespace YouTubeV2.Application.Services.VideoServices
             await FFmpegDownloader.GetLatestVersion(FFmpegVersion.Official, Directory.GetCurrentDirectory());
             FFmpeg.SetExecutablesPath(Directory.GetCurrentDirectory());
 
+            await WaitForApplicationStarted();
+
+            using var serviceScope = _serviceScopeFactory.CreateScope();
+            _videoService = serviceScope.ServiceProvider.GetRequiredService<IVideoService>();
+            _blobVideoService = serviceScope.ServiceProvider.GetRequiredService<IBlobVideoService>();
+            _fileInspector = serviceScope.ServiceProvider.GetRequiredService<IFileInspector>();
+
             await foreach (var videoProcessJob in _videoProcessingChannel.Reader.ReadAllAsync(stoppingToken))
             {
                 await ConvertToMP4AndUploadVideoAsync(videoProcessJob, stoppingToken);
             }
         }
 
+        private Task WaitForApplicationStarted()
+        {
+            var completionSource = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _hostApplicationLifetime.ApplicationStarted.Register(() => completionSource.TrySetResult());
+            return completionSource.Task;
+        }
+
         private async Task ConvertToMP4AndUploadVideoAsync(VideoProcessJob videoProcessJob, CancellationToken cancellationToken)
         {
             Video? video = null;
-            using var serviceScope = _serviceScopeFactory.CreateScope();
-            var videoService = serviceScope.ServiceProvider.GetRequiredService<IVideoService>();
-            var blobVideoService = serviceScope.ServiceProvider.GetRequiredService<IBlobVideoService>();
 
             try
             {
-                video = await videoService.GetVideoByIdAsync(videoProcessJob.VideoId, cancellationToken);
+                video = await _videoService.GetVideoByIdAsync(videoProcessJob.VideoId, cancellationToken);
 
                 if (video == null) return;
 
                 if (video.ProcessingProgress != ProcessingProgress.Uploading) return;
 
+                await SetVideoLengthAsync(video, videoProcessJob.Path, cancellationToken);
+
                 if (videoProcessJob.Extension == _mp4Extension)
                 {
-
-                    await blobVideoService.UploadVideoAsync(videoProcessJob.VideoId.ToString(), videoProcessJob.VideoStream, cancellationToken);
-                    await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Ready, cancellationToken);
-                    videoProcessJob.VideoStream.Dispose();
+                    using FileStream videoStream = _fileInspector.OpenRead(videoProcessJob.Path);
+                    await _blobVideoService.UploadVideoAsync(videoProcessJob.VideoId.ToString(), videoStream, cancellationToken);
+                    await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Ready, cancellationToken);
+                    videoStream.Close();
+                    _fileInspector.Delete(videoProcessJob.Path);
                     return;
                 }
 
-                await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Processing, cancellationToken);
+                await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Processing, cancellationToken);
 
-                var inputFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"{videoProcessJob.VideoId}{videoProcessJob.Extension}");
                 var outputFilePath = Path.Combine(Directory.GetCurrentDirectory(), $"{videoProcessJob.VideoId}{_mp4Extension}");
 
-                await using var inputFileStream = File.Create(inputFilePath);
-                await videoProcessJob.VideoStream.CopyToAsync(inputFileStream, cancellationToken);
-                await inputFileStream.FlushAsync(cancellationToken);
-                inputFileStream.Close();
-                videoProcessJob.VideoStream.Dispose();
-
                 var conversion = FFmpeg.Conversions.New()
-                    .AddParameter($"-i \"{inputFilePath}\"")
+                    .AddParameter($"-i \"{videoProcessJob.Path}\"")
                     .SetOutput(outputFilePath)
                     .SetOverwriteOutput(true);
 
                 await conversion.Start(cancellationToken);
 
-                File.Delete(inputFilePath);
+                _fileInspector.Delete(videoProcessJob.Path);
 
-                var mediaInfo = await FFmpeg.GetMediaInfo(outputFilePath, cancellationToken);
-                await videoService.SetVideoLengthAsync(video, mediaInfo.Duration.TotalSeconds, cancellationToken);
-
-                await using var outputFileStream = File.OpenRead(outputFilePath);
-                await blobVideoService.UploadVideoAsync(videoProcessJob.VideoId.ToString(), outputFileStream, cancellationToken);
+                await using var outputFileStream = _fileInspector.OpenRead(outputFilePath);
+                await _blobVideoService.UploadVideoAsync(videoProcessJob.VideoId.ToString(), outputFileStream, cancellationToken);
                 outputFileStream.Close();
-                File.Delete(outputFilePath);
-                await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Ready, cancellationToken);
+                _fileInspector.Delete(outputFilePath);
+
+                await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Ready, cancellationToken);
             }
             catch
             {
                 if (video != null)
-                    await videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.FailedToUpload, cancellationToken);
+                    await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.FailedToUpload, cancellationToken);
             }
+        }
+
+        private async Task SetVideoLengthAsync(Video video, string path, CancellationToken cancellationToken)
+        {
+            var mediaInfo = await FFmpeg.GetMediaInfo(path, cancellationToken);
+            await _videoService.SetVideoLengthAsync(video, mediaInfo.Duration.TotalSeconds, cancellationToken);
         }
     }
 }

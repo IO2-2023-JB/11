@@ -1,5 +1,7 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using YouTubeV2.Application.Configurations.BlobStorage;
@@ -14,13 +16,12 @@ namespace YouTubeV2.Application.Services.BlobServices
         private readonly BlobStorageImagesConfig _blobStorageConfig;
         private string _hostUrl;
 
-        public BlobImageService(BlobServiceClient blobServiceClient, IOptions<BlobStorageImagesConfig> blobStorageConfig, IHttpContextAccessor httpContextAccessor)
+        public BlobImageService(BlobServiceClient blobServiceClient, IOptions<BlobStorageImagesConfig> blobStorageConfig, IServer server)
         {
             _blobServiceClient = blobServiceClient;
             _blobStorageConfig = blobStorageConfig.Value;
 
-            var request = httpContextAccessor.HttpContext!.Request;
-            _hostUrl = $"{request.Scheme}://{request.Host}";
+            _hostUrl = server.Features.Get<IServerAddressesFeature>()!.Addresses.First();
         }
 
         public Uri GetProfilePictureUrl(string fileName) => GetImageUrl(fileName, _blobStorageConfig.UserAvatarsContainerName);
