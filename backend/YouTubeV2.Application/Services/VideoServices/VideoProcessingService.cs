@@ -20,6 +20,7 @@ namespace YouTubeV2.Application.Services.VideoServices
         private IBlobVideoService _blobVideoService = null!;
         private IFileInspector _fileInspector = null!;
         private const string _mp4Extension = ".mp4";
+        private bool IsInitialized = false;
 
         public VideoProcessingService(IServiceScopeFactory serviceScopeFactory, IHostApplicationLifetime hostApplicationLifetime)
         {
@@ -36,10 +37,7 @@ namespace YouTubeV2.Application.Services.VideoServices
 
             await WaitForApplicationStarted();
 
-            using var serviceScope = _serviceScopeFactory.CreateScope();
-            _videoService = serviceScope.ServiceProvider.GetRequiredService<IVideoService>();
-            _blobVideoService = serviceScope.ServiceProvider.GetRequiredService<IBlobVideoService>();
-            _fileInspector = serviceScope.ServiceProvider.GetRequiredService<IFileInspector>();
+            if (!IsInitialized) Initialize();
 
             await foreach (var videoProcessJob in _videoProcessingChannel.Reader.ReadAllAsync(stoppingToken))
             {
@@ -54,12 +52,23 @@ namespace YouTubeV2.Application.Services.VideoServices
             return completionSource.Task;
         }
 
+        private void Initialize()
+        {
+            using var serviceScope = _serviceScopeFactory.CreateScope();
+            _videoService = serviceScope.ServiceProvider.GetRequiredService<IVideoService>();
+            _blobVideoService = serviceScope.ServiceProvider.GetRequiredService<IBlobVideoService>();
+            _fileInspector = serviceScope.ServiceProvider.GetRequiredService<IFileInspector>();
+            IsInitialized = true;
+        }
+
         private async Task ConvertToMP4AndUploadVideoAsync(VideoProcessJob videoProcessJob, CancellationToken cancellationToken)
         {
             Video? video = null;
 
             try
             {
+                if (!IsInitialized) Initialize();
+
                 video = await _videoService.GetVideoByIdAsync(videoProcessJob.VideoId, cancellationToken);
 
                 if (video == null) return;
