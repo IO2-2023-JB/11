@@ -10,7 +10,6 @@ using YouTubeV2.Application.Model;
 using YouTubeV2.Application.Services.BlobServices;
 using YouTubeV2.Application.Services.VideoServices;
 using FluentAssertions;
-using Microsoft.Extensions.Hosting;
 using YouTubeV2.Application.FileInspector;
 
 namespace YouTubeV2.Application.Tests.VideoProcessingServiceTests
@@ -46,9 +45,7 @@ namespace YouTubeV2.Application.Tests.VideoProcessingServiceTests
                 .Setup(factory => factory.CreateScope())
                 .Returns(serviceScopeMock.Object);
 
-            Mock<IHostApplicationLifetime> hostApplicationLifetime = new();
-
-            _videoProcessingService = new VideoProcessingService(serviceScopeFactoryMock.Object, hostApplicationLifetime.Object);
+            _videoProcessingService = new VideoProcessingService(serviceScopeFactoryMock.Object);
 
             Type videoProcessingServiceType = _videoProcessingService.GetType();
             BindingFlags bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance;
