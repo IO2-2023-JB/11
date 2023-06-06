@@ -23,9 +23,9 @@ export class HomeComponent {
     private playlistService: PlaylistService,
     private subscriptionService: SubscriptionService,
     private router: Router) {
+      this.userId = getUserId();
       this.getRecommended();
       this.getSubscriptions();
-      this.userId = getUserId();
   }
 
   ngOnDestroy(): void {
