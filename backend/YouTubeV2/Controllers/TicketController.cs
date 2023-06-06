@@ -58,11 +58,13 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpGet("list")]
-        [Roles(Role.Administrator)]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult<IEnumerable<GetTicketDto>>> GetTicketList(CancellationToken cancellationToken)
         {
-            var result = await _ticketService.GetTicketListAsync(cancellationToken);
-            return Ok(result);
+            if (GetUserRole() == Role.Administrator)
+                return Ok(await _ticketService.GetTicketListAsync(cancellationToken));
+
+            return Ok(await _ticketService.GetUserTicketListAsync(GetUserId(), cancellationToken));
         }
     }
 

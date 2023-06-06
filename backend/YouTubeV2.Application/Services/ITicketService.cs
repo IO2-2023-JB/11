@@ -15,5 +15,6 @@ namespace YouTubeV2.Application.Services
         Task<SubmitTicketResponseDto> RespondToTicketAsync(Guid id, RespondToTicketDto dto, CancellationToken cancellationToken = default);
         Task<GetTicketStatusDto> GetTicketStatusAsync(Guid id, CancellationToken cancellationToken = default);
         Task<IEnumerable<GetTicketDto>> GetTicketListAsync(CancellationToken cancellationToken = default);
+        Task<IEnumerable<GetTicketDto>> GetUserTicketListAsync(string id, CancellationToken cancellationToken = default);
     }
 }

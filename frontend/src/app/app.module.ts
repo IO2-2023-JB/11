@@ -25,6 +25,8 @@ import { TicketModule } from './pages/ticket/ticket.module';
 import { ReportButtonModule } from './core/components/report-button/report-button.module';
 import { BackendSelectionComponent } from './pages/backend-selection/backend-selection.component';
 import { BackendSelectionModule } from './pages/backend-selection/backend-selection.module';
+import { UserTicketsComponent } from './pages/user-tickets/user-tickets.component';
+import { UserTicketsModule } from './pages/user-tickets/user-tickets.module';
 
 @NgModule({
     declarations: [
@@ -62,7 +64,8 @@ import { BackendSelectionModule } from './pages/backend-selection/backend-select
         UpdateVideoMetadataModule,
         TicketModule,
         ReportButtonModule,
-        BackendSelectionModule
+        BackendSelectionModule,
+        UserTicketsModule
     ]
 })
 export class AppModule { }
