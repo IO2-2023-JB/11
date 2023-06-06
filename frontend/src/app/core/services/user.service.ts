@@ -23,13 +23,13 @@ export class UserService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('role');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('role');
     this.sendAuthenticationStateChangedNotification(false);
   }
 
   isUserAuthenticated(): boolean {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
     return token != null;
   }
 

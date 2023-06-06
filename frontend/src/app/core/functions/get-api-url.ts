@@ -1,7 +1,7 @@
 import { environment } from "src/environments/environment";
 
 export function getApiUrl(): string {
-    const api = localStorage.getItem('api');
+    const api = sessionStorage.getItem('api');
     if (api === '10') {
       return environment.group10WebApiUrl;
     }

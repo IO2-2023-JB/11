@@ -59,7 +59,7 @@ export class VideoObjectModel {
 
     async expectLoginSuccess() {
         await expect(this.page).toHaveURL('http://localhost:4200');
-        const token = await this.page.evaluate(() => localStorage.getItem('token'));
+        const token = await this.page.evaluate(() => sessionStorage.getItem('token'));
         expect(token != null).toBeTruthy();
     }
 
@@ -89,7 +89,7 @@ export class VideoObjectModel {
     }
 
     async expectLogoutSuccess() {
-        const token = await this.page.evaluate(() => localStorage.getItem('token'));
+        const token = await this.page.evaluate(() => sessionStorage.getItem('token'));
         expect(token).toBeNull();
     }
 }
