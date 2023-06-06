@@ -7,7 +7,7 @@
                 <div class="grid">
                     <div class="videoCol" *ngFor="let sub of userSubscriptions">
                         <div class="image-container">
-                            <img [src] = "sub.avatarImage" class="avatarImage" (click)="goToCreator(sub.id)">
+                            <img [src] = "sub.avatarImage || 'assets/images/default-user-avatar.jpg'" class="avatarImage" (click)="goToCreator(sub.id)">
                             <span class="image-label">{{ sub.nickname }}</span>
                         </div>
                     </div>
@@ -22,7 +22,7 @@
                   <div class="grid">
                     <div class="m-2 video" *ngFor="let video of videos" (click)="goToVideo(video.id)">
                       <div class="thumbnail-container">
-                        <img [src] = "video.thumbnail" class="thumbnail">
+                        <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
                         <span class="video-length">{{ video.duration }}</span>
                       </div>
                       <strong class="video-title">{{ video.title }}</strong>
@@ -38,7 +38,7 @@
                   </div>
                 </ng-template>
               </div>
-        </p-card>      
+        </p-card>
     </div>
 </div>
 
