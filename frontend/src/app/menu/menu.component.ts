@@ -54,7 +54,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   ticketsButtonOnClick(): void {
-    this.router.navigate(['tickets']);
+    if (this.role == 'Administrator') this.router.navigate(['tickets']);
+    else this.router.navigate(['user-tickets']);
   }
 
   registerButtonOnClick(): void {

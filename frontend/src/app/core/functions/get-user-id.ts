@@ -1,3 +1,3 @@
 export function getUserId(): string {
-    return localStorage.getItem('userId')!;
+    return sessionStorage.getItem('userId')!;
 }

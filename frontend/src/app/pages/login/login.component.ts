@@ -54,8 +54,8 @@ export class LoginComponent implements OnDestroy {
         });
       }),
       switchMap((authenticationResponse: AuthenticationResponseDTO) => {
-        localStorage.setItem('token', authenticationResponse.token);
-
+        sessionStorage.setItem('token', authenticationResponse.token);
+    
         return this.userService.getUser(null).pipe(
           map((userDTO: UserDTO) => ({ userDTO }))
         );
@@ -65,8 +65,8 @@ export class LoginComponent implements OnDestroy {
     this.subscriptions.push(
       this.doWithLoading(login$).subscribe({
         next: ({ userDTO }: { userDTO: UserDTO }) => {
-          localStorage.setItem('role', userDTO.userType);
-          localStorage.setItem('userId', userDTO.id);
+          sessionStorage.setItem('role', userDTO.userType);
+          sessionStorage.setItem('userId', userDTO.id);
         },
         complete: () => {
           this.userService.sendAuthenticationStateChangedNotification(true);

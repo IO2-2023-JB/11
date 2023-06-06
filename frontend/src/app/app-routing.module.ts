@@ -16,6 +16,7 @@ import { UpdateVideoMetadataComponent } from './pages/update-video-metadata/upda
 import { TicketComponent } from './pages/ticket/ticket.component';
 import { CustomRouteReuseStrategy } from './core/route-reuse-strategies/custom-route-reuse-strategy';
 import { BackendSelectionComponent } from './pages/backend-selection/backend-selection.component';
+import { UserTicketsComponent } from './pages/user-tickets/user-tickets.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent, canActivate: [AuthGuard] },
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'subscriptions-videos', component: SubscriptionsVideosComponent, canActivate: [AuthGuard]  },
   { path: 'update-video-metadata/:videoId', component: UpdateVideoMetadataComponent, canActivate: [AuthGuard] },
   { path: 'tickets', component: TicketComponent, canActivate: [AuthGuard] },
+  { path: 'user-tickets', component: UserTicketsComponent, canActivate: [AuthGuard] },
   { path: 'backend-selection', component: BackendSelectionComponent },
 ];
 
