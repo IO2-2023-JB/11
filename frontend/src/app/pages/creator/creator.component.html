@@ -1,7 +1,7 @@
 <p-card
   styleClass="p-card-style shadow-7">
   <div class="flex flex-wrap justify-content-start mx-2 mt-2">
-    <img [src] = "user.avatarImage" class="avatar-image mr-3">
+    <img [src] = "user.avatarImage || 'assets/images/default-user-avatar.jpg'" class="avatar-image mr-3">
     <div class="flex flex-column">
       <h1>{{ user.nickname }}</h1>
       <label class="mb-1">{{ user.name }} {{ user.surname }}</label>
@@ -24,7 +24,7 @@
           <div class="grid">
             <div class="m-2 video" *ngFor="let video of videos" (click)="goToVideo(video.id)">
               <div class="thumbnail-container">
-                <img [src] = "video.thumbnail" class="thumbnail">
+                <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
                 <span class="video-length">{{ video.duration }}</span>
               </div>
               <strong class="video-title">{{ video.title }}</strong>

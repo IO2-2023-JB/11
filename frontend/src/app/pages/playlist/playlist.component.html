@@ -16,7 +16,7 @@
         <div class="grid m-2">
           <div class="m-2 video-in-playlist" *ngFor="let video of playlist.videos" (click)="goToVideo(video.id)">
             <div class="thumbnail-container">
-              <img [src] = "video.thumbnail" class="thumbnail">
+              <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
               <span class="video-length">{{ video.duration }}</span>
             </div>
             <div class="flex justify-content-between">

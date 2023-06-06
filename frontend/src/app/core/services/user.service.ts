@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Observable, Subject } from "rxjs";
 import { UserForRegistrationDTO } from "../../authentication/models/user-for-registration-dto";
@@ -25,6 +25,7 @@ export class UserService {
   logout(): void {
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('role');
+    sessionStorage.removeItem('userId');
     this.sendAuthenticationStateChangedNotification(false);
   }
 
@@ -67,6 +68,8 @@ export class UserService {
   }
 
   downloadFileImage(url: string): Observable<Blob> {
-    return this.httpClient.get(url, {responseType: 'blob'});
+    let options = { headers: getHttpOptionsWithAuthenticationHeader().headers, responseType: 'blob' as 'json' };
+
+    return this.httpClient.get<Blob>(url, options);
   }
 }

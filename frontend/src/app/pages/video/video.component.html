@@ -27,7 +27,7 @@
         <div class="flex flex-wrap justify-content-between">
           <div class="flex" >
             <div class="flex video-author-info" (click)="goToUserProfile(author.id)">
-              <img [src] = "author.avatarImage" class="avatar-image mr-2">
+              <img [src] = "author.avatarImage || 'assets/images/default-user-avatar.jpg'" class="avatar-image mr-2">
               <div class="flex flex-column">
                 <label id="author-nickname" class="video-author">{{ author.nickname }}</label>
                 <label>{{ author.subscriptionsCount }} subscribers</label>
@@ -75,7 +75,7 @@
         <div class="col" *ngFor="let video of videos">
           <div class="rec-video" (click)="goToVideo(video.id)">
           <div class="image-container">
-            <img [src]="video.thumbnail" class="thumbnail">
+            <img [src]="video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
             <span class="image-label">{{ video.duration }}</span>
           </div>
           <h3 class="noPadding">{{ video.title }}</h3>

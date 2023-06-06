@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 import { SubscriptionDto } from 'src/app/core/models/subscribtion-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
@@ -16,6 +17,7 @@ export class HomeComponent {
   videos!: VideoMetadataDto[];
   userSubscriptions!: SubscriptionDto[];
   subscriptions: Subscription[] = [];
+  userId: string;
 
   constructor(
     private playlistService: PlaylistService,
@@ -23,6 +25,7 @@ export class HomeComponent {
     private router: Router) {
       this.getRecommended();
       this.getSubscriptions();
+      this.userId = getUserId();
   }
 
   ngOnDestroy(): void {
@@ -41,7 +44,7 @@ export class HomeComponent {
 
   getSubscriptions() {
     this.subscriptions.push(this.subscriptionService
-      .getSubscriptions()
+      .getSubscriptions(this.userId)
       .subscribe(userSubs => {
         this.userSubscriptions = userSubs.subscriptions;
     }));

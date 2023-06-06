@@ -61,11 +61,12 @@ export class LoginComponent implements OnDestroy {
         );
       })
     );
-    
+
     this.subscriptions.push(
       this.doWithLoading(login$).subscribe({
         next: ({ userDTO }: { userDTO: UserDTO }) => {
           sessionStorage.setItem('role', userDTO.userType);
+          sessionStorage.setItem('userId', userDTO.id);
         },
         complete: () => {
           this.userService.sendAuthenticationStateChangedNotification(true);

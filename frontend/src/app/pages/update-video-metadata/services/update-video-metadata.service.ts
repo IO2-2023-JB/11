@@ -12,7 +12,9 @@ export class UpdateVideoMetadataService {
   constructor(private httpClient: HttpClient) { }
 
   downloadFileImage(url: string): Observable<Blob> {
-    return this.httpClient.get(url, {responseType: 'blob'});
+    let options = { headers: getHttpOptionsWithAuthenticationHeader().headers, responseType: 'blob' as 'json' };
+
+    return this.httpClient.get<Blob>(url, options);
   }
 
   updateVideoMetadata(videoMetadataDTO: VideoMetadataUpdateDTO, videoId: string): Observable<void> {

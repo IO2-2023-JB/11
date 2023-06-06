@@ -14,7 +14,7 @@ export class DonationService {
 
   sendDonation(id: string, amount: number): Observable<void>{
     const httpOptions = {
-        params: new HttpParams().set('id', id).set('amount',amount),
+        params: new HttpParams().set('id', id).set('amount', amount),
         headers: getHttpOptionsWithAuthenticationHeader().headers
       };
     return this.httpClient.post<void>(`${getApiUrl()}/donate/send`, null, httpOptions);
@@ -22,7 +22,7 @@ export class DonationService {
 
   withdraw(amount: number): Observable<void>{
     const httpOptions = {
-        params: new HttpParams().set('amount',amount),
+        params: new HttpParams().set('amount', amount),
         headers: getHttpOptionsWithAuthenticationHeader().headers
     };
     return this.httpClient.post<void>(`${getApiUrl()}/donate/withdraw`, null, httpOptions);

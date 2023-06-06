@@ -6,6 +6,7 @@ import { UserPlaylistsDto } from '../models/user-playlists-dto';
 import { Observable } from 'rxjs';
 import { PlaylistVideosDto } from '../models/playlist-videos-dto';
 import { getApiUrl } from '../functions/get-api-url';
+import { getUserId } from '../functions/get-user-id';
 
 
 
@@ -34,7 +35,7 @@ export class PlaylistService {
   }
 
   getOwnPlaylists(): Observable<UserPlaylistsDto[]>{
-    return this.httpClient.get<UserPlaylistsDto[]>(`${getApiUrl()}/playlist/user`, getHttpOptionsWithAuthenticationHeader());
+    return this.getUserPlaylists(getUserId());
   }
 
   getUserPlaylists(id: string): Observable<UserPlaylistsDto[]>{
