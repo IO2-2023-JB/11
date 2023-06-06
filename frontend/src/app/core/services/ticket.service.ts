@@ -7,15 +7,13 @@ import { GetTicketStatusDto } from '../models/tickets/get-ticket-status-dto';
 import { RespondToTicketDto } from '../models/tickets/respond-to-ticket-dto';
 import { SubmitTicketResponseDto } from '../models/tickets/submit-ticket-response-dto';
 import { SubmitTicketDto } from '../models/tickets/submit-ticket-dto';
-import { CommentsService } from 'src/app/pages/video/components/comments/services/comments.service';
 import { getApiUrl } from '../functions/get-api-url';
 
 @Injectable({
   providedIn: 'root'
 })
 export class TicketService {
-  constructor(private httpClient: HttpClient,
-    private commentService: CommentsService) { }
+  constructor(private httpClient: HttpClient) { }
 
   submitTicket(dto: SubmitTicketDto): Observable<SubmitTicketResponseDto> {
     const url = `${getApiUrl()}/ticket`;

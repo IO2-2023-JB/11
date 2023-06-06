@@ -12,8 +12,13 @@ import { getApiUrl } from '../functions/get-api-url';
 export class SubscriptionService {
   constructor(private httpClient: HttpClient) { }
 
-  getSubscriptions(): Observable<userSubscriptionListDto> {
-    return this.httpClient.get<userSubscriptionListDto>(`${getApiUrl()}/subscriptions`, getHttpOptionsWithAuthenticationHeader());
+  getSubscriptions(userId: string): Observable<userSubscriptionListDto> {
+    const httpOptions = {
+      params: new HttpParams().set('id', userId),
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
+
+    return this.httpClient.get<userSubscriptionListDto>(`${getApiUrl()}/subscriptions`, httpOptions);
   }
 
   postSubscription(subId: string): Observable<void> {

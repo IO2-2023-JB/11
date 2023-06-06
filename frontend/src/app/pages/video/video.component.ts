@@ -21,6 +21,7 @@ import { UserPlaylistsDto } from 'src/app/core/models/user-playlists-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { getApiUrl } from 'src/app/core/functions/get-api-url';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 
 @Component({
   selector: 'app-video',
@@ -68,8 +69,9 @@ export class VideoComponent implements OnInit, OnDestroy {
   donateAmount = 0;
   showPlaylistDialog = false;
   userPlaylists!: UserPlaylistsDto[];
-  reportReason = ''
-  targetId = ''
+  reportReason = '';
+  targetId = '';
+  userId: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -85,6 +87,7 @@ export class VideoComponent implements OnInit, OnDestroy {
     private messageService : MessageService
   ) {
     this.videoId = this.route.snapshot.params['videoId'];
+    this.userId = getUserId();
   }
 
   ngOnInit(): void {
@@ -97,7 +100,7 @@ export class VideoComponent implements OnInit, OnDestroy {
           return forkJoin({
             user: this.userService.getUser(this.videoMetadata.authorId),
             userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId),
-            subscriptionList: this.subscriptionService.getSubscriptions()
+            subscriptionList: this.subscriptionService.getSubscriptions(this.userId),
           });
         })
       )
@@ -125,7 +128,7 @@ export class VideoComponent implements OnInit, OnDestroy {
   }
 
   private checkIfAuthorIsSubscribed(): void {
-    this.subscriptions.push(this.subscriptionService.getSubscriptions().subscribe(subscriptions =>
+    this.subscriptions.push(this.subscriptionService.getSubscriptions(this.userId).subscribe(subscriptions =>
         this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptions)
       ));
   }
