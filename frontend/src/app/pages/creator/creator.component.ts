@@ -25,6 +25,7 @@ export class CreatorComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   playlists!: UserPlaylistsDto[];
   userId: string;
+  isOwnProfile!: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,6 +52,7 @@ export class CreatorComponent implements OnInit, OnDestroy {
       this.videos = videosList.videos;
       this.isCreatorSubscribed = this.isThisCreatorSubscribed(subscriptionList);
       this.playlists = playlists;
+      this.isOwnProfile = (user.id == this.userId);
     }));
   }
 

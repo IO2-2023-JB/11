@@ -31,6 +31,11 @@
               <div>
                 {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
               </div>
+              <div *ngIf="isOwnProfile">
+                Processing progess: {{ video.processingProgress }}
+                <br>
+                Visibility: {{ video.visibility }}
+              </div>
             </div>
           </div>
         </div>
