@@ -17,8 +17,6 @@ namespace YouTubeV2.Application.Services
 
         public async Task SendDonationAsync(string senderId, string recipientId, decimal ammount)
         {
-            if (senderId == recipientId)
-                throw new BadRequestException("You cannot send money to yourself");
 
             if (ammount <= 0)
                 throw new BadRequestException("Ammount has to be positive");
@@ -29,17 +27,23 @@ namespace YouTubeV2.Application.Services
             User? sender = await _userService.GetByIdAsync(senderId)
                 ?? throw new BadRequestException();
 
-            if (!await _userManager.IsInRoleAsync(recipient, Role.Creator))
-                throw new BadRequestException("You can only support Creators");
+            if (!((recipientId == senderId) && await _userManager.IsInRoleAsync(sender, Role.Simple)))
+            {
+                if (recipientId == senderId)
+                    throw new BadRequestException("You cannot send money to yourself");
 
-            bool isSenderAdmin = await _userManager.IsInRoleAsync(sender, Role.Administrator);
+                if (!await _userManager.IsInRoleAsync(recipient, Role.Creator))
+                    throw new BadRequestException("You can only support Creators");
 
-            if (!isSenderAdmin && (sender.AccountBalance < ammount))
-                throw new BadRequestException("Not enough ballance");
+                bool isSenderAdmin = await _userManager.IsInRoleAsync(sender, Role.Administrator);
 
-            if (!isSenderAdmin)
-                sender.AccountBalance -= ammount;
-            
+                if (!isSenderAdmin && (sender.AccountBalance < ammount))
+                    throw new BadRequestException("Not enough ballance");
+
+                if (!isSenderAdmin)
+                    sender.AccountBalance -= ammount;
+            }
+
             recipient.AccountBalance += ammount;
 
             await _userManager.UpdateAsync(sender);

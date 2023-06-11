@@ -198,5 +198,49 @@ namespace YouTubeV2.Api.Tests.DonationControllerTests
             // ASSERT
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
         }
+
+
+        [TestMethod]
+        public async Task SendDonation_SimpleToSelf_GoodAmmount_ShouldChangeBallance()
+        {
+            // ARRANGE
+            User sender = new User("sender5@mail.com", "sender5", "sender5", "sender5");
+
+            sender.AccountBalance = 20;
+
+            string senderId = null!;
+
+            await _webApplicationFactory.DoWithinScope<UserManager<User>>(
+                async userManager =>
+                {
+                    await userManager.CreateAsync(sender);
+
+                    await userManager.AddToRoleAsync(sender, Role.Simple);
+
+                    senderId = await userManager.GetUserIdAsync(sender);
+                });
+
+            using HttpClient httpClient = _webApplicationFactory.WithAuthentication(ClaimsProvider.WithRoleAccessAndUserId(Role.Simple, senderId)).CreateClient();
+
+            // ACT
+            var query = new Dictionary<string, string?>()
+            {
+                { "id", senderId },
+                { "amount", "10" }
+            };
+            var path = QueryHelpers.AddQueryString("api/donate/send", query);
+            var response = await httpClient.PostAsync(path, null);
+
+            // ASSERT
+            response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+            await _webApplicationFactory.DoWithinScope<UserManager<User>>(
+                async userManager =>
+                {
+                    var senderFound = await userManager.FindByIdAsync(senderId);
+
+                    senderFound!.AccountBalance.Should().Be(30);
+                });
+        }
     }
 }

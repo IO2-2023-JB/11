@@ -9,6 +9,7 @@ import { finalize, Observable, of, Subscription, switchMap, tap } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { FileUpload } from 'primeng/fileupload';
 import { DonationService } from 'src/app/core/services/donation.service';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 
 
 @Component({
@@ -30,8 +31,11 @@ export class UserComponent implements OnInit, OnDestroy {
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
   ableToWithdraw = false;
+  ableToTransferFounds = false;
   showWithdrawDialog = false;
+  showTransferFoundsDialog = false;
   withdrawAmount = 0;
+  transferAmount = 0;
   withdrawMax = 0;
   @ViewChild('avatarImageUpload') avatarImageUpload!: FileUpload;
 
@@ -52,6 +56,7 @@ export class UserComponent implements OnInit, OnDestroy {
       accountBalance: userDTO.accountBalance,
     });
     this.ableToWithdraw = (userDTO.userType == 'Creator');
+    this.ableToTransferFounds = (userDTO.userType == 'Simple');
     if (userDTO.accountBalance != null)
     {
       this.withdrawMax = userDTO.accountBalance as number;
@@ -192,6 +197,38 @@ export class UserComponent implements OnInit, OnDestroy {
 
       this.showWithdrawDialog = false;
       this.withdrawAmount = 0;
+    }
+  }
+
+  startTransfer(): void {
+    this.showTransferFoundsDialog = true;
+  }
+
+  isTransferNonPositive(): boolean {
+    return this.transferAmount <= 0;
+  }
+
+  transferFounds(): void {
+    if (!this.isTransferNonPositive())
+    {
+
+      const edit$ = this.donationService.sendDonation(getUserId(), this.transferAmount).pipe(
+        tap(() => {
+          this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'Money was transfered'
+        })
+      })
+      );
+      this.subscriptions.push(this.doWithLoading(edit$).subscribe({
+        complete: () => {
+          this.refreshInfo();
+       }
+      }));
+
+      this.showTransferFoundsDialog = false;
+      this.transferAmount = 0;
     }
   }
 

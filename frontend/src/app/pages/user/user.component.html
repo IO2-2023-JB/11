@@ -82,12 +82,15 @@
       <input
         id="ballance-display"
         type="number"
-        formControlName="accountBallance"
+        formControlName="accountBalance"
         pInputText
         placeholder="Ballance" />
     </div>
     <div class="withdrawContainer">
       <p-button *ngIf="ableToWithdraw" (click)="startWithdraw()" styleClass="p-button-style p-button-secondary" label="Withdraw"></p-button>
+    </div>
+    <div class="tranmsferContainer">
+      <p-button *ngIf="ableToTransferFounds" (click)="startTransfer()" styleClass="p-button-style p-button-secondary" label="Transfer money from your bank"></p-button>
     </div>
     <div>
       <label for="avatarImage-input" class="field-label">
@@ -150,5 +153,18 @@
   </div>
   <p-footer>
     <button pButton type="text" label="Submit" (click)="withdraw()"></button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog header="Transfer money from your bank" [(visible)]="showTransferFoundsDialog" [modal]="true" [style]="{width: '50vw'}">
+  <div class="p-fluid">
+    <input [(ngModel)]="transferAmount" pInputText type="number" placeholder="Enter amount" 
+    [ngClass]="{
+      'ng-invalid ng-dirty': isTransferNonPositive()
+    }">
+    <small class="p-error" *ngIf="isTransferNonPositive()">Cannot transfer a non posivie value</small>
+  </div>
+  <p-footer>
+    <button pButton type="text" label="Transfer founds" (click)="transferFounds()"></button>
   </p-footer>
 </p-dialog>
