@@ -25,9 +25,10 @@ namespace YouTubeV2.Api.Controllers
             [FromQuery] DateTime? beginDate, [FromQuery] DateTime? endDate, 
             CancellationToken cancellationToken)
         {
-            if (GetUserId() == null) return Forbid();
+            string? userId = GetUserId();
+            if (userId == null) return Forbid();
 
-            return await _searchService.SearchAsync(query, sortingType, 
+            return await _searchService.SearchAsync(userId, query, sortingType, 
                 sortingCriterion, beginDate, endDate, cancellationToken);
         }
     }

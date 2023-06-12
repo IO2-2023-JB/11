@@ -7,6 +7,7 @@ import { Router } from '@angular/router';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { finalize, Observable, of, Subscription, switchMap } from 'rxjs';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 
 interface SortTypeOption {
   label: string;
@@ -38,6 +39,8 @@ export class SearchComponent {
   sortingType!: SortTypeOption;
   sortingDirection!: SortDirectionOption;
 
+  userId!: string;
+
   constructor(
     private searchService: SearchService,
     private router: Router,
@@ -55,6 +58,8 @@ export class SearchComponent {
 
     this.sortingDirection = this.sortingDirections[0];
     this.sortingType = this.sortingTypes[0];
+
+    this.userId = getUserId();
 
     let routerState = this.router.getCurrentNavigation()?.extras.state;
     if (routerState != undefined) {
