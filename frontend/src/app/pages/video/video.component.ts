@@ -22,6 +22,7 @@ import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { getApiUrl } from 'src/app/core/functions/get-api-url';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { getUserId } from 'src/app/core/functions/get-user-id';
+import { getRole } from 'src/app/core/functions/get-role';
 
 @Component({
   selector: 'app-video',
@@ -112,6 +113,9 @@ export class VideoComponent implements OnInit, OnDestroy {
         if (this.userId == this.author.id) {
           this.videoMenuModel[1].visible = true;
           this.videoMenuModel[3].visible = true;
+        }
+        if (getRole() == 'Administrator') {
+          this.videoMenuModel[1].visible = true;
         }
       }));
     this.getReactions();
