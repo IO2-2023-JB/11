@@ -64,7 +64,6 @@ export class VideoComponent implements OnInit, OnDestroy {
   showReportDialog = false;
   showDonateDialog = false;
   isProgressSpinnerVisible = false;
-  maxDonate = 0;
   id = '';
   donateAmount = 0;
   showPlaylistDialog = false;
@@ -109,7 +108,6 @@ export class VideoComponent implements OnInit, OnDestroy {
         this.videos = userVideos.videos;
         this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptionList);
       }));
-    this.getBalance();
     this.getReactions();
   }
 
@@ -297,27 +295,12 @@ export class VideoComponent implements OnInit, OnDestroy {
         })
       })
       );
-      this.subscriptions.push(this.doWithLoading(donate$).subscribe({
-        complete: () => {
-          this.getBalance();
-       }
-      }));
+      this.subscriptions.push(this.doWithLoading(donate$).subscribe());
       this.showDonateDialog = false;
     }
   }
 
   isDonateImpossible() : boolean {
-    return this.donateAmount > this.maxDonate;
-  }
-
-  getBalance() {
-    const getUserData$ = this.userService.getUser(null).pipe(
-      switchMap((userDTO: UserDTO) => {
-        this.maxDonate = userDTO.accountBalance as number;
-        this.id = userDTO.id;
-        return of(null);
-      }),
-    );
-    this.subscriptions.push(this.doWithLoading(getUserData$).subscribe());
+    return this.donateAmount <= 0;
   }
 }
