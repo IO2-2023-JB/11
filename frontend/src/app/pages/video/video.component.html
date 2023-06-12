@@ -37,7 +37,7 @@
               <p-button class="ml-2" icon="pi pi-times" label="Unsubscribe" styleClass="p-button-danger" (click)="handleSubscribtionOnClick()"></p-button>
             </ng-container>
             <ng-template #isNotSubscribed>
-              <p-button class="ml-2" icon="pi pi-check" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
+              <p-button class="ml-2" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
             </ng-template>
             <p-button *ngIf="author.id != id" class="ml-2" icon="pi pi-wallet" (click)="startDonate()" label="Donate"></p-button>
           </div>
@@ -69,19 +69,16 @@
       </p-card>
     </div>
   </div>
-  <div class="videos">
-    <div *ngIf="videos">
-      <div class="grid">
-        <div class="col" *ngFor="let video of videos">
-          <div class="rec-video" (click)="goToVideo(video.id)">
-          <div class="image-container">
-            <img [src]="video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
-            <span class="image-label">{{ video.duration }}</span>
-          </div>
-          <h3 class="noPadding">{{ video.title }}</h3>
-          <p class="noPadding rec-video-author" (click)="goToUserProfile(video.authorId)">{{ video.authorNickname }}</p>
-          <p class="noPadding">{{ video.viewCount }} views</p>
-          </div>
+  <div class="mt-4">
+    <div class="grid">
+      <div class="m-2 video" *ngFor="let video of videos" (click)="goToVideo(video.id)">
+        <div class="rec-thumbnail-container">
+          <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="rec-thumbnail">
+          <span class="rec-video-length">{{ video.duration }}</span>
+        </div>
+        <strong class="rec-video-title">{{ video.title }}</strong>
+        <div>
+          {{ video.viewCount }} views, {{ getTimeAgo(video.uploadDate) }} ago
         </div>
       </div>
     </div>

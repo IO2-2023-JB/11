@@ -2,7 +2,7 @@
 {
     public enum ProcessingProgress
     {
-        MetadataRecordCreater,
+        MetadataRecordCreated,
         Uploading,
         Uploaded,
         FailedToUpload,

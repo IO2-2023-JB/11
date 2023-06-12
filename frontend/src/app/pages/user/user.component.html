@@ -76,15 +76,15 @@
         placeholder="Email" />
     </div>
     <div class="p-fluid">
-      <label for="ballance-input" class="field-label">
-        <p class="required">Ballance</p>
+      <label for="balance-input" class="field-label">
+        <p class="required">Balance</p>
       </label>
       <input
-        id="ballance-display"
+        id="balance-display"
         type="number"
-        formControlName="accountBallance"
+        formControlName="accountBalance"
         pInputText
-        placeholder="Ballance" />
+        placeholder="Balance" />
     </div>
     <div class="withdrawContainer">
       <p-button *ngIf="ableToWithdraw" (click)="startWithdraw()" styleClass="p-button-style p-button-secondary" label="Withdraw"></p-button>
@@ -146,7 +146,8 @@
     [ngClass]="{
       'ng-invalid ng-dirty': isWithdrawalImpossible()
     }">
-    <small class="p-error" *ngIf="isWithdrawalImpossible()">Cannot withdraw more than account balance</small>
+    <small class="p-error" *ngIf="isWithdrawalMoreThanMax()">Cannot withdraw more than account balance</small>
+    <small class="p-error" *ngIf="isWithdrawalNonPositive()">Cannot withdraw a non positive value</small>
   </div>
   <p-footer>
     <button pButton type="text" label="Submit" (click)="withdraw()"></button>

@@ -25,7 +25,7 @@ export class UserComponent implements OnInit, OnDestroy {
     avatarImage: new FormControl(''),
     userType: new FormControl<boolean>(false),
     email: new FormControl({value: '', disabled: true}),
-    accountBallance: new FormControl({value: '', disabled: true}),
+    accountBalance: new FormControl({value: '', disabled: true}),
   });
   subscriptions: Subscription[] = [];
   isProgressSpinnerVisible = false;
@@ -168,7 +168,15 @@ export class UserComponent implements OnInit, OnDestroy {
   }
 
   isWithdrawalImpossible(): boolean {
+    return this.isWithdrawalMoreThanMax() || this.isWithdrawalNonPositive();
+  }
+
+  isWithdrawalMoreThanMax(): boolean {
     return this.withdrawAmount > this.withdrawMax;
+  }
+
+  isWithdrawalNonPositive(): boolean {
+    return this.withdrawAmount <= 0;
   }
 
   withdraw(): void {

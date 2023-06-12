@@ -93,7 +93,7 @@ namespace YouTubeV2.Api.Tests.VideoControllerTests
                     videoResult!.Description.Should().Be(videoMetadata.description);
                     videoResult!.Visibility.Should().Be(videoMetadata.visibility);
                     videoResult!.ViewCount.Should().Be(0);
-                    videoResult!.ProcessingProgress.Should().Be(ProcessingProgress.MetadataRecordCreater);
+                    videoResult!.ProcessingProgress.Should().Be(ProcessingProgress.MetadataRecordCreated);
                     videoResult!.UploadDate.Should().Be(_utcNow);
                     videoResult!.EditDate.Should().Be(_utcNow);
                     videoResult!.Duration.Should().Be("00:00");

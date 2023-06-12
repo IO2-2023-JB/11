@@ -100,7 +100,7 @@ namespace YouTubeV2.Api.Controllers
                 return NotFound($"Video with id {id} not found");
             if (video!.Author.Id != GetUserId())
                 return Forbid();
-            if (video.ProcessingProgress != ProcessingProgress.MetadataRecordCreater && video.ProcessingProgress != ProcessingProgress.FailedToUpload)
+            if (video.ProcessingProgress != ProcessingProgress.MetadataRecordCreated && video.ProcessingProgress != ProcessingProgress.FailedToUpload)
                 return BadRequest($"Trying to upload video which has processing progress {video.ProcessingProgress}");
 
             await _videoService.SetVideoProcessingProgressAsync(video, ProcessingProgress.Uploading, cancellationToken);

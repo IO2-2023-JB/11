@@ -11,7 +11,7 @@
         <p-button class="ml-2" icon="pi pi-times" label="Unsubscribe" styleClass="p-button-danger" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-container>
       <ng-template #isNotSubscribed>
-        <p-button class="ml-2" icon="pi pi-check" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
+        <p-button class="ml-2" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-template>
       <app-report-button [targetId]="user.id"></app-report-button>
     </div>
@@ -30,6 +30,11 @@
               <strong class="video-title">{{ video.title }}</strong>
               <div>
                 {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
+              </div>
+              <div *ngIf="isOwnProfile">
+                Processing progess: {{ video.processingProgress }}
+                <br>
+                Visibility: {{ video.visibility }}
               </div>
             </div>
           </div>
