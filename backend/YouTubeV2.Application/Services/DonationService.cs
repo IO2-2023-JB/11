@@ -31,14 +31,6 @@ namespace YouTubeV2.Application.Services
 
             if (!await _userManager.IsInRoleAsync(recipient, Role.Creator))
                 throw new BadRequestException("You can only support Creators");
-
-            bool isSenderAdmin = await _userManager.IsInRoleAsync(sender, Role.Administrator);
-
-            if (!isSenderAdmin && (sender.AccountBalance < ammount))
-                throw new BadRequestException("Not enough ballance");
-
-            if (!isSenderAdmin)
-                sender.AccountBalance -= ammount;
             
             recipient.AccountBalance += ammount;
 
