@@ -49,6 +49,7 @@ export class VideoComponent implements OnInit, OnDestroy {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: () => this.deleteVideo(),
+      visible: false,
     },
     {
       label: 'Report',
@@ -59,6 +60,7 @@ export class VideoComponent implements OnInit, OnDestroy {
       label: 'Edit metadata',
       icon: 'pi pi-file-edit',
       command: () => this.editMetadata(),
+      visible: false,
     },
   ];
   showReportDialog = false;
@@ -107,6 +109,10 @@ export class VideoComponent implements OnInit, OnDestroy {
         this.author = user;
         this.videos = userVideos.videos;
         this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptionList);
+        if (this.userId == this.author.id) {
+          this.videoMenuModel[1].visible = true;
+          this.videoMenuModel[3].visible = true;
+        }
       }));
     this.getReactions();
   }

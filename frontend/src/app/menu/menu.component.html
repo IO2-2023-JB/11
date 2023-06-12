@@ -1,6 +1,6 @@
 <p-card styleClass="p-card-style shadow-7">
   <div class="flex justify-content-between flex-wrap">
-    <div>
+    <div *ngIf="isUserAuthenticated">
       <button
         id="home-button"
         pButton
@@ -15,7 +15,7 @@
         pButton
         pRipple
         type="playlists"
-        label="Playlists"
+        label="Manage-Playlists"
         class="p-button-secondary p-button-text"
         (click)="playlistsButtonOnClick()">
       </button>
