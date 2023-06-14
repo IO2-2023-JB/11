@@ -47,7 +47,8 @@
       <div>
         <h3 class="noPadding">{{ user.nickname }}</h3>
         <p class="noPadding">{{ user.name }} {{ user.surname }}</p>
-        <p class="noPadding">{{ user.subscriptionsCount }} subscribers</p>
+        <p *ngIf="user.userType == 'Creator'" class="noPadding">{{ user.subscriptionsCount }} subscribers</p>
+        <p *ngIf="user.userType == 'Simple'" class="noPadding">Simple user</p>
       </div>
     </div>
   </div>

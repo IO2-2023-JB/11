@@ -10,7 +10,8 @@ namespace YouTubeV2.Application.EntityConfiguration
         {
             builder.HasKey(s => new { s.SubscriberId, s.SubscribeeId });
             builder.HasOne(s => s.Subscriber).WithMany().HasForeignKey(s => s.SubscriberId).OnDelete(DeleteBehavior.Restrict);
-            builder.HasOne(s => s.Subscribee).WithMany(s => s.Subscriptions).HasForeignKey(s => s.SubscribeeId);
+            builder.HasOne(s => s.Subscribee).WithMany(s => s.Subscriptions)
+                .HasForeignKey(s => s.SubscribeeId).OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

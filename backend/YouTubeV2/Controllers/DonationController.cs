@@ -30,7 +30,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpPost("withdraw")]
-        [Roles(Role.Simple, Role.Creator)]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult> WithdrawMoneyAsync([FromQuery][Required] decimal amount)
         {
             string? withdrawerId = GetUserId();

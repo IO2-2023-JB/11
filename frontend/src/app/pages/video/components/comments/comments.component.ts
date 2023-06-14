@@ -7,6 +7,7 @@ import { Subscription, tap } from 'rxjs';
 import { CommentsDTO } from './models/comments-dto';
 import { TicketService } from 'src/app/core/services/ticket.service';
 import { SubmitTicketDto } from 'src/app/core/models/tickets/submit-ticket-dto';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 
 @Component({
   selector: 'app-comments',
@@ -178,6 +179,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
         label: 'Delete',
         icon: 'pi pi-trash',
         command: () => this.deleteComment(commentIndex),
+        visible: this.userHasCommentOwnership(commentIndex),
       },
       {
         label: 'Report',
@@ -193,6 +195,7 @@ export class CommentsComponent implements OnInit, OnDestroy {
         label: 'Delete',
         icon: 'pi pi-trash',
         command: () => this.deleteCommentResponse(comment, responseIndex),
+        visible: this.userHasResponseOwnership(comment, responseIndex),
       },
       {
         label: 'Report',
@@ -200,6 +203,14 @@ export class CommentsComponent implements OnInit, OnDestroy {
         command: () => this.reportCommentResponse(comment, responseIndex),
       },
     ];
+  }
+
+  userHasCommentOwnership(commentIndex: number): boolean {
+    return (this.comments![commentIndex].authorId == getUserId());
+  }
+
+  userHasResponseOwnership(comment: Comment, responseIndex: number): boolean {
+    return (comment.responses![responseIndex].authorId == getUserId());
   }
 
   report() {
