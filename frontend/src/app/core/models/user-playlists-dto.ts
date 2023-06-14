@@ -1,5 +1,5 @@
 export interface UserPlaylistsDto {
     name: string;
-    count: number;
+    visibility: string;
     id: string;
 }

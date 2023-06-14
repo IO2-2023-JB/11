@@ -53,7 +53,7 @@
             <div class="m-2" *ngFor="let playlist of playlists">
               <p-card class="playlist" styleClass="shadow-4 hover:shadow-7" (click)="goToPlaylist(playlist.id)">
                 <strong>{{ playlist.name }}</strong>
-                <p>Videos: {{ playlist.count }}</p>
+                <p>Visibility: {{ playlist.visibility }}</p>
               </p-card>
             </div>
           </div>
