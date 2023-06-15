@@ -60,9 +60,9 @@ namespace YouTubeV2.Application.Services
                ?? throw new BadRequestException();
 
             User? user = await _userManager.FindByIdAsync(requesterUserId)
-                ?? throw new ForbiddenException();
+               ?? throw new ForbiddenException();
 
-            if (!(string.Equals(playlist.Creator.Id, requesterUserId, StringComparison.OrdinalIgnoreCase) 
+            if (!(string.Equals(playlist.Creator.Id, requesterUserId, StringComparison.OrdinalIgnoreCase)
                 || await _userManager.IsInRoleAsync(user, Role.Administrator)))
             {
                 throw new ForbiddenException();
