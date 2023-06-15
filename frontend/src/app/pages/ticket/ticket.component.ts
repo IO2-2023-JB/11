@@ -45,7 +45,7 @@ export class TicketComponent {
     goToTarget(ticket: GetTicketDto) {
       switch (ticket.targetType) {
         case 'Video':
-          this.router.navigate(['video/' + ticket.targetId]);
+          this.router.navigate(['videos/' + ticket.targetId]);
           break;
         case 'User':
           this.router.navigate(['creator/' + ticket.targetId]);

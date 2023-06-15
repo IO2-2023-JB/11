@@ -20,6 +20,9 @@ import { DonationService } from 'src/app/core/services/donation.service';
 import { UserPlaylistsDto } from 'src/app/core/models/user-playlists-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { getApiUrl } from 'src/app/core/functions/get-api-url';
+import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
+import { getUserId } from 'src/app/core/functions/get-user-id';
+import { getRole } from 'src/app/core/functions/get-role';
 
 @Component({
   selector: 'app-video',
@@ -47,6 +50,7 @@ export class VideoComponent implements OnInit, OnDestroy {
       label: 'Delete',
       icon: 'pi pi-trash',
       command: () => this.deleteVideo(),
+      visible: false,
     },
     {
       label: 'Report',
@@ -57,18 +61,19 @@ export class VideoComponent implements OnInit, OnDestroy {
       label: 'Edit metadata',
       icon: 'pi pi-file-edit',
       command: () => this.editMetadata(),
+      visible: false,
     },
   ];
   showReportDialog = false;
   showDonateDialog = false;
   isProgressSpinnerVisible = false;
-  maxDonate = 0;
   id = '';
   donateAmount = 0;
   showPlaylistDialog = false;
   userPlaylists!: UserPlaylistsDto[];
-  reportReason = ''
-  targetId = ''
+  reportReason = '';
+  targetId = '';
+  userId: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -84,6 +89,7 @@ export class VideoComponent implements OnInit, OnDestroy {
     private messageService : MessageService
   ) {
     this.videoId = this.route.snapshot.params['videoId'];
+    this.userId = getUserId();
   }
 
   ngOnInit(): void {
@@ -96,7 +102,7 @@ export class VideoComponent implements OnInit, OnDestroy {
           return forkJoin({
             user: this.userService.getUser(this.videoMetadata.authorId),
             userVideos: this.videoService.getUserVideos(this.videoMetadata.authorId),
-            subscriptionList: this.subscriptionService.getSubscriptions()
+            subscriptionList: this.subscriptionService.getSubscriptions(this.userId),
           });
         })
       )
@@ -104,8 +110,14 @@ export class VideoComponent implements OnInit, OnDestroy {
         this.author = user;
         this.videos = userVideos.videos;
         this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptionList);
+        if (this.userId == this.author.id) {
+          this.videoMenuModel[1].visible = true;
+          this.videoMenuModel[3].visible = true;
+        }
+        if (getRole() == 'Administrator') {
+          this.videoMenuModel[1].visible = true;
+        }
       }));
-    this.getBalance();
     this.getReactions();
   }
 
@@ -124,7 +136,7 @@ export class VideoComponent implements OnInit, OnDestroy {
   }
 
   private checkIfAuthorIsSubscribed(): void {
-    this.subscriptions.push(this.subscriptionService.getSubscriptions().subscribe(subscriptions =>
+    this.subscriptions.push(this.subscriptionService.getSubscriptions(this.userId).subscribe(subscriptions =>
         this.isAuthorSubscribed = this.isThisAuthorSubscribed(subscriptions)
       ));
   }
@@ -258,24 +270,7 @@ export class VideoComponent implements OnInit, OnDestroy {
   }
 
   public getTimeAgo(value: Date): string {
-    value = new Date(value);
-    const now = new Date();
-    const timeDiffInSeconds = Math.floor((now.getTime() - value.getTime()) / 1000);
-    const minutes = Math.floor(timeDiffInSeconds / 60);
-    const hours = Math.floor(minutes / 60);
-    const days = Math.floor(hours / 24);
-    const weeks = Math.floor(days / 7);
-
-    if (weeks > 0) {
-      return weeks + (weeks === 1 ? ' week' : ' weeks');
-    } else if (days > 0) {
-      return days + (days === 1 ? ' day' : ' days');
-    } else if (hours > 0) {
-      return hours + (hours === 1 ? ' hour' : ' hours');
-    } else {
-      const roundedMinutes = Math.max(1, minutes);
-      return roundedMinutes + (roundedMinutes === 1 ? ' minute' : ' minutes');
-    }
+    return getTimeAgo(value);
   }
 
   report() {
@@ -310,27 +305,12 @@ export class VideoComponent implements OnInit, OnDestroy {
         })
       })
       );
-      this.subscriptions.push(this.doWithLoading(donate$).subscribe({
-        complete: () => {
-          this.getBalance();
-       }
-      }));
+      this.subscriptions.push(this.doWithLoading(donate$).subscribe());
       this.showDonateDialog = false;
     }
   }
 
   isDonateImpossible() : boolean {
-    return this.donateAmount > this.maxDonate;
-  }
-
-  getBalance() {
-    const getUserData$ = this.userService.getUser(null).pipe(
-      switchMap((userDTO: UserDTO) => {
-        this.maxDonate = userDTO.accountBalance as number;
-        this.id = userDTO.id;
-        return of(null);
-      }),
-    );
-    this.subscriptions.push(this.doWithLoading(getUserData$).subscribe());
+    return this.donateAmount <= 0;
   }
 }

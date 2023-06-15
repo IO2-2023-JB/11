@@ -16,12 +16,6 @@
   border-radius: 50%;
 }
 
-.container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-}
-
 .image-container {
     position: relative;
     display: inline-block;
@@ -43,8 +37,8 @@
 }
 
 .full-page-video {
-    width: 100%; /* adjust this value if you want some margin */
-    height: 70%; /* adjust this value if you want some margin */
+    width: 100%;
+    height: 70%;
     object-fit: contain;
     top: 5;
     left: 5;
@@ -54,37 +48,61 @@
     width: 80% !important;
 }
 
-.videos {
-  width: 20%;
-  color: rgb(73, 80, 87);
-}
-
-.rec-video:hover {
-  cursor: pointer;
-}
-
 .grid {
     display: flex;
     flex-direction: column;
     padding: 5px;
 }
 
-.thumbnail {
-  width: 99%;
-  max-width: 100%;
-  height: auto;
+.rec-thumbnail-container {
+  overflow: hidden;
+  position: relative;
+  height: 11em;
+  width: 20em;
 }
 
-.video-author-info:hover, .video-author-info *:hover {
+.rec-thumbnail {
+  display: block;
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.rec-video-length {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  padding: 5px 10px;
+  z-index: 1;
+}
+
+.rec-video-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3em;
+  line-height: 1.5;
+}
+
+.rec-thumbnail:hover, .rec-video-title:hover, .video-author-info:hover, .video-author-info *:hover {
   cursor: pointer;
 }
 
-.video-author-info:hover .video-author {
+.rec-video-title:hover, .video-author-info:hover .video-author {
   color: black;
 }
 
-.rec-video-author:hover {
-  color: black;
+.rec-video-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 3em;
+  line-height: 1.5;
 }
 
 .playlist {

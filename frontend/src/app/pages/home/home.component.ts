@@ -1,9 +1,8 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MessageService } from 'primeng/api';
 import { Subscription } from 'rxjs/internal/Subscription';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
-import { getToken } from 'src/app/core/functions/get-token';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 import { SubscriptionDto } from 'src/app/core/models/subscribtion-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
@@ -18,12 +17,13 @@ export class HomeComponent {
   videos!: VideoMetadataDto[];
   userSubscriptions!: SubscriptionDto[];
   subscriptions: Subscription[] = [];
+  userId: string;
 
   constructor(
     private playlistService: PlaylistService,
     private subscriptionService: SubscriptionService,
-    private messageService: MessageService,
     private router: Router) {
+      this.userId = getUserId();
       this.getRecommended();
       this.getSubscriptions();
   }
@@ -44,7 +44,7 @@ export class HomeComponent {
 
   getSubscriptions() {
     this.subscriptions.push(this.subscriptionService
-      .getSubscriptions()
+      .getSubscriptions(this.userId)
       .subscribe(userSubs => {
         this.userSubscriptions = userSubs.subscriptions;
     }));

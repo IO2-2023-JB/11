@@ -16,11 +16,11 @@ export class BackendSelectionComponent {
   selectedGroup = this.groups[this.getSelectedGroup()];
 
   onButtonClick(group: any) {
-    localStorage.setItem('api', group.number);
+    sessionStorage.setItem('api', group.number);
   }
 
   private getSelectedGroup(): number {
-    let api = localStorage.getItem('api');
+    let api = sessionStorage.getItem('api');
     if (api === '10') {
       return 0;
     }

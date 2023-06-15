@@ -18,7 +18,7 @@ namespace YouTubeV2.Api.Controllers
         }
 
         [HttpPost("send")]
-        [Roles(Role.Simple, Role.Administrator)]
+        [Roles(Role.Simple, Role.Creator, Role.Administrator)]
         public async Task<ActionResult> SendDontaionAsync([FromQuery][Required] Guid id, [FromQuery][Required] decimal amount)
         {
             string? senderId = GetUserId();

@@ -75,6 +75,18 @@ namespace YouTubeV2.Application.Services
             return tickets;
         }
 
+        public async Task<IEnumerable<GetTicketDto>> GetUserTicketListAsync(string id, CancellationToken cancellationToken = default)
+        {
+            var tickets = await _context.Tickets
+                .Include(x => x.Submitter)
+                .Where(x => x.Submitter.Id == id)
+                .OrderBy(x => x.CreateDate)
+                .Select(x => new GetTicketDto(x, new Guid(x.Submitter.Id)))
+                .ToListAsync(cancellationToken);
+
+            return tickets;
+        }
+
         private async Task<TicketTargetType> GetTargetType(Guid id, CancellationToken cancellationToken)
         {
             var playlist = await _context.Playlists.SingleOrDefaultAsync(x => x.Id == id, cancellationToken);

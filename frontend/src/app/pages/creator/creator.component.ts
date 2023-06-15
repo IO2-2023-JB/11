@@ -10,6 +10,7 @@ import { SubscriptionService } from 'src/app/core/services/subscription.service'
 import { userSubscriptionListDto } from 'src/app/core/models/user-subscription-list-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { UserPlaylistsDto } from 'src/app/core/models/user-playlists-dto';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 
 @Component({
   selector: 'app-creator',
@@ -23,6 +24,8 @@ export class CreatorComponent implements OnInit, OnDestroy {
   isCreatorSubscribed!: boolean;
   subscriptions: Subscription[] = [];
   playlists!: UserPlaylistsDto[];
+  userId: string;
+  isOwnProfile!: boolean;
 
   constructor(
     private route: ActivatedRoute,
@@ -33,12 +36,13 @@ export class CreatorComponent implements OnInit, OnDestroy {
     private playlistService: PlaylistService,
     ) {
     this.id = this.route.snapshot.paramMap.get('id')!;
+    this.userId = getUserId();
   }
 
   ngOnInit(): void {
     const getUser$ = this.userService.getUser(this.id);
     const getVideos$ = this.videoService.getUserVideos(this.id);
-    const getSubList$ = this.subscriptionService.getSubscriptions();
+    const getSubList$ = this.subscriptionService.getSubscriptions(this.userId);
     const getPlaylists$ = this.playlistService.getUserPlaylists(this.id);
 
     this.subscriptions.push(
@@ -48,11 +52,12 @@ export class CreatorComponent implements OnInit, OnDestroy {
       this.videos = videosList.videos;
       this.isCreatorSubscribed = this.isThisCreatorSubscribed(subscriptionList);
       this.playlists = playlists;
+      this.isOwnProfile = (user.id == this.userId);
     }));
   }
 
   private checkIfCreatorIsSubscribed(): void {
-    this.subscriptions.push(this.subscriptionService.getSubscriptions().subscribe(subscriptions =>
+    this.subscriptions.push(this.subscriptionService.getSubscriptions(this.userId).subscribe(subscriptions =>
         this.isCreatorSubscribed = this.isThisCreatorSubscribed(subscriptions)
       ));
   }

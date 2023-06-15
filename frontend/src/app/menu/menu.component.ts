@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserService } from '../core/services/user.service';
 import { getRole } from '../core/functions/get-role';
+import { getUserId } from '../core/functions/get-user-id';
 
 @Component({
   selector: 'app-menu',
@@ -54,7 +55,8 @@ export class MenuComponent implements OnInit, OnDestroy {
   }
 
   ticketsButtonOnClick(): void {
-    this.router.navigate(['tickets']);
+    if (this.role == 'Administrator') this.router.navigate(['tickets']);
+    else this.router.navigate(['user-tickets']);
   }
 
   registerButtonOnClick(): void {
@@ -63,6 +65,10 @@ export class MenuComponent implements OnInit, OnDestroy {
 
   loginButtonOnClick(): void {
     this.router.navigate(['login']);
+  }
+
+  profileButtonOnClick(): void {
+    this.router.navigate(['creator/' + getUserId()])
   }
 
   accountButtonOnClick(): void {

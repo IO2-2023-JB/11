@@ -1,7 +1,7 @@
 <p-card
   styleClass="p-card-style shadow-7">
   <div class="flex flex-wrap justify-content-start mx-2 mt-2">
-    <img [src] = "user.avatarImage" class="avatar-image mr-3">
+    <img [src] = "user.avatarImage || 'assets/images/default-user-avatar.jpg'" class="avatar-image mr-3">
     <div class="flex flex-column">
       <h1>{{ user.nickname }}</h1>
       <label class="mb-1">{{ user.name }} {{ user.surname }}</label>
@@ -11,7 +11,7 @@
         <p-button class="ml-2" icon="pi pi-times" label="Unsubscribe" styleClass="p-button-danger" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-container>
       <ng-template #isNotSubscribed>
-        <p-button class="ml-2" icon="pi pi-check" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
+        <p-button class="ml-2" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-template>
       <app-report-button [targetId]="user.id"></app-report-button>
     </div>
@@ -24,12 +24,17 @@
           <div class="grid">
             <div class="m-2 video" *ngFor="let video of videos" (click)="goToVideo(video.id)">
               <div class="thumbnail-container">
-                <img [src] = "video.thumbnail" class="thumbnail">
+                <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
                 <span class="video-length">{{ video.duration }}</span>
               </div>
               <strong class="video-title">{{ video.title }}</strong>
               <div>
                 {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
+              </div>
+              <div *ngIf="isOwnProfile">
+                Processing progess: {{ video.processingProgress }}
+                <br>
+                Visibility: {{ video.visibility }}
               </div>
             </div>
           </div>
@@ -48,7 +53,7 @@
             <div class="m-2" *ngFor="let playlist of playlists">
               <p-card class="playlist" styleClass="shadow-4 hover:shadow-7" (click)="goToPlaylist(playlist.id)">
                 <strong>{{ playlist.name }}</strong>
-                <p>Videos: {{ playlist.count }}</p>
+                <p>Visibility: {{ playlist.visibility }}</p>
               </p-card>
             </div>
           </div>

@@ -32,12 +32,16 @@ namespace YouTubeV2.Application.Services
             _blobImageService = blobImageService;
         }
 
-        public async Task<SearchResultsDto> SearchAsync(string query, SortingDirections sortingDirection,
+        public async Task<SearchResultsDto> SearchAsync(string userId, string query, SortingDirections sortingDirection,
             SortingTypes sortingType, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd, CancellationToken cancellationToken)
         {
-            var videos = await SearchForVideosAsync(query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
+            User? user = await _userService.GetByIdAsync(userId);
+            if (user == null)
+                throw new BadRequestException();
+
+            var videos = await SearchForVideosAsync(user, query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
             var users = await SearchForUsersAsync(query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
-            var playlists = await SearchForPlaylistsAsync(query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
+            var playlists = await SearchForPlaylistsAsync(user, query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
 
             return new SearchResultsDto(videos, users, playlists);
         }
@@ -119,15 +123,19 @@ namespace YouTubeV2.Application.Services
                     _subscriptionService.GetSubscriptionCountAsync(x.Id, cancellationToken).GetAwaiter().GetResult());
         }
 
-        private async Task<IReadOnlyList<VideoMetadataDto>> SearchForVideosAsync(string query, SortingDirections sortingDirection,
+        private async Task<IReadOnlyList<VideoMetadataDto>> SearchForVideosAsync(User user, string query, SortingDirections sortingDirection,
            SortingTypes sortingType, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd, CancellationToken cancellationToken)
         {
             // for some reason Contains() with StringComparison doesn't work here
             var matchingVideos = _context.Videos
                 .Include(video => video.Author)
                 .Include(video => video.Tags)
-                .Where(video => video.Visibility == Visibility.Public
-                     && video.ProcessingProgress == ProcessingProgress.Ready
+                .Where(video => 
+                     (
+                     (video.Visibility == Visibility.Public
+                     && video.ProcessingProgress == ProcessingProgress.Ready)
+                     || (video.Author.Id == user.Id)
+                     )
                      && video.Title.ToLower().Contains(query.ToLower()));
 
             ClipVideosBasedOnDate(ref matchingVideos, dateBegin, dateEnd);
@@ -188,13 +196,13 @@ namespace YouTubeV2.Application.Services
                 videos = videos.OrderByDescending(x => x.ViewCount);
         }
 
-        private async Task<IReadOnlyList<PlaylistBaseDto>> SearchForPlaylistsAsync(string query, SortingDirections sortingDirection,
+        private async Task<IReadOnlyList<PlaylistBaseDto>> SearchForPlaylistsAsync(User user, string query, SortingDirections sortingDirection,
            SortingTypes sortingType, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd, CancellationToken cancellationToken)
         {
             // for some reason Contains() with StringComparison doesn't work here
             var matchingPlaylists = _context.Playlists
                 .Where(playlist => playlist.Name.ToLower().Contains(query.ToLower())
-                && playlist.Visibility == Visibility.Public);
+                && (playlist.Visibility == Visibility.Public || playlist.Creator.Id == user.Id));
 
             ClipPlaylistsBasedOnDate(ref matchingPlaylists, dateBegin, dateEnd);
             SortPlaylists(ref matchingPlaylists, sortingDirection, sortingType);

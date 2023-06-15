@@ -1,6 +1,6 @@
 <p-card styleClass="p-card-style shadow-7">
   <div class="flex justify-content-between flex-wrap">
-    <div>
+    <div *ngIf="isUserAuthenticated">
       <button
         id="home-button"
         pButton
@@ -15,7 +15,7 @@
         pButton
         pRipple
         type="playlists"
-        label="Playlists"
+        label="Manage-Playlists"
         class="p-button-secondary p-button-text"
         (click)="playlistsButtonOnClick()">
       </button>
@@ -39,7 +39,6 @@
         (click)="addVideoButtonOnClick()">
       </button>
       <button
-        *ngIf="role == 'Administrator'"
         id="tickets-button"
         pButton
         pRipple
@@ -87,15 +86,25 @@
         (click)="registerButtonOnClick()">
       </button>
       <button
-      *ngIf="isUserAuthenticated"
-      id="account-button"
-      pButton
-      pRipple
-      type="account"
-      label="Account"
-      class="p-button-secondary p-button-text"
-      (click)="accountButtonOnClick()">
-    </button>
+        *ngIf="role == 'Creator'"
+        id="profile-button"
+        pButton
+        pRipple
+        type="profile"
+        label="Profile"
+        class="p-button-secondary p-button-text"
+        (click)="profileButtonOnClick()">
+      </button>
+      <button
+        *ngIf="isUserAuthenticated"
+        id="account-button"
+        pButton
+        pRipple
+        type="account"
+        label="Account"
+        class="p-button-secondary p-button-text"
+        (click)="accountButtonOnClick()">
+      </button>
       <button
         *ngIf="isUserAuthenticated"
         id="logout-button"

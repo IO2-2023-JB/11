@@ -20,7 +20,7 @@
       </small>
     </div>
   </div>
-  
+
   <div class="searchItem">
     <p-dropdown [options]="sortingTypes" [(ngModel)]="sortingType" optionLabel="label" placeholder="Sorting type"></p-dropdown>
   </div>
@@ -42,7 +42,7 @@
   <div *ngFor="let user of searchResults.users">
     <div class="userContainer" (click)="goToUserProfile(user.id)">
       <div class="image-container">
-        <img [src] = "user.avatarImage" class="avatarImage">
+        <img [src] = "user.avatarImage || 'assets/images/default-user-avatar.jpg'" class="avatarImage">
       </div>
       <div>
         <h3 class="noPadding">{{ user.nickname }}</h3>
@@ -52,22 +52,30 @@
     </div>
   </div>
   <h2 *ngIf="searchResults.videos.length != 0">Videos:</h2>
-  <div *ngFor="let video of searchResults.videos">
-    <div class="m-2 video" *ngFor="let video of searchResults.videos" (click)="goToVideo(video.id)">
-      <div class="thumbnail-container">
-        <img [src] = "video.thumbnail" class="thumbnail">
-        <span class="video-length">{{ video.duration }}</span>
-      </div>
-      <strong class="video-title">{{ video.title }}</strong>
-      <div>
-        {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
-      </div>
+  <div class="m-2 video" *ngFor="let video of searchResults.videos" (click)="goToVideo(video.id)">
+    <div class="thumbnail-container">
+      <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
+      <span class="video-length">{{ video.duration }}</span>
+    </div>
+    <strong class="video-title">{{ video.title }}</strong>
+    <div>
+      {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
+    </div>
+    <div *ngIf="video.authorId == userId">
+      <strong>Own video</strong>
+      <br>
+      Processing progess: {{ video.processingProgress }}
+      <br>
+      Visibility: {{ video.visibility }}
     </div>
   </div>
   <h2 *ngIf="searchResults.playlists.length != 0">Playlists:</h2>
     <div style="width: 15%;" class="m-2" *ngFor="let playlist of searchResults.playlists">
       <p-card class="playlist" styleClass="shadow-4 hover:shadow-7" (click)="goToPlaylist(playlist.id)">
         <strong class="playlist-title">{{ playlist.name }}</strong>
+        <div *ngIf="playlist.visibility == 'Private'">
+          Own private playlist
+        </div>
       </p-card>
     </div>
 </ul>

@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Observable, Subscription, finalize, of, switchMap, tap } from 'rxjs';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
+import { getUserId } from 'src/app/core/functions/get-user-id';
 import { PlaylistVideosDto } from 'src/app/core/models/playlist-videos-dto';
 import { VideoMetadataDto } from 'src/app/core/models/video-metadata-dto';
 import { PlaylistService } from 'src/app/core/services/playlist.service';
@@ -20,6 +21,7 @@ export class PlaylistComponent {
   inputSwitch = false;
   isProgressSpinnerVisible = false;
   subscriptions: Subscription[] = [];
+  userId!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -29,6 +31,7 @@ export class PlaylistComponent {
     this.id = this.route.snapshot.paramMap.get('id')!;
 
     this.getPlaylist();
+    this.userId = getUserId();
   }
 
   public getPlaylist() {
