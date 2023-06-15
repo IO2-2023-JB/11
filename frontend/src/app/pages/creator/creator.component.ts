@@ -11,6 +11,8 @@ import { userSubscriptionListDto } from 'src/app/core/models/user-subscription-l
 import { PlaylistService } from 'src/app/core/services/playlist.service';
 import { UserPlaylistsDto } from 'src/app/core/models/user-playlists-dto';
 import { getUserId } from 'src/app/core/functions/get-user-id';
+import { getRole } from 'src/app/core/functions/get-role';
+import { MessageService } from 'primeng/api';
 
 @Component({
   selector: 'app-creator',
@@ -26,6 +28,7 @@ export class CreatorComponent implements OnInit, OnDestroy {
   playlists!: UserPlaylistsDto[];
   userId: string;
   isOwnProfile!: boolean;
+  role!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -34,9 +37,11 @@ export class CreatorComponent implements OnInit, OnDestroy {
     private videoService: VideoService,
     private subscriptionService: SubscriptionService,
     private playlistService: PlaylistService,
+    private messageService: MessageService,
     ) {
     this.id = this.route.snapshot.paramMap.get('id')!;
     this.userId = getUserId();
+    this.role = getRole();
   }
 
   ngOnInit(): void {
@@ -97,6 +102,23 @@ export class CreatorComponent implements OnInit, OnDestroy {
     }
 
     this.updateSubCount();
+  }
+
+  public handleDeleteOnClick(): void {
+    const delete$ = this.userService.deleteUser(this.id).pipe(
+      tap(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'The user has been deleted'
+        })
+      })
+    );
+    this.subscriptions.push(delete$.subscribe({
+       complete: () => {
+         this.router.navigate(['']);
+       }
+    }));
   }
 
   public goToVideo(id: string): void {

@@ -25,6 +25,7 @@ namespace YouTubeV2.Application.Services
         private readonly ISubscriptionService _subscriptionService;
         private readonly IVideoService _videoService;
         private readonly IDateTimeProvider _dateTimeProvider;
+        private readonly IPlaylistService _playlistService;
 
         public UserService(
             UserManager<User> userManager,
@@ -35,7 +36,8 @@ namespace YouTubeV2.Application.Services
             ISubscriptionService subscriptionService,
             UpdateUserDTOValidator updateUserDTOValidator,
             IVideoService videoService,
-            IDateTimeProvider dateTimeProvider)
+            IDateTimeProvider dateTimeProvider,
+            IPlaylistService playlistService)
         {
             _userManager = userManager;
             _blobImageService = blobImageService;
@@ -46,6 +48,7 @@ namespace YouTubeV2.Application.Services
             _updateUserDTOValidator = updateUserDTOValidator;
             _videoService = videoService;
             _dateTimeProvider = dateTimeProvider;
+            _playlistService = playlistService;
         }
 
         public async Task<LoginResponseDto> LoginAsync(LoginDto loginDto, CancellationToken cancellationToken)
@@ -166,6 +169,8 @@ namespace YouTubeV2.Application.Services
             }
 
             await _subscriptionService.DeleteAllSubscriptionsRelatedToUserAsync(user, cancellationToken);
+            // get the job done
+            await _playlistService.DeleteAllUserPlaylists(user, cancellationToken);
 
             await _blobImageService.DeleteProfilePictureAsync(user.Id, cancellationToken);
 

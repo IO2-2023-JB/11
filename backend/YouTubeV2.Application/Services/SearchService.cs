@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.TagHelpers;
 using Microsoft.EntityFrameworkCore;
 using YouTubeV2.Api.Enums;
 using YouTubeV2.Application.DTO.PlaylistDTOS;
@@ -40,16 +41,26 @@ namespace YouTubeV2.Application.Services
                 throw new BadRequestException();
 
             var videos = await SearchForVideosAsync(user, query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
-            var users = await SearchForUsersAsync(query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
+            var users = await SearchForUsersAsync(user, query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
             var playlists = await SearchForPlaylistsAsync(user, query, sortingDirection, sortingType, dateBegin, dateEnd, cancellationToken);
 
             return new SearchResultsDto(videos, users, playlists);
         }
 
-        private async Task<IReadOnlyList<UserDto>> SearchForUsersAsync(string query, SortingDirections sortingDirection,
+        private async Task<IReadOnlyList<UserDto>> SearchForUsersAsync(User callingUser, string query, SortingDirections sortingDirection,
             SortingTypes sortingType, DateTimeOffset? dateBegin, DateTimeOffset? dateEnd, CancellationToken cancellationToken)
         {
             var searchableUsers = await _userManager.GetUsersInRoleAsync(Role.Creator);
+            if (await _userManager.IsInRoleAsync(callingUser, Role.Administrator))
+            {
+                var simpleUsers = await _userManager.GetUsersInRoleAsync(Role.Simple);
+                // ugly but doesnt require to change much
+                foreach (var user in simpleUsers)
+                {
+                    searchableUsers.Add(user);
+                } 
+            }
+
             var matchingUsers = searchableUsers.Where(user => user.UserName!
                 .Contains(query, StringComparison.InvariantCultureIgnoreCase)).AsQueryable();
 
