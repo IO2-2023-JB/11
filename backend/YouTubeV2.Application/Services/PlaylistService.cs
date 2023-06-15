@@ -58,8 +58,12 @@ namespace YouTubeV2.Application.Services
                .Include(p => p.Videos)
                .SingleOrDefaultAsync(p => p.Id == playlistId, cancellationToken)
                ?? throw new BadRequestException();
+            
+            User? user = await _userManager.FindByIdAsync(requesterUserId)
+               ?? throw new ForbiddenException();
 
-            if (string.Equals(playlist.Creator.Id, requesterUserId, StringComparison.OrdinalIgnoreCase) is false)
+            if (!(string.Equals(playlist.Creator.Id, requesterUserId, StringComparison.OrdinalIgnoreCase)
+                || await _userManager.IsInRoleAsync(user, Role.Administrator)))
             {
                 throw new ForbiddenException();
             }

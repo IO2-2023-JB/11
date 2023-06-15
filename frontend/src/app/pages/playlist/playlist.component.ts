@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MenuItem, MessageService } from 'primeng/api';
 import { Observable, Subscription, finalize, of, switchMap, tap } from 'rxjs';
+import { getRole } from 'src/app/core/functions/get-role';
 import { getTimeAgo } from 'src/app/core/functions/get-time-ago';
 import { getUserId } from 'src/app/core/functions/get-user-id';
 import { PlaylistVideosDto } from 'src/app/core/models/playlist-videos-dto';
@@ -22,6 +23,7 @@ export class PlaylistComponent {
   isProgressSpinnerVisible = false;
   subscriptions: Subscription[] = [];
   userId!: string;
+  role!: string;
 
   constructor(
     private route: ActivatedRoute,
@@ -32,6 +34,7 @@ export class PlaylistComponent {
 
     this.getPlaylist();
     this.userId = getUserId();
+    this.role = getRole();
   }
 
   public getPlaylist() {
@@ -111,5 +114,22 @@ export class PlaylistComponent {
     );
 
     this.subscriptions.push(this.doWithLoading(removeVideo$).subscribe());
+  }
+
+  handleDeletePlaylistOnClick(): void {
+    const delete$ = this.playlistService.deletePlaylist(this.id).pipe(
+      tap(() => {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Success',
+          detail: 'The playlist has been deleted'
+        })
+      })
+    );
+    this.subscriptions.push(delete$.subscribe({
+        complete: () => {
+          this.router.navigate(['']);
+        }
+    }));
   }
 }
