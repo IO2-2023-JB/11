@@ -22,6 +22,12 @@ namespace YouTubeV2.Application.EntityConfiguration
                         .HasOne<Playlist>()
                         .WithMany()
                         .HasForeignKey("PlaylistId"));
+
+            builder
+                .Metadata
+                .FindNavigation(nameof(Playlist.Creator))!
+                .ForeignKey
+                .DeleteBehavior = DeleteBehavior.Cascade;
         }
     }
 }
