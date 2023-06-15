@@ -18,7 +18,7 @@ export class UpdateVideoMetadataService {
   }
 
   updateVideoMetadata(videoMetadataDTO: VideoMetadataUpdateDTO, videoId: string): Observable<void> {
-    const putVideoMetadataWebAPIUrl: string = `${getApiUrl()}/video-metadata}`;
+    const putVideoMetadataWebAPIUrl: string = `${getApiUrl()}/video-metadata`;
     const httpOptions = {
       params: new HttpParams().set('id', videoId),
       headers: getHttpOptionsWithAuthenticationHeader().headers,
