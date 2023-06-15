@@ -52,7 +52,7 @@ export class UserService {
     return this.httpClient.get<UserDTO>(`${getApiUrl()}/user`, httpOptions);
   }
 
-  editUser(id: string, updateUserDTO: UpdateUserDTO): Observable<void>{
+  editUser(id: string, updateUserDTO: UpdateUserDTO): Observable<void> {
     let params = new HttpParams().set('id', id);
 
     const httpOptions = {
@@ -61,6 +61,17 @@ export class UserService {
     };
 
     return this.httpClient.put<void>(`${getApiUrl()}/user`, updateUserDTO, httpOptions);
+  }
+
+  deleteUser(id: string): Observable<void> {
+    let params = new HttpParams().set('id', id);
+
+    const httpOptions = {
+      params: params,
+      headers: getHttpOptionsWithAuthenticationHeader().headers
+    };
+
+    return this.httpClient.delete<void>(`${getApiUrl()}/user`, httpOptions);
   }
 
   loginUser(userForLogin: UserForLoginDTO): Observable<AuthenticationResponseDTO> {

@@ -10,7 +10,7 @@ namespace YouTubeV2.Application.EntityConfiguration
         {
             builder
                 .Metadata
-                .FindNavigation(nameof(Comment.Author))!
+                .FindNavigation(nameof(Video.Author))!
                 .ForeignKey
                 .DeleteBehavior = DeleteBehavior.Cascade;
         }

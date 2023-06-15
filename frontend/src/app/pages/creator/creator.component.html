@@ -6,13 +6,22 @@
       <h1>{{ user.nickname }}</h1>
       <label class="mb-1">{{ user.name }} {{ user.surname }}</label>
       <label class="mb-1">{{ user.email }}</label>
-      <label>{{ user.subscriptionsCount }} subscribers, {{ videos.length }} videos</label>
+      <label *ngIf="user.userType == 'Creator'">{{ user.subscriptionsCount }} subscribers, {{ videos.length }} videos</label>
+      <label *ngIf="user.userType == 'Simple'">Simple user</label>
       <ng-container *ngIf="isCreatorSubscribed; else isNotSubscribed">
         <p-button class="ml-2" icon="pi pi-times" label="Unsubscribe" styleClass="p-button-danger" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-container>
       <ng-template #isNotSubscribed>
         <p-button class="ml-2" label="Subscribe" (click)="handleSubscribtionOnClick()"></p-button>
       </ng-template>
+      <p-button
+        *ngIf="role == 'Administrator'" 
+        class="ml-2" 
+        icon="pi pi-times"
+        label="Delete user"
+        styleClass="p-button-danger"
+        (click)="handleDeleteOnClick()">
+      </p-button>
       <app-report-button [targetId]="user.id"></app-report-button>
     </div>
   </div>

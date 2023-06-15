@@ -24,7 +24,7 @@ namespace YouTubeV2.Application.Services
                 throw new BadRequestException("Ammount has to be positive");
 
             User? recipient = await _userService.GetByIdAsync(recipientId)
-                ?? throw new BadRequestException("Recipient does not exist");
+                ?? throw new NotFoundException("Recipient does not exist");
 
             User? sender = await _userService.GetByIdAsync(senderId)
                 ?? throw new BadRequestException();
@@ -40,6 +40,12 @@ namespace YouTubeV2.Application.Services
 
         public async Task WithdrawMoneyAsync(string withdrawerId, decimal ammount)
         {
+            User? user = await _userManager.FindByIdAsync(withdrawerId) 
+                ?? throw new BadRequestException();
+
+            if (!await _userManager.IsInRoleAsync(user, Role.Creator))
+                throw new ForbiddenException("Only Creator can withdraw");
+            
             if (ammount <= 0)
                 throw new BadRequestException("Ammount has to be positive");
 

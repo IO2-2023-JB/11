@@ -74,6 +74,23 @@ namespace YouTubeV2.Application.Services
             await _context.SaveChangesAsync(cancellationToken);
         }
 
+        public async Task DeleteAllUserPlaylists(User user, CancellationToken cancellationToken)
+        {
+            var playlists = await _context.Playlists
+                .Include(p => p.Creator)
+                .Include(p => p.Videos)
+                .Where(p => p.Creator == user)
+                .ToListAsync(cancellationToken);
+
+            foreach (var playlist in playlists) 
+            {
+                playlist.Videos.Clear();
+            }
+            await _context.SaveChangesAsync(cancellationToken);
+            _context.Playlists.RemoveRange(playlists);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<PlaylistDto> GetPlaylistVideos(string requesterUserId, Guid playlistId, CancellationToken cancellationToken)
         {
             var playlist = await _context.Playlists
