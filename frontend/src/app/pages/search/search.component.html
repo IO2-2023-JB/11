@@ -52,23 +52,21 @@
     </div>
   </div>
   <h2 *ngIf="searchResults.videos.length != 0">Videos:</h2>
-  <div *ngFor="let video of searchResults.videos">
-    <div class="m-2 video" *ngFor="let video of searchResults.videos" (click)="goToVideo(video.id)">
-      <div class="thumbnail-container">
-        <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
-        <span class="video-length">{{ video.duration }}</span>
-      </div>
-      <strong class="video-title">{{ video.title }}</strong>
-      <div>
-        {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
-      </div>
-      <div *ngIf="video.authorId == userId">
-        <strong>Own video</strong>
-        <br>
-        Processing progess: {{ video.processingProgress }}
-        <br>
-        Visibility: {{ video.visibility }}
-      </div>
+  <div class="m-2 video" *ngFor="let video of searchResults.videos" (click)="goToVideo(video.id)">
+    <div class="thumbnail-container">
+      <img [src] = "video.thumbnail || 'assets/images/default-video-thumbnail.jpg'" class="thumbnail">
+      <span class="video-length">{{ video.duration }}</span>
+    </div>
+    <strong class="video-title">{{ video.title }}</strong>
+    <div>
+      {{ video.viewCount }} views, {{ getTimeAgo(video) }} ago
+    </div>
+    <div *ngIf="video.authorId == userId">
+      <strong>Own video</strong>
+      <br>
+      Processing progess: {{ video.processingProgress }}
+      <br>
+      Visibility: {{ video.visibility }}
     </div>
   </div>
   <h2 *ngIf="searchResults.playlists.length != 0">Playlists:</h2>
